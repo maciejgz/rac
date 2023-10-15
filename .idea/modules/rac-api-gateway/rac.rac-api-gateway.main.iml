@@ -5,4 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/../../../rac-api-gateway/build/generated/sources/annotationProcessor/java/main" isTestSource="false" generated="true" />
     </content>
   </component>
+  <component name="SonarLintModuleSettings">
+    <option name="uniqueId" value="249adda1-1012-4e6a-a5c1-0eeecd552172" />
+  </component>
 </module>
