@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  rac-mongodb:
+    image: mongo:7
+    restart: no
+    container_name: rac-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - /var/lib/docker/volumes/rac/mongodb_data:/data/db
+    networks:
+        - rac-network
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  rac-network:

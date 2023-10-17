@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  rac-zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: rac-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - rac-network
+
+  rac-kafka:
+    image: wurstmeister/kafka
+    container_name: rac-kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - rac-zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_ZOOKEEPER_CONNECT: rac-zookeeper:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    networks:
+      - rac-network
+
+
+networks:
+  rac-network:
