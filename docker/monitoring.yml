@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  rac-prometheus:
+    container_name: rac-prometheus
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - rac-network
+
+  rac-grafana:
+    container_name: rac-grafana
+    image: grafana/grafana
+    volumes:
+      ## initial grafana config with port rewritten to 9091
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      ## blog-prometheus datasource config
+      - ./grafana/prometheus_datasource.yml:/etc/grafana/provisioning/datasources/prometheus_datasource.yml
+    ports:
+      - "9091:9091"
+    depends_on:
+      - rac-prometheus
+    networks:
+      - rac-network
+
+
+networks:
+  rac-network:

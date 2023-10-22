@@ -26,6 +26,21 @@ services:
     networks:
       - rac-network
 
+  rac-zipkin:
+    container_name: rac-zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    environment:
+      COLLECTOR_KAFKA_ENABLED: true
+      KAFKA_BOOTSTRAP_SERVERS: rac-kafka:9092
+      KAFKA_TOPIC: zipkin
+    networks:
+      - rac-network
+    depends_on:
+      - rac-zookeeper
+      - rac-kafka
+
 
 networks:
   rac-network:

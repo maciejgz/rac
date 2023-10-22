@@ -11,6 +11,12 @@ spring:
       port: 27017
   config:
     import: optional:configserver:http://localhost:8888
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 ## Discovery Service
 eureka:
@@ -23,7 +29,18 @@ eureka:
 
 ## Actuator
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
   endpoints:
     web:
       exposure:
         include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+## Tracing

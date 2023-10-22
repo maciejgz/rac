@@ -1,0 +1,19 @@
+apiVersion: 1
+deleteDatasources:
+  - name: rac-prometheus
+    orgId: 1
+
+datasources:
+  - name: rac-prometheus
+    type: prometheus
+    orgId: 1
+    access: proxy
+    uid: rac_prometheus_id
+    url: http://rac-prometheus:9090
+    isDefault: true
+    jsonData:
+      graphiteVersion: "1.1"
+      tlsAuth: false
+      tlsAuthWithCACert: false
+    version: 1
+    editable: true
