@@ -88,10 +88,11 @@ Build with Gradle wrapper from the root repository directory:
 ```
 
 #### Code analysis
-To run Sonar code analysis, run the following command in the root repository directory with [sonar container](docker/sonar.yml) running locally
+To run Sonar code analysis, run the following command in the root repository directory with [sonar container](docker/sonar.yml) running locally.
+Then login with admin/admin credentials, change the password to admin1 and run the analysis with the following command:
 
 ```shell
-.\gradlew.bat sonar
+.\gradlew.bat clean compileJava sonar
 ```
 
 #### Build Docker images

@@ -6,12 +6,17 @@ services:
     container_name: rac-elasticsearch
     environment:
       - discovery.type=single-node
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.enabled=false
     networks:
       - rac-network
     ports:
       - "9200:9200"
     volumes:
-      - /var/lib/docker/volumes/rac/elasticsearch-data:/usr/share/elasticsearch/data
+      - type: volume
+        source: elasticsearch-data
+        target: /usr/share/elasticsearch/data
+
 
   rac-kibana:
     image: docker.elastic.co/kibana/kibana:8.10.4
@@ -25,7 +30,6 @@ services:
 
 volumes:
   elasticsearch-data:
-    driver: local
 
 networks:
   rac-network:

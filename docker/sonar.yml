@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  blog-sonar:
+  rac-sonar:
     image: sonarqube:10.2.1-community
     container_name: rac-sonar
     # default credentials for sonar: admin/admin
@@ -8,3 +8,9 @@ services:
       - sonar.forceAuthentication=true
     ports:
       - "9000:9000"
+    networks:
+      - rac-network
+
+
+networks:
+  rac-network:
