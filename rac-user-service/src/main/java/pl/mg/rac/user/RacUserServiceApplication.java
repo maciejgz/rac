@@ -1,11 +1,13 @@
 package pl.mg.rac.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
+@Slf4j
 public class RacUserServiceApplication {
 
     @Value("${rac.user.variable}")
@@ -17,7 +19,7 @@ public class RacUserServiceApplication {
 
     @Bean
     public void testing() {
-        System.out.println("Value: " + value);
+        log.debug("Value: " + value);
     }
 
 }
