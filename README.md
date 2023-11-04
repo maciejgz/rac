@@ -29,6 +29,9 @@ https://github.com/maciejgz/rac
 
 #### Non-functional
 - Gradle as a build tool
+- DDD and hexagonal architecture - keep application and domain logic independent of the framework. All beans shall be created in the infrastructure layer config classes. 
+  The only exception are the transactional annotations in the application service layer.
+- Domain services should operate on pure data without commands. Commands reach the application service layer and from there we pass on pure data or domain DTOs.
 - Event sourcing - Kafka as a message broker
 - Internal communication between services by events with sagas
 - Requests to the services through the API Gateway
@@ -55,7 +58,7 @@ https://github.com/maciejgz/rac
     - Micrometer - observability facade
     - Prometheus - time series database
     - Grafana - http://localhost:9091/ - monitoring admin/admin
-- Sonar
+- Sonar - http://localhost:9000/ - code analysis
 
 | component                 | port  | comment                                                                  |        group        |
 |---------------------------|:-----:|:-------------------------------------------------------------------------|:-------------------:|
