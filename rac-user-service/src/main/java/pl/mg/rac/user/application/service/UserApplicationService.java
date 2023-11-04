@@ -1,12 +1,14 @@
 package pl.mg.rac.user.application.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.mg.rac.user.application.dto.command.ChargeUserCommand;
 import pl.mg.rac.user.application.dto.command.CreateUserCommand;
 import pl.mg.rac.user.application.dto.command.DeleteUserCommand;
-import pl.mg.rac.user.application.dto.exception.*;
+import pl.mg.rac.user.application.dto.exception.UserChargeException;
+import pl.mg.rac.user.application.dto.exception.UserDeletionException;
+import pl.mg.rac.user.application.dto.exception.UserNotFoundException;
+import pl.mg.rac.user.application.dto.exception.UserRegistrationException;
 import pl.mg.rac.user.application.dto.query.GetUserQuery;
 import pl.mg.rac.user.application.dto.response.ChargeUserResponse;
 import pl.mg.rac.user.application.dto.response.CreateUserResponse;
@@ -23,7 +25,6 @@ import pl.mg.rac.user.domain.service.UserDomainService;
 /**
  * Responsible for transaction handling and domain services coordination - it is a facade for domain services.
  */
-@Service
 @Slf4j
 public class UserApplicationService implements CreateUserPort, DeleteUserPort, ChargeUserPort, GetUserPort {
 
@@ -57,7 +58,6 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
         }
     }
 
-
     @Override
     @Transactional
     public void deleteUser(DeleteUserCommand command) throws UserDeletionException {
@@ -71,7 +71,7 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponse getUser(GetUserQuery query) throws UserSearchException, UserNotFoundException {
+    public UserResponse getUser(GetUserQuery query) throws UserNotFoundException {
         log.debug("getUser() called with: name = [" + query + "]");
         try {
             User user = userDomainService.getUser(query.name());

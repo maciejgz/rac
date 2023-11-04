@@ -34,8 +34,8 @@ public class UserQueryController {
 
     @ExceptionHandler
     public ResponseEntity<String> handleException(UserSearchException e) {
+        //TODO return JSON object instead of plain text
         return ResponseEntity.badRequest().body(e.getMessage());
     }
-
 
 }

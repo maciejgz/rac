@@ -1,16 +1,21 @@
 package pl.mg.rac.user.domain.model;
 
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 
+@Document
 @Getter
 public class User {
 
+    @Id
+    private String id;
     private String name;
     private BigDecimal balance;
 
-    protected User() {
+    private User() {
     }
 
     public User(String name, BigDecimal balance) {

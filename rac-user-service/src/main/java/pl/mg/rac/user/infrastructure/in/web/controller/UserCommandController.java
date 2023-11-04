@@ -48,16 +48,19 @@ public class UserCommandController {
 
     @ExceptionHandler
     public ResponseEntity<String> handleRegistrationException(UserRegistrationException e) {
+        //TODO return JSON object instead of plain text
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleDeletionException(UserDeletionException e) {
+        //TODO return JSON object instead of plain text
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleChargeException(UserChargeException e) {
+        //TODO return JSON object instead of plain text
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
