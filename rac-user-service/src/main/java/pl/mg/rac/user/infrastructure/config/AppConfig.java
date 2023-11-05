@@ -1,12 +1,13 @@
 package pl.mg.rac.user.infrastructure.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pl.mg.rac.user.application.facade.UserFacade;
 import pl.mg.rac.user.application.port.out.UserDatabase;
+import pl.mg.rac.user.application.port.out.UserEventPublisher;
 import pl.mg.rac.user.application.service.UserApplicationService;
 import pl.mg.rac.user.domain.service.UserDomainService;
+import pl.mg.rac.user.infrastructure.out.messaging.UserKafkaEventPublisher;
 import pl.mg.rac.user.infrastructure.out.persistence.UserJpaRepository;
 import pl.mg.rac.user.infrastructure.out.persistence.UserRepository;
 
@@ -31,18 +32,25 @@ public class AppConfig {
     //application services
     @Bean
     UserApplicationService userApplicationService() {
-        return new UserApplicationService(userDomainService());
+        return new UserApplicationService(userDomainService(), userEventPublisher());
     }
 
-    //adapter beans
+    //domain service
     @Bean
     UserDomainService userDomainService() {
         return new UserDomainService(userDatabase());
     }
 
+
+    //outgoing port adapters
     @Bean
     UserDatabase userDatabase() {
         return new UserRepository(userJpaRepository);
+    }
+
+    @Bean
+    public UserEventPublisher userEventPublisher() {
+        return new UserKafkaEventPublisher();
     }
 
 

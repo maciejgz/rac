@@ -2,6 +2,7 @@ package pl.mg.rac.user.application.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.user.application.dto.command.ChargeUserCommand;
 import pl.mg.rac.user.application.dto.command.CreateUserCommand;
 import pl.mg.rac.user.application.dto.command.DeleteUserCommand;
@@ -17,10 +18,13 @@ import pl.mg.rac.user.application.port.in.ChargeUserPort;
 import pl.mg.rac.user.application.port.in.CreateUserPort;
 import pl.mg.rac.user.application.port.in.DeleteUserPort;
 import pl.mg.rac.user.application.port.in.GetUserPort;
+import pl.mg.rac.user.application.port.out.UserEventPublisher;
 import pl.mg.rac.user.domain.exception.UserAlreadyRegisteredException;
 import pl.mg.rac.user.domain.exception.UserNotExistException;
 import pl.mg.rac.user.domain.model.User;
 import pl.mg.rac.user.domain.service.UserDomainService;
+
+import java.util.List;
 
 /**
  * Responsible for transaction handling and domain services coordination - it is a facade for domain services.
@@ -29,9 +33,11 @@ import pl.mg.rac.user.domain.service.UserDomainService;
 public class UserApplicationService implements CreateUserPort, DeleteUserPort, ChargeUserPort, GetUserPort {
 
     private final UserDomainService userDomainService;
+    private final UserEventPublisher userEventPublisher;
 
-    public UserApplicationService(UserDomainService userDomainService) {
+    public UserApplicationService(UserDomainService userDomainService, UserEventPublisher userEventPublisher) {
         this.userDomainService = userDomainService;
+        this.userEventPublisher = userEventPublisher;
     }
 
     @Transactional
@@ -40,6 +46,7 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
         log.debug("createUser() called with: command = [" + command + "]");
         try {
             User user = userDomainService.createUser(command.name());
+            user.getEvents().forEach(userEventPublisher::publishUserEvent);
             return new CreateUserResponse(user.getName(), user.getBalance());
         } catch (UserAlreadyRegisteredException e) {
             throw new UserRegistrationException(e.getMessage());
@@ -52,6 +59,7 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
         log.debug("chargeUser() called with: command = [" + command + "]");
         try {
             User user = userDomainService.chargeUser(command.name(), command.amount());
+            user.getEvents().forEach(userEventPublisher::publishUserEvent);
             return new ChargeUserResponse(user.getName(), user.getBalance());
         } catch (UserNotExistException e) {
             throw new UserChargeException(e.getMessage());
@@ -63,7 +71,8 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
     public void deleteUser(DeleteUserCommand command) throws UserDeletionException {
         log.debug("deleteUser() called with: command = [" + command + "]");
         try {
-            userDomainService.deleteUser(command.name());
+            List<RacEvent<?>> domainEvents = userDomainService.deleteUser(command.name());
+            domainEvents.forEach(userEventPublisher::publishUserEvent);
         } catch (UserNotExistException e) {
             throw new UserDeletionException(e.getMessage());
         }

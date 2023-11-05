@@ -80,6 +80,19 @@ https://github.com/maciejgz/rac
 | rac-grafana               | 9091  | Grafana - Web UI for the containers monitoring data stored in Prometheus |     MONITORING      |
 | rac-sonar                 | 9000  | Sonar - code analysis                                                    |    CODE ANALYSIS    |
 
+### Events
+
+#### User service
+| event ID         |  topic   | comment                                              |
+|------------------|:--------:|:-----------------------------------------------------|
+| RAC_USER_CREATED | RAC_USER | Sent when user is created                            |
+| RAC_USER_DELETED | RAC_USER | Sent when user is deleted                            |
+| RAC_USER_CHARGED | RAC_USER | Sent when user is charged for rent                   |
+
+### Sagas
+
+[comment]: <> (TODO add sagas)
+
 ## Build and run
 
 ### Build

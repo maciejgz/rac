@@ -34,7 +34,7 @@ public class UserCommandController {
         return ResponseEntity.created(new URI("/user/" + user.name())).body(user);
     }
 
-    @PostMapping(value = "/{name}")
+    @DeleteMapping(value = "/{name}")
     public ResponseEntity<Void> deleteUser(@PathVariable String name) throws UserDeletionException {
         userFacade.deleteUser(new DeleteUserCommand(name));
         return ResponseEntity.noContent().build();
@@ -45,6 +45,7 @@ public class UserCommandController {
         ChargeUserResponse chargeUserResponse = userFacade.chargeUser(command);
         return ResponseEntity.ok(chargeUserResponse);
     }
+
 
     @ExceptionHandler
     public ResponseEntity<String> handleRegistrationException(UserRegistrationException e) {

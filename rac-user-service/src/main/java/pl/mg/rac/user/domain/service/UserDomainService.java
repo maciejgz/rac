@@ -2,6 +2,11 @@ package pl.mg.rac.user.domain.service;
 
 
 import lombok.extern.slf4j.Slf4j;
+import pl.mg.rac.commons.event.RacEvent;
+import pl.mg.rac.commons.event.user.UserCreatedEvent;
+import pl.mg.rac.commons.event.user.UserDeletedEvent;
+import pl.mg.rac.commons.event.user.payload.UserCreatedPayload;
+import pl.mg.rac.commons.event.user.payload.UserDeletedPayload;
 import pl.mg.rac.user.application.port.out.UserDatabase;
 import pl.mg.rac.user.domain.exception.UserAlreadyRegisteredException;
 import pl.mg.rac.user.domain.exception.UserNotExistException;
@@ -9,6 +14,7 @@ import pl.mg.rac.user.domain.factory.UserFactory;
 import pl.mg.rac.user.domain.model.User;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Slf4j
 public class UserDomainService {
@@ -24,12 +30,15 @@ public class UserDomainService {
         if (userDatabase.exists(name)) {
             throw new UserAlreadyRegisteredException("User with name " + name + " already exists");
         }
-        return userDatabase.save(UserFactory.createUser(name));
+        User user = UserFactory.createUser(name);
+        user.addEvent(new UserCreatedEvent(user.getName(), new UserCreatedPayload(user.getName())));
+        return userDatabase.save(user);
     }
 
-    public void deleteUser(String name) throws UserNotExistException {
+    public List<RacEvent<?>> deleteUser(String name) throws UserNotExistException {
         log.debug("deleteUser() called with: name = [" + name + "]");
         userDatabase.delete(userDatabase.findByName(name).orElseThrow(() -> new UserNotExistException("User with name " + name + " not exists")));
+        return List.of(new UserDeletedEvent(name, new UserDeletedPayload(name)));
     }
 
     public User chargeUser(String name, BigDecimal amount) throws UserNotExistException {
