@@ -29,6 +29,9 @@ https://github.com/maciejgz/rac
 
 #### Non-functional
 - Gradle as a build tool
+- DDD and hexagonal architecture - keep application and domain logic independent of the framework. All beans shall be created in the infrastructure layer config classes. 
+  The only exception are the transactional annotations in the application service layer.
+- Domain services should operate on pure data without commands. Commands reach the application service layer and from there we pass on pure data or domain DTOs.
 - Event sourcing - Kafka as a message broker
 - Internal communication between services by events with sagas
 - Requests to the services through the API Gateway
@@ -55,7 +58,7 @@ https://github.com/maciejgz/rac
     - Micrometer - observability facade
     - Prometheus - time series database
     - Grafana - http://localhost:9091/ - monitoring admin/admin
-- Sonar
+- Sonar - http://localhost:9000/ - code analysis
 
 | component                 | port  | comment                                                                  |        group        |
 |---------------------------|:-----:|:-------------------------------------------------------------------------|:-------------------:|
@@ -76,6 +79,19 @@ https://github.com/maciejgz/rac
 | rac-prometheus            | 9090  | Prometheus - time series database receives data from Micrometer agents   |     MONITORING      |
 | rac-grafana               | 9091  | Grafana - Web UI for the containers monitoring data stored in Prometheus |     MONITORING      |
 | rac-sonar                 | 9000  | Sonar - code analysis                                                    |    CODE ANALYSIS    |
+
+### Events
+
+#### User service
+| event ID         |  topic   | comment                                              |
+|------------------|:--------:|:-----------------------------------------------------|
+| RAC_USER_CREATED | RAC_USER | Sent when user is created                            |
+| RAC_USER_DELETED | RAC_USER | Sent when user is deleted                            |
+| RAC_USER_CHARGED | RAC_USER | Sent when user is charged for rent                   |
+
+### Sagas
+
+[comment]: <> (TODO add sagas)
 
 ## Build and run
 
