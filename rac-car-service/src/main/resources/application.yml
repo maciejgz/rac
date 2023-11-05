@@ -1,12 +1,13 @@
 server:
-  port: 8081
+  port: 8084
+
 
 spring:
   application:
-    name: rac-user-service
+    name: rac-car-service
   data:
     mongodb:
-      database: rac-user
+      database: rac-car
       host: localhost
       port: 27017
   config:
