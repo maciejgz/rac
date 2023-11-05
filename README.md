@@ -82,12 +82,21 @@ https://github.com/maciejgz/rac
 
 ### Events
 
-#### User service
+#### User service events
 | event ID         |  topic   | comment                                              |
 |------------------|:--------:|:-----------------------------------------------------|
 | RAC_USER_CREATED | RAC_USER | Sent when user is created                            |
 | RAC_USER_DELETED | RAC_USER | Sent when user is deleted                            |
 | RAC_USER_CHARGED | RAC_USER | Sent when user is charged for rent                   |
+
+
+### Car service events
+| event ID         |  topic  | comment                               |
+|------------------|:-------:|:--------------------------------------|
+| RAC_CAR_CREATED  | RAC_CAR | Sent when car is added to the fleet   |
+| RAC_CAR_DELETED  | RAC_CAR | Sent when user is deleted             |
+| RAC_CAR_RENTED   | RAC_CAR | Sent when car is rented               |
+| RAC_CAR_RETURNED | RAC_CAR | Sent when car is returned from rental |
 
 ### Sagas
 
