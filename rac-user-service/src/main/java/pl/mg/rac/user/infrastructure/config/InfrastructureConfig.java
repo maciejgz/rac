@@ -15,11 +15,11 @@ import pl.mg.rac.user.infrastructure.out.persistence.UserRepository;
  * Put all the framework specific configuration here - adapter beans, etc.
  */
 @Configuration
-public class AppConfig {
+public class InfrastructureConfig {
 
     private final UserJpaRepository userJpaRepository;
 
-    public AppConfig(UserJpaRepository userJpaRepository) {
+    public InfrastructureConfig(UserJpaRepository userJpaRepository) {
         this.userJpaRepository = userJpaRepository;
     }
 
