@@ -19,6 +19,7 @@ import java.util.List;
 @Slf4j
 public class UserDomainService {
 
+    //TODO move to application service
     private final UserDatabase userDatabase;
 
     public UserDomainService(UserDatabase userDatabase) {
@@ -27,6 +28,7 @@ public class UserDomainService {
 
     public User createUser(String name) throws UserAlreadyRegisteredException {
         log.debug("createUser() called with: name = [" + name + "]");
+        //TODO database object should be used by an application service, here should be just a domain logic
         if (userDatabase.exists(name)) {
             throw new UserAlreadyRegisteredException("User with name " + name + " already exists");
         }
@@ -36,12 +38,14 @@ public class UserDomainService {
     }
 
     public List<RacEvent<?>> deleteUser(String name) throws UserNotExistException {
+        //TODO move to application service, domain event always should be generated in domain object or in the incoming port adapter (application service)
         log.debug("deleteUser() called with: name = [" + name + "]");
         userDatabase.delete(userDatabase.findByName(name).orElseThrow(() -> new UserNotExistException("User with name " + name + " not exists")));
         return List.of(new UserDeletedEvent(name, new UserDeletedPayload(name)));
     }
 
     public User chargeUser(String name, BigDecimal amount) throws UserNotExistException {
+        //TODO move to application service
         log.debug("chargeUser() called with: name = [" + name + "], amount = [" + amount + "]");
         var user = userDatabase.findByName(name).orElseThrow(() -> new UserNotExistException("User with name " + name + " not exists"));
         user.charge(amount);
@@ -50,6 +54,7 @@ public class UserDomainService {
     }
 
     public User getUser(String name) throws UserNotExistException {
+        //TODO move to application service
         log.debug("getUser() called with: name = [" + name + "]");
         return userDatabase.findByName(name).orElseThrow(() -> new UserNotExistException("User with name " + name + " not exists"));
     }
