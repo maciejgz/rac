@@ -3,6 +3,10 @@ package pl.mg.rac.user.application.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import pl.mg.rac.commons.event.RacEvent;
+import pl.mg.rac.commons.event.user.UserCreatedEvent;
+import pl.mg.rac.commons.event.user.UserDeletedEvent;
+import pl.mg.rac.commons.event.user.payload.UserCreatedPayload;
+import pl.mg.rac.commons.event.user.payload.UserDeletedPayload;
 import pl.mg.rac.user.application.dto.command.ChargeUserCommand;
 import pl.mg.rac.user.application.dto.command.CreateUserCommand;
 import pl.mg.rac.user.application.dto.command.DeleteUserCommand;
@@ -18,9 +22,10 @@ import pl.mg.rac.user.application.port.in.ChargeUserPort;
 import pl.mg.rac.user.application.port.in.CreateUserPort;
 import pl.mg.rac.user.application.port.in.DeleteUserPort;
 import pl.mg.rac.user.application.port.in.GetUserPort;
+import pl.mg.rac.user.application.port.out.UserDatabase;
 import pl.mg.rac.user.application.port.out.UserEventPublisher;
-import pl.mg.rac.user.domain.exception.UserAlreadyRegisteredException;
 import pl.mg.rac.user.domain.exception.UserNotExistException;
+import pl.mg.rac.user.domain.factory.UserFactory;
 import pl.mg.rac.user.domain.model.User;
 import pl.mg.rac.user.domain.service.UserDomainService;
 
@@ -34,23 +39,26 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
 
     private final UserDomainService userDomainService;
     private final UserEventPublisher userEventPublisher;
+    private final UserDatabase userDatabase;
 
-    public UserApplicationService(UserDomainService userDomainService, UserEventPublisher userEventPublisher) {
+    public UserApplicationService(UserDomainService userDomainService, UserEventPublisher userEventPublisher, UserDatabase userDatabase) {
         this.userDomainService = userDomainService;
         this.userEventPublisher = userEventPublisher;
+        this.userDatabase = userDatabase;
     }
 
     @Transactional
     @Override
     public CreateUserResponse createUser(CreateUserCommand command) throws UserRegistrationException {
         log.debug("createUser() called with: command = [" + command + "]");
-        try {
-            User user = userDomainService.createUser(command.name());
-            user.getEvents().forEach(userEventPublisher::publishUserEvent);
-            return new CreateUserResponse(user.getName(), user.getBalance());
-        } catch (UserAlreadyRegisteredException e) {
-            throw new UserRegistrationException(e.getMessage());
+        if (userDatabase.exists(command.name())) {
+            throw new UserRegistrationException("User with name " + command.name() + " already exists");
         }
+        User user = UserFactory.createUser(command.name());
+        user.addEvent(new UserCreatedEvent(user.getName(), new UserCreatedPayload(user.getName())));
+        User userSaved = userDatabase.save(user);
+        user.getEvents().forEach(userEventPublisher::publishUserEvent);
+        return new CreateUserResponse(userSaved.getName(), userSaved.getBalance());
     }
 
     @Override
@@ -58,7 +66,10 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
     public ChargeUserResponse chargeUser(ChargeUserCommand command) throws UserChargeException {
         log.debug("chargeUser() called with: command = [" + command + "]");
         try {
-            User user = userDomainService.chargeUser(command.name(), command.amount());
+            var user = userDatabase.findByName(command.name()).orElseThrow(
+                    () -> new UserNotExistException("User with name " + command.name() + " not exists"));
+            user.charge(command.amount());
+            user = userDatabase.save(user);
             user.getEvents().forEach(userEventPublisher::publishUserEvent);
             return new ChargeUserResponse(user.getName(), user.getBalance());
         } catch (UserNotExistException e) {
@@ -71,7 +82,9 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
     public void deleteUser(DeleteUserCommand command) throws UserDeletionException {
         log.debug("deleteUser() called with: command = [" + command + "]");
         try {
-            List<RacEvent<?>> domainEvents = userDomainService.deleteUser(command.name());
+            userDatabase.delete(userDatabase.findByName(command.name()).orElseThrow(
+                    () -> new UserNotExistException("User with name " + command.name() + " not exists")));
+            List<RacEvent<?>> domainEvents = List.of(new UserDeletedEvent(command.name(), new UserDeletedPayload(command.name())));
             domainEvents.forEach(userEventPublisher::publishUserEvent);
         } catch (UserNotExistException e) {
             throw new UserDeletionException(e.getMessage());
@@ -82,11 +95,8 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
     @Transactional(readOnly = true)
     public UserResponse getUser(GetUserQuery query) throws UserNotFoundException {
         log.debug("getUser() called with: name = [" + query + "]");
-        try {
-            User user = userDomainService.getUser(query.name());
-            return new UserResponse(user.getName(), user.getBalance());
-        } catch (UserNotExistException e) {
-            throw new UserNotFoundException(e.getMessage());
-        }
+        User user = userDatabase.findByName(query.name()).orElseThrow(
+                () -> new UserNotFoundException("User with name " + query.name() + " not exists"));
+        return new UserResponse(user.getName(), user.getBalance());
     }
 }

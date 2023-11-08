@@ -3,6 +3,7 @@ package pl.mg.rac.user.infrastructure.in.web.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.mg.rac.commons.api.dto.ApiError;
 import pl.mg.rac.user.application.dto.command.ChargeUserCommand;
 import pl.mg.rac.user.application.dto.command.CreateUserCommand;
 import pl.mg.rac.user.application.dto.command.DeleteUserCommand;
@@ -46,22 +47,18 @@ public class UserCommandController {
         return ResponseEntity.ok(chargeUserResponse);
     }
 
-
     @ExceptionHandler
-    public ResponseEntity<String> handleRegistrationException(UserRegistrationException e) {
-        //TODO return JSON object instead of plain text
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ApiError> handleRegistrationException(UserRegistrationException e) {
+        return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleDeletionException(UserDeletionException e) {
-        //TODO return JSON object instead of plain text
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ApiError> handleDeletionException(UserDeletionException e) {
+        return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleChargeException(UserChargeException e) {
-        //TODO return JSON object instead of plain text
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ApiError> handleChargeException(UserChargeException e) {
+        return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
     }
 }

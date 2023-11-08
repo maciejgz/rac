@@ -27,6 +27,13 @@ public class User {
         this.events = new ArrayList<>();
     }
 
+    public User(String id, String name, BigDecimal balance) {
+        this.id = id;
+        this.name = name;
+        this.balance = balance;
+        this.events = new ArrayList<>();
+    }
+
     public User(String name, BigDecimal balance) {
         this.name = name;
         this.balance = balance;

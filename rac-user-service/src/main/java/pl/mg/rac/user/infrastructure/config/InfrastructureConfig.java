@@ -32,15 +32,14 @@ public class InfrastructureConfig {
     //application services
     @Bean
     UserApplicationService userApplicationService() {
-        return new UserApplicationService(userDomainService(), userEventPublisher());
+        return new UserApplicationService(userDomainService(), userEventPublisher(), userDatabase());
     }
 
     //domain service
     @Bean
     UserDomainService userDomainService() {
-        return new UserDomainService(userDatabase());
+        return new UserDomainService();
     }
-
 
     //outgoing port adapters
     @Bean
