@@ -91,12 +91,16 @@ https://github.com/maciejgz/rac
 
 
 ### Car service events
-| event ID         |  topic  | comment                               |
-|------------------|:-------:|:--------------------------------------|
-| RAC_CAR_CREATED  | RAC_CAR | Sent when car is added to the fleet   |
-| RAC_CAR_DELETED  | RAC_CAR | Sent when user is deleted             |
-| RAC_CAR_RENTED   | RAC_CAR | Sent when car is rented               |
-| RAC_CAR_RETURNED | RAC_CAR | Sent when car is returned from rental |
+| event ID                               |  topic  | comment                                                            |
+|----------------------------------------|:-------:|:-------------------------------------------------------------------|
+| RAC_CAR_CREATED                        | RAC_CAR | Sent when car is added to the fleet                                |
+| RAC_CAR_DELETED                        | RAC_CAR | Sent when user is deleted                                          |
+| RAC_CAR_RENT_SUCCESS                   | RAC_CAR | Sent when car is rented                                            |
+| RAC_CAR_RENT_FAILED_ALREADY_RENTED     | RAC_CAR | Sent when car cannot be rented - already rented by other user      |
+| RAC_CAR_RENT_FAILED_NOT_EXIST          | RAC_CAR | Sent when car cannot be rented - car already not exist in the pool |
+| RAC_CAR_RETURN_SUCCESS                 | RAC_CAR | Sent when car is successfully returned from rental                 |
+| RAC_CAR_RETURN_FAILED_ALREADY_RETURNED | RAC_CAR | Sent when car cannot be returned - already returned                |
+| RAC_CAR_RETURN_FAILED_NOT_EXIST        | RAC_CAR | Sent when car cannot be returned - already returned                |
 
 ### Sagas
 
