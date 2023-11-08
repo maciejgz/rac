@@ -47,7 +47,6 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'pl.mg.rac:rac-commons:0.0.1-SNAPSHOT'
-    implementation project(path: ':rac-commons')
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'

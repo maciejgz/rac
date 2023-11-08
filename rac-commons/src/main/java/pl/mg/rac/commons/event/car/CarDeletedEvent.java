@@ -3,16 +3,17 @@ package pl.mg.rac.commons.event.car;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.car.payload.CarCreatedPayload;
+import pl.mg.rac.commons.event.car.payload.CarDeletedPayload;
 
-public class CarCreatedEvent extends RacEvent<CarCreatedPayload> {
+public class CarDeletedEvent extends RacEvent<CarDeletedPayload> {
 
-    public CarCreatedEvent(String aggregateId, CarCreatedPayload payload) {
+    public CarDeletedEvent(String aggregateId, CarDeletedPayload payload) {
         super(aggregateId, payload);
     }
 
     @Override
     public String getEventType() {
-        return EventType.RAC_CAR_CREATED.getId();
+        return EventType.RAC_CAR_DELETED.getId();
     }
 
 }
