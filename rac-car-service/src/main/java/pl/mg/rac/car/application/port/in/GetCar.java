@@ -1,4 +1,4 @@
 package pl.mg.rac.car.application.port.in;
 
-public interface ReturnCar {
+public interface GetCar {
 }

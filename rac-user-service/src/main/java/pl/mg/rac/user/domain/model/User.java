@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import pl.mg.rac.commons.event.RacEvent;
+import pl.mg.rac.commons.event.RacEventPayload;
 import pl.mg.rac.commons.event.user.UserChargedEvent;
 import pl.mg.rac.commons.event.user.payload.UserChargedPayload;
 
@@ -21,7 +22,7 @@ public class User {
     private String name;
     private BigDecimal balance;
     @Transient
-    private final List<RacEvent<?>> events;
+    private final List<RacEvent<? extends RacEventPayload>> events;
 
     private User() {
         this.events = new ArrayList<>();

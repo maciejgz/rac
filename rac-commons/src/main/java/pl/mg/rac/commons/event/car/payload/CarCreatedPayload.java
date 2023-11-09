@@ -1,4 +1,6 @@
 package pl.mg.rac.commons.event.car.payload;
 
-public class CarCreatedPayload {
+import pl.mg.rac.commons.event.RacEventPayload;
+
+public class CarCreatedPayload implements RacEventPayload {
 }
