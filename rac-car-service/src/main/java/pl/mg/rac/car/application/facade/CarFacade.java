@@ -20,7 +20,7 @@ public class CarFacade {
         this.getCarAdapter = getCarAdapter;
     }
 
-    public AddCarResponse addCar(AddCarCommand) {
+    public AddCarResponse addCar(AddCarCommand command) {
         return null;
     }
 
