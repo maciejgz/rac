@@ -4,5 +4,6 @@ import pl.mg.rac.commons.event.RacEventPayload;
 
 import java.math.BigDecimal;
 
-public record UserChargedPayload(String username, BigDecimal previousBalance, BigDecimal currentBalance) implements RacEventPayload {
+public record UserChargedPayload(String username, BigDecimal previousBalance,
+                                 BigDecimal currentBalance) implements RacEventPayload {
 }

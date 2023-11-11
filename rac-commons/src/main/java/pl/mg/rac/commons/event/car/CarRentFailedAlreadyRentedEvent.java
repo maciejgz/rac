@@ -2,7 +2,6 @@ package pl.mg.rac.commons.event.car;
 
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
-import pl.mg.rac.commons.event.car.payload.CarDeletedPayload;
 import pl.mg.rac.commons.event.car.payload.CarRentFailedAlreadyRentedPayload;
 
 public class CarRentFailedAlreadyRentedEvent extends RacEvent<CarRentFailedAlreadyRentedPayload> {

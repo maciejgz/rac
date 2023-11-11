@@ -2,7 +2,6 @@ package pl.mg.rac.commons.event.car;
 
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
-import pl.mg.rac.commons.event.car.payload.CarCreatedPayload;
 import pl.mg.rac.commons.event.car.payload.CarDeletedPayload;
 
 public class CarDeletedEvent extends RacEvent<CarDeletedPayload> {

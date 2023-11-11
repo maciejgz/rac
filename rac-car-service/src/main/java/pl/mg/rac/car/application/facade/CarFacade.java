@@ -40,7 +40,7 @@ public class CarFacade {
         return rentCarAdapter.rentCar(command);
     }
 
-    public ReturnCarResponse returnCar(ReturnCarCommand command) {
+    public ReturnCarResponse returnCar(ReturnCarCommand command) throws CarNotFoundException {
         return returnCarAdapter.returnCar(command);
     }
 
