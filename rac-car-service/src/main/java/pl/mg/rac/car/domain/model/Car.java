@@ -31,6 +31,15 @@ public class Car {
 
     }
 
+    public Car(String id, String vin, Location location, Boolean rented, Double mileage, String rentalId) {
+        this.id = id;
+        this.vin = vin;
+        this.location = location;
+        this.rented = rented;
+        this.mileage = mileage;
+        this.rentalId = rentalId;
+    }
+
     public Car(String vin, Location location, Boolean rented, Double mileage, String rentalId) {
         this.vin = vin;
         this.location = location;

@@ -1,5 +1,6 @@
 package pl.mg.rac.car.application.service;
 
+import lombok.extern.slf4j.Slf4j;
 import pl.mg.rac.car.application.dto.command.AddCarCommand;
 import pl.mg.rac.car.application.dto.command.DeleteCarCommand;
 import pl.mg.rac.car.application.dto.command.RentCarCommand;
@@ -10,6 +11,7 @@ import pl.mg.rac.car.application.port.in.*;
 import pl.mg.rac.car.application.port.out.CarDatabase;
 import pl.mg.rac.car.application.port.out.CarEventPublisher;
 
+@Slf4j
 public class CarApplicationService implements AddCar, DeleteCar, RentCar, ReturnCar, GetCar {
 
     private final CarDatabase carDatabase;
@@ -22,6 +24,7 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
 
     @Override
     public AddCarResponse addCar(AddCarCommand command) {
+        log.debug("addCar() called with: command = [" + command + "]");
         //TODO implement
         return null;
     }

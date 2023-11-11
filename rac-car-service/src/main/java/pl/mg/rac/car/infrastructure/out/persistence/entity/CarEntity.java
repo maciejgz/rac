@@ -13,6 +13,6 @@ public class CarEntity {
     private Location location;
     private Boolean rented;
     private Double mileage;
-    private String lastRentalId;
+    private String rentalId;
 
 }
