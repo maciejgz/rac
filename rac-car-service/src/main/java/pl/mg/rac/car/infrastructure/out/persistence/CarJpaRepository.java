@@ -13,4 +13,6 @@ public interface CarJpaRepository extends MongoRepository<CarEntity, String> {
 
     Optional<CarEntity> findByVin(String vin);
 
+    void deleteByVin(String vin);
+
 }

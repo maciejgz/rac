@@ -1,6 +1,10 @@
 package pl.mg.rac.car.application.dto.response;
 
-public record AddCarResponse(
+import pl.mg.rac.commons.value.Location;
 
+public record AddCarResponse (
+    String vin,
+    Location location,
+    double mileage
 ) {
 }

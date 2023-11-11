@@ -49,9 +49,12 @@ public class Car {
     }
 
     public void returnCar(String rentalId, Double mileage, Location location) {
+        //TODO implement
     }
 
     public void rentCar(String rentalId) {
+        //TODO implement
+
     }
 
     public void addEvent(RacEvent<?> event) {
@@ -59,10 +62,12 @@ public class Car {
     }
 
     public void updateMileage(Double mileage) {
+        //TODO implement
         this.mileage = mileage;
     }
 
     public void updateLocation(Location location) {
+        //TODO implement
         this.location = location;
     }
 
