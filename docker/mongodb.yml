@@ -9,7 +9,7 @@ services:
     volumes:
       - /var/lib/docker/volumes/rac/mongodb_data:/data/db
     networks:
-        - rac-network
+      - rac-network
 volumes:
   mongodb_data:
     driver: local

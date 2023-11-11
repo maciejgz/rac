@@ -2,6 +2,7 @@ package pl.mg.rac.user.infrastructure.out.persistence;
 
 import pl.mg.rac.user.application.port.out.UserDatabase;
 import pl.mg.rac.user.domain.model.User;
+import pl.mg.rac.user.infrastructure.out.persistence.entity.UserEntity;
 
 import java.util.Optional;
 
@@ -20,17 +21,20 @@ public class UserRepository implements UserDatabase {
 
     @Override
     public User save(User user) {
-        //TODO można tu tłumaczyć obiekt User na obiekt UserEntity - dzięki temu nie ma @Document w agregacie, ale wymaga dodatkowego mappera
-        return userJpaRepository.save(user);
+        return this.mapToDomainUser(userJpaRepository.save(UserEntity.ofUser(user)));
     }
 
     @Override
     public void delete(User user) {
-        userJpaRepository.delete(user);
+        userJpaRepository.delete(UserEntity.ofUser(user));
     }
 
     @Override
     public Optional<User> findByName(String name) {
-        return userJpaRepository.findByName(name);
+        return userJpaRepository.findByName(name).map(this::mapToDomainUser);
+    }
+
+    private User mapToDomainUser(UserEntity userEntity) {
+        return new User(userEntity.getId(), userEntity.getName(), userEntity.getBalance());
     }
 }

@@ -1,4 +1,6 @@
 package pl.mg.rac.commons.event.user.payload;
 
-public record UserDeletedPayload(String username) {
+import pl.mg.rac.commons.event.RacEventPayload;
+
+public record UserDeletedPayload(String username) implements RacEventPayload {
 }

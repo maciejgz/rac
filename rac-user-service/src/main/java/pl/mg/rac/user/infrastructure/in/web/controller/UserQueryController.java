@@ -4,6 +4,7 @@ package pl.mg.rac.user.infrastructure.in.web.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.mg.rac.commons.api.dto.ApiError;
 import pl.mg.rac.user.application.dto.exception.UserNotFoundException;
 import pl.mg.rac.user.application.dto.exception.UserSearchException;
 import pl.mg.rac.user.application.dto.query.GetUserQuery;
@@ -33,9 +34,8 @@ public class UserQueryController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleException(UserSearchException e) {
-        //TODO return JSON object instead of plain text
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ApiError> handleException(UserSearchException e) {
+        return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
     }
 
 }

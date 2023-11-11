@@ -42,5 +42,3 @@ management:
   endpoint:
     health:
       show-details: always
-
-## Tracing

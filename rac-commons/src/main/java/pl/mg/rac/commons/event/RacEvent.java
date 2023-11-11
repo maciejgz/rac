@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public abstract class RacEvent<T> {
+public abstract class RacEvent<T extends RacEventPayload> {
 
     private final UUID eventId;
     private final Instant timestamp;

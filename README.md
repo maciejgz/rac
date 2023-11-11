@@ -4,9 +4,11 @@ Java 21, Spring Cloud based microservices application for renting cars. POC of t
 architecture written in DDD and hexagonal architecture.
 
 ### Repository
+
 https://github.com/maciejgz/rac
 
 ### Tech stack
+
 - **Language** - Java 21
 - **Frameworks** - Spring Boot, Spring Cloud
 - **Database** - MongoDB
@@ -19,7 +21,9 @@ https://github.com/maciejgz/rac
 - **Containerization** - Docker, Docker Compose
 
 ### Requirements
+
 #### Functional
+
 - User can search for a car to rent by his coordinates
 - User can rent an available car
 - Position of the car is constantly updated and available for the administrator
@@ -28,16 +32,24 @@ https://github.com/maciejgz/rac
 - Administrator can add or remove a car from the pool of the available cars
 
 #### Non-functional
+
 - Gradle as a build tool
-- DDD and hexagonal architecture - keep application and domain logic independent of the framework. All beans shall be created in the infrastructure layer config classes. 
+- DDD and hexagonal architecture - keep application and domain logic independent of the framework. All beans shall be
+  created in the infrastructure layer config classes.
   The only exception are the transactional annotations in the application service layer.
-- Domain services should operate on pure data without commands. Commands reach the application service layer and from there we pass on pure data or domain DTOs.
-- Event sourcing - Kafka as a message broker
+- Domain events should be different from the events sent to the message broker. Domain events are used for internal
+  communication between services. For the simplicity,
+  we will use the same events for both internal and external communication.
+- Domain services should operate on pure data without commands. Commands reach the application service layer and from
+  there we pass on pure data or domain DTOs.
+- Kafka as a message broker
 - Internal communication between services by events with sagas
 - Requests to the services through the API Gateway
-- API Gateway receives a success message right after submission of rent request - then asynchronous commit is sent after succesful saga execution
+- API Gateway receives a success message right after submission of rent request - then asynchronous commit is sent after
+  successful saga execution
 
 ### Components
+
 - rac-api-gateway - 8080 - API gateway
 - rac-user-service - 8081 - User management service
 - rac-rent-service - 8082 - Renting service
@@ -82,12 +94,26 @@ https://github.com/maciejgz/rac
 
 ### Events
 
-#### User service
-| event ID         |  topic   | comment                                              |
-|------------------|:--------:|:-----------------------------------------------------|
-| RAC_USER_CREATED | RAC_USER | Sent when user is created                            |
-| RAC_USER_DELETED | RAC_USER | Sent when user is deleted                            |
-| RAC_USER_CHARGED | RAC_USER | Sent when user is charged for rent                   |
+#### User service events
+
+| event ID         |  topic   | comment                            |
+|------------------|:--------:|:-----------------------------------|
+| RAC_USER_CREATED | RAC_USER | Sent when user is created          |
+| RAC_USER_DELETED | RAC_USER | Sent when user is deleted          |
+| RAC_USER_CHARGED | RAC_USER | Sent when user is charged for rent |
+
+### Car service events
+
+| event ID                               |  topic  | comment                                                            |
+|----------------------------------------|:-------:|:-------------------------------------------------------------------|
+| RAC_CAR_CREATED                        | RAC_CAR | Sent when car is added to the fleet                                |
+| RAC_CAR_DELETED                        | RAC_CAR | Sent when user is deleted                                          |
+| RAC_CAR_RENT_SUCCESS                   | RAC_CAR | Sent when car is rented                                            |
+| RAC_CAR_RENT_FAILED_ALREADY_RENTED     | RAC_CAR | Sent when car cannot be rented - already rented by other user      |
+| RAC_CAR_RENT_FAILED_NOT_EXIST          | RAC_CAR | Sent when car cannot be rented - car already not exist in the pool |
+| RAC_CAR_RETURN_SUCCESS                 | RAC_CAR | Sent when car is successfully returned from rental                 |
+| RAC_CAR_RETURN_FAILED_ALREADY_RETURNED | RAC_CAR | Sent when car cannot be returned - already returned                |
+| RAC_CAR_RETURN_FAILED_NOT_EXIST        | RAC_CAR | Sent when car cannot be returned - already returned                |
 
 ### Sagas
 
@@ -96,15 +122,19 @@ https://github.com/maciejgz/rac
 ## Build and run
 
 ### Build
+
 Build with Gradle wrapper from the root repository directory:
 
 #### build project
+
 ```shell
 .\gradlew.bat build
 ```
 
 #### Code analysis
-To run Sonar code analysis, run the following command in the root repository directory with [sonar container](docker/sonar.yml) running locally.
+
+To run Sonar code analysis, run the following command in the root repository directory
+with [sonar container](docker/sonar.yml) running locally.
 Then login with admin/admin credentials, change the password to admin1 and run the analysis with the following command:
 
 ```shell
@@ -116,7 +146,9 @@ Then login with admin/admin credentials, change the password to admin1 and run t
 #### Generate java docs
 
 ### Run
-To run a project, at first, 3rd party services shall be started. To do so, run the following command in the [docker](docker) directory:
+
+To run a project, at first, 3rd party services shall be started. To do so, run the following command in
+the [docker](docker) directory:
 
 ```shell
 .\start_3rd_party_components.bat 
