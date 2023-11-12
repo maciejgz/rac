@@ -30,6 +30,8 @@ https://github.com/maciejgz/rac
 - User can return a car
 - User can see a history of his rents
 - Administrator can add or remove a car from the pool of the available cars
+- User is charged for the distance traveled (to simplify - the distance is calculated as a difference between the
+  current and the previous location of the car) - 1$ per km
 
 #### Non-functional
 
@@ -38,8 +40,8 @@ https://github.com/maciejgz/rac
   created in the infrastructure layer config classes.
   The only exception are the transactional annotations in the application service layer.
 - Domain events should be different from the events sent to the message broker. Domain events are used for internal
-  communication between services. For the simplicity,
-  we will use the same events for both internal and external communication.
+  communication between services. For the simplicity, we will use the same events for both internal and external
+  communication.
 - Domain services should operate on pure data without commands. Commands reach the application service layer and from
   there we pass on pure data or domain DTOs.
 - Kafka as a message broker
@@ -47,8 +49,8 @@ https://github.com/maciejgz/rac
 - Requests to the services through the API Gateway
 - API Gateway receives a success message right after submission of rent request - then asynchronous commit is sent after
   successful saga execution
-- In the final version use time series Cassandra column database for storing the car location updates. At first - MongoDB shall
-  be used.
+- In the final version use time series Cassandra column database for storing the car location updates. At first -
+  MongoDB shall be used.
 
 ### Components
 
@@ -99,11 +101,11 @@ https://github.com/maciejgz/rac
 
 #### User service events
 
-| event ID                  |  topic   | comment                            |
-|---------------------------|:--------:|:-----------------------------------|
-| RAC_USER_CREATED          | RAC_USER | Sent when user is created          |
-| RAC_USER_DELETED          | RAC_USER | Sent when user is deleted          |
-| RAC_USER_CHARGED          | RAC_USER | Sent when user is charged for rent |
+| event ID         |  topic   | comment                                                        |
+|------------------|:--------:|:---------------------------------------------------------------|
+| RAC_USER_CREATED | RAC_USER | Sent when user is created                                      |
+| RAC_USER_DELETED | RAC_USER | Sent when user is deleted                                      |
+| RAC_USER_CHARGED | RAC_USER | Sent when user is charged for rent or due to some other reason |
 
 ### Car service events
 
@@ -118,7 +120,25 @@ https://github.com/maciejgz/rac
 | RAC_CAR_RETURN_FAILED_ALREADY_RETURNED | RAC_CAR | Sent when car cannot be returned - already returned                |
 | RAC_CAR_RETURN_FAILED_NOT_EXIST        | RAC_CAR | Sent when car cannot be returned - already returned                |
 
-#### Rent service events
+#### Rent related events
+
+| event ID              |  topic   | comment                                                                                            |
+|-----------------------|:--------:|:---------------------------------------------------------------------------------------------------|
+| RAC_RENT_REQUEST_USER | RAC_RENT | Sent when rent is requested to validate request in the user service                                |
+| RAC_RENT_REQUEST_CAR  | RAC_RENT | Sent when rent is requested and confirmed in user service. Car service should validate the request |
+| RAC_RENT_CONFIRMATION | RAC_RENT | Sent when rent is confirmed in car service and should be confirmed in rent service                 |
+| RAC_RENT_FAILED_USER  | RAC_RENT | Issue in rent validation in user service                                                           |
+| RAC_RENT_FAILED_CAR   | RAC_RENT | Issue in rent validation in car service                                                            |
+
+#### Return related events
+
+| event ID                |   topic    | comment                                                                                              |
+|-------------------------|:----------:|:-----------------------------------------------------------------------------------------------------|
+| RAC_RETURN_REQUEST_USER | RAC_RETURN | Sent when return is requested to validate request in the user service                                |
+| RAC_RETURN_REQUEST_CAR  | RAC_RETURN | Sent when return is requested and confirmed in user service. Car service should validate the request |
+| RAC_RETURN_CONFIRMATION | RAC_RETURN | Sent when return is confirmed in car service and should be confirmed in rent service                 |
+| RAC_RETURN_FAILED_USER  | RAC_RETURN | Issue in return validation in user service                                                           |
+| RAC_RETURN_FAILED_CAR   | RAC_RETURN | Issue in return validation in car service                                                            |
 
 #### Location service events
 
@@ -129,7 +149,58 @@ https://github.com/maciejgz/rac
 
 ### Sagas
 
-[comment]: <> (TODO add sagas)
+#### Rent car saga
+
+- User sends a rent HTTP request to the API Gateway
+- API Gateway sends a rent request to the rac-rent-service (HTTP)
+- Rent service validates the request and:
+    - in case of success: creates a rent, starts a saga and sends a rent request to the rac-user-service (Kafka) - *
+      *RAC_RENT_REQUEST_USER**
+    - in case of failure: sends a rent failure to the api gateway (HTTP)
+- User service validates the request and:
+    - in case of success - sets the user as a renter with the rental id and sends a rent request to the
+      rac-car-service (Kafka) - **RAC_RENT_REQUEST_CAR**
+    - in case of failure - sends a rent failure to the rac-rent-service (Kafka) - **RAC_RENT_FAILED_USER**, then the
+      saga is compensated in the rac-rent-service
+- Car service validates the request and:
+    - in case of success - sets the car as rented with the rental id and sends a rent confirmation to the
+      rac-rent-service (Kafka) - **RAC_RENT_CONFIRMATION**. Search service is updated with the car status.
+    - in case of failure - sends a rent failure to the rac-rent-service and rac-user-service (Kafka) - *
+      *RAC_RENT_FAILED_CAR**. Then the saga is compensated in the rac-rent-service and rac-user-service
+
+When a rental is initiated, customer and car GPS agents should increase the frequency of data sending to the location
+service - once per 5s. Location service should update the car and user location in the database and push
+notifications (**RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search, car, user and rent
+service).
+
+#### Return car saga
+
+- User sends a return HTTP request to the API Gateway
+- API Gateway sends a return request to the rac-rent-service (HTTP)
+- rac-rent-service validates the request and:
+    - in case of success - calculate distance traveled, sends a return request to the rac-user-service (Kafka) - *
+      *RAC_RETURN_REQUEST_USER**
+    - in case of failure - sends a return failure api gateway (HTTP)
+- rac-user-service validates the request and:
+    - in case of success - charges user for the distance traveled, sends an event to the rac-car-service (Kafka) -
+      **RAC_RETURN_REQUEST_CAR**
+    - in case of failure - sends a return failure to the rac-rent-service (Kafka) - **RAC_RETURN_FAILED_USER**, then the
+      saga is compensated in the rac-rent-service
+- rac-car-service validates the request and:
+    - in case of success - sets the car as available and sends a return confirmation to the rac-rent-service (Kafka) -
+      **RAC_RETURN_CONFIRMATION**. Search service is updated with the car status.
+    - in case of failure - sends a return failure to the rac-rent-service and rac-user-service (Kafka) - *
+      *RAC_RETURN_FAILED_CAR**.
+      Then the saga is compensated in the rac-rent-service and rac-user-service (charged money
+      is returned to the user).
+- rac-rent-service sends a return success to the api gateway (HTTP). In case of failure, the saga is compensated in the
+  rac-rent-service and error message has to be returned to the api gateway (HTTP). User then has to contact the support.
+
+When a rental is finished, customer and car GPS agents should decrease the frequency of data sending to the location
+service - once per 30s.
+Location service should update the car and user location in the database and push notifications (
+**RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search, car, user and rent
+service).
 
 ## Build and run
 
