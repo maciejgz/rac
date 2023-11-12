@@ -4,6 +4,45 @@ server:
 spring:
   application:
     name: rac-api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-service-api-route
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/user/**, /api/user
+          filters:
+            - RewritePath=/api/user/(?<segment>.*), /user/${segment}
+            - RewritePath=/api/user, /user
+        - id: car-service-api-route
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/car/**, /api/car
+          filters:
+            - RewritePath=/api/car/(?<segment>.*), /car/${segment}
+            - RewritePath=/api/car, /car
+        - id: rent-service-api-route
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/rent/**, /api/rent
+          filters:
+            - RewritePath=/api/rent/(?<segment>.*), /rent/${segment}
+            - RewritePath=/api/route, /route
+        - id: search-service-api-route
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/search/**, /api/search
+          filters:
+            - RewritePath=/api/search/(?<segment>.*), /search/${segment}
+            - RewritePath=/api/search, /search
+        - id: location-service-api-route
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/location/**, /api/location
+          filters:
+            - RewritePath=/api/location/(?<segment>.*), /location/${segment}
+            - RewritePath=/api/location, /location
+
 
 ## Discovery Service
 eureka:

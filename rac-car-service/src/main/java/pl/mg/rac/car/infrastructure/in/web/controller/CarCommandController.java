@@ -10,6 +10,7 @@ import pl.mg.rac.car.application.dto.exception.CarAlreadyNotExistException;
 import pl.mg.rac.car.application.dto.response.AddCarResponse;
 import pl.mg.rac.car.application.dto.response.DeleteCarResponse;
 import pl.mg.rac.car.application.facade.CarFacade;
+import pl.mg.rac.commons.api.dto.ApiError;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,19 +28,25 @@ public class CarCommandController {
 
     @PostMapping(value = "")
     public ResponseEntity<AddCarResponse> addCar(@RequestBody AddCarCommand command) throws URISyntaxException, CarAlreadyExistsException {
-        log.debug("Blacklist user {}", command);
+        log.debug("addCar() called with: command = [" + command + "]");
         AddCarResponse addCarResponse = carFacade.addCar(command);
         return ResponseEntity.created(new URI("/car/" + addCarResponse.vin())).body(addCarResponse);
     }
 
     @DeleteMapping(value = "/{vin}")
     public ResponseEntity<Void> deleteUser(@PathVariable String vin) throws CarAlreadyNotExistException {
+        log.debug("deleteUser() called with: vin = [" + vin + "]");
         DeleteCarResponse response = carFacade.deleteCar(new DeleteCarCommand(vin));
-        log.debug("deleteUser() deleted: vin = [" + response.vin() + "]");
         return ResponseEntity.noContent().build();
     }
 
-    //TODO implement missing command endpoints
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleCarAlreadyNotExistException(CarAlreadyNotExistException e) {
+        return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
+    }
 
-    //TODO implement exception handlers
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleCarAlreadyExistException(CarAlreadyExistsException e) {
+        return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
+    }
 }

@@ -8,6 +8,7 @@ import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.RacEventPayload;
 import pl.mg.rac.commons.event.user.UserChargedEvent;
 import pl.mg.rac.commons.event.user.payload.UserChargedPayload;
+import pl.mg.rac.commons.value.Location;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ public class User {
     private String id;
     private String name;
     private BigDecimal balance;
+    private Location location;
+
     @Transient
     private final List<RacEvent<? extends RacEventPayload>> events;
 
@@ -28,16 +31,17 @@ public class User {
         this.events = new ArrayList<>();
     }
 
-    public User(String id, String name, BigDecimal balance) {
+    public User(String id, String name, BigDecimal balance, Location location) {
         this.id = id;
         this.name = name;
         this.balance = balance;
         this.events = new ArrayList<>();
     }
 
-    public User(String name, BigDecimal balance) {
+    public User(String name, BigDecimal balance, Location location) {
         this.name = name;
         this.balance = balance;
+        this.location = location;
         this.events = new ArrayList<>();
     }
 
