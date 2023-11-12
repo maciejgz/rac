@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2023-11-12T16:09:20.375Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="bGMkUqbcAOojx0C2hcI1" version="22.0.3" type="device" pages="3">
+<mxfile host="Electron" modified="2023-11-12T16:21:53.419Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="I6rpK2nZbNQJVWoJWiEY" version="22.0.3" type="device" pages="3">
   <diagram name="User" id="13e1069c-82ec-6db2-03f1-153e76fe0fe0">
     <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
       <root>
@@ -399,8 +399,19 @@
             <mxPoint x="1" as="offset" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="X_DDhdHNDz55oe680tEE-1" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="bbrAlsQB3KGbsBwekGWN-1" target="bbrAlsQB3KGbsBwekGWN-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="55" y="100" as="sourcePoint" />
+            <mxPoint x="185" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="X_DDhdHNDz55oe680tEE-2" value="VALIDATE_USER_DETAILS" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="X_DDhdHNDz55oe680tEE-1">
+          <mxGeometry x="-0.0351" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
         <mxCell id="bbrAlsQB3KGbsBwekGWN-2" value="user-service" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" vertex="1" parent="1">
-          <mxGeometry x="445" y="50" width="135" height="440" as="geometry" />
+          <mxGeometry x="445" y="50" width="105" height="440" as="geometry" />
         </mxCell>
         <mxCell id="bbrAlsQB3KGbsBwekGWN-12" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="bbrAlsQB3KGbsBwekGWN-2">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -411,6 +422,28 @@
         <mxCell id="bbrAlsQB3KGbsBwekGWN-13" value="RENT_CAR" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="bbrAlsQB3KGbsBwekGWN-12">
           <mxGeometry x="-0.0351" relative="1" as="geometry">
             <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="X_DDhdHNDz55oe680tEE-3" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="bbrAlsQB3KGbsBwekGWN-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="52" y="180" as="sourcePoint" />
+            <mxPoint x="189.5" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="X_DDhdHNDz55oe680tEE-4" value="RENT_CAR" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="X_DDhdHNDz55oe680tEE-3">
+          <mxGeometry x="-0.0351" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="X_DDhdHNDz55oe680tEE-5" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="bbrAlsQB3KGbsBwekGWN-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="54.620000000000005" y="140" as="sourcePoint" />
+            <mxPoint x="-85" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="X_DDhdHNDz55oe680tEE-6" value="&lt;b&gt;&lt;i&gt;REJECT_RENT_USER&lt;/i&gt;&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="X_DDhdHNDz55oe680tEE-5">
+          <mxGeometry x="0.1374" y="-1" relative="1" as="geometry">
+            <mxPoint x="9" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="bbrAlsQB3KGbsBwekGWN-3" value="car-service" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;align=center;" vertex="1" parent="1">
