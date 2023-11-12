@@ -57,7 +57,8 @@ https://github.com/maciejgz/rac
 - rac-rent-service - 8082 - Renting service
 - rac-search-service - 8083 - search functionality
 - rac-car-service - 8084 - car fleet management
-- rac-location-service - 8085 - gathering location data of the cars
+- rac-location-service - 8085 - gathering location data of the cars and users. All the agents are sending the data to
+  this service. Should use Cassandra column database for storing the location data.
 - rac-discovery-service - http://localhost:8761/ - Spring Eureka server
 - rac-configuration-service - 8888 - Spring Cloud Config
 - MongoDB - 27017 - centralized database - each microservice will have a different schema
@@ -98,11 +99,11 @@ https://github.com/maciejgz/rac
 
 #### User service events
 
-| event ID         |  topic   | comment                            |
-|------------------|:--------:|:-----------------------------------|
-| RAC_USER_CREATED | RAC_USER | Sent when user is created          |
-| RAC_USER_DELETED | RAC_USER | Sent when user is deleted          |
-| RAC_USER_CHARGED | RAC_USER | Sent when user is charged for rent |
+| event ID                  |  topic   | comment                            |
+|---------------------------|:--------:|:-----------------------------------|
+| RAC_USER_CREATED          | RAC_USER | Sent when user is created          |
+| RAC_USER_DELETED          | RAC_USER | Sent when user is deleted          |
+| RAC_USER_CHARGED          | RAC_USER | Sent when user is charged for rent |
 
 ### Car service events
 
@@ -116,6 +117,15 @@ https://github.com/maciejgz/rac
 | RAC_CAR_RETURN_SUCCESS                 | RAC_CAR | Sent when car is successfully returned from rental                 |
 | RAC_CAR_RETURN_FAILED_ALREADY_RETURNED | RAC_CAR | Sent when car cannot be returned - already returned                |
 | RAC_CAR_RETURN_FAILED_NOT_EXIST        | RAC_CAR | Sent when car cannot be returned - already returned                |
+
+#### Rent service events
+
+#### Location service events
+
+| event ID                  |       topic       | comment                                 |
+|---------------------------|:-----------------:|:----------------------------------------|
+| RAC_LOCATION_USER_CHANGED | RAC_LOCATION_USER | Sent when user has changed his location |
+| RAC_LOCATION_CAR_CHANGED  | RAC_LOCATION_CAR  | Sent when car has changed his location  |
 
 ### Sagas
 
