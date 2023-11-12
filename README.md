@@ -47,6 +47,8 @@ https://github.com/maciejgz/rac
 - Requests to the services through the API Gateway
 - API Gateway receives a success message right after submission of rent request - then asynchronous commit is sent after
   successful saga execution
+- In the final version use time series Cassandra column database for storing the car location updates. At first - MongoDB shall
+  be used.
 
 ### Components
 
