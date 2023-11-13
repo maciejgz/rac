@@ -172,6 +172,7 @@ When a rental is initiated, customer and car GPS agents should increase the freq
 service - once per 5s. Location service should update the car and user location in the database and push
 notifications (**RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search, car, user and rent
 service).
+User is notified about the successful rent by the Websocket connection.
 
 #### Return car saga
 
@@ -194,13 +195,14 @@ service).
       Then the saga is compensated in the rac-rent-service and rac-user-service (charged money
       is returned to the user).
 - rac-rent-service sends a return success to the api gateway (HTTP). In case of failure, the saga is compensated in the
-  rac-rent-service and error message has to be returned to the api gateway (HTTP). User then has to contact the support.
+  rac-rent-service and error message has to be returned to the api gateway over websocket. User then has to contact the support.
 
 When a rental is finished, customer and car GPS agents should decrease the frequency of data sending to the location
 service - once per 30s.
 Location service should update the car and user location in the database and push notifications (
 **RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search, car, user and rent
 service).
+User is notified about the successful return by the Websocket connection.
 
 ## Build and run
 

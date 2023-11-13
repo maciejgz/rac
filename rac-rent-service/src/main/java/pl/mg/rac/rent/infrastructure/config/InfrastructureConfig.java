@@ -1,0 +1,54 @@
+package pl.mg.rac.rent.infrastructure.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import pl.mg.rac.rent.application.facade.RentFacade;
+import pl.mg.rac.rent.application.port.out.RentDatabase;
+import pl.mg.rac.rent.application.port.out.RentEventPublisher;
+import pl.mg.rac.rent.application.service.RentApplicationService;
+import pl.mg.rac.rent.domain.service.RentDomainService;
+import pl.mg.rac.rent.infrastructure.out.messaging.RentKafkaEventPublisher;
+import pl.mg.rac.rent.infrastructure.out.persistence.RentOrderJpaRepository;
+import pl.mg.rac.rent.infrastructure.out.persistence.RentOrderRepository;
+
+/**
+ * Put all the framework specific configuration here - adapter beans, etc.
+ */
+@Configuration
+public class InfrastructureConfig {
+
+    private final RentOrderJpaRepository rentOrderJpaRepository;
+
+    public InfrastructureConfig(RentOrderJpaRepository rentOrderJpaRepository) {
+        this.rentOrderJpaRepository = rentOrderJpaRepository;
+    }
+
+    //facade
+    @Bean
+    public RentFacade rentFacade() {
+        return new RentFacade();
+    }
+
+    //application services
+    @Bean
+    public RentApplicationService rentApplicationService() {
+        return new RentApplicationService(rentDatabase(), rentEventPublisher());
+    }
+
+    //domain service
+    public RentDomainService rentDomainService() {
+        return new RentDomainService();
+    }
+
+    //outgoing port adapters
+    @Bean
+    public RentDatabase rentDatabase() {
+        return new RentOrderRepository(rentOrderJpaRepository);
+    }
+
+    @Bean
+    public RentEventPublisher rentEventPublisher() {
+        return new RentKafkaEventPublisher();
+    }
+
+}
