@@ -179,7 +179,7 @@ User is notified about the successful rent by the Websocket connection.
 - User sends a return HTTP request to the API Gateway
 - API Gateway sends a return request to the rac-rent-service (HTTP)
 - rac-rent-service validates the request and:
-    - in case of success - calculate distance traveled, sends a return request to the rac-user-service (Kafka) - *
+    - in case of success - calculate distance traveled querying rac-location-service, sends a return request to the rac-user-service (Kafka) - *
       *RAC_RETURN_REQUEST_USER**
     - in case of failure - sends a return failure api gateway (HTTP)
 - rac-user-service validates the request and:
