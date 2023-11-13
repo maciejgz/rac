@@ -8,8 +8,8 @@ import pl.mg.rac.rent.application.port.out.RentEventPublisher;
 import pl.mg.rac.rent.application.service.RentApplicationService;
 import pl.mg.rac.rent.domain.service.RentDomainService;
 import pl.mg.rac.rent.infrastructure.out.messaging.RentKafkaEventPublisher;
-import pl.mg.rac.rent.infrastructure.out.persistence.RentOrderJpaRepository;
-import pl.mg.rac.rent.infrastructure.out.persistence.RentOrderRepository;
+import pl.mg.rac.rent.infrastructure.out.persistence.RentJpaRepository;
+import pl.mg.rac.rent.infrastructure.out.persistence.RentRepository;
 
 /**
  * Put all the framework specific configuration here - adapter beans, etc.
@@ -17,10 +17,10 @@ import pl.mg.rac.rent.infrastructure.out.persistence.RentOrderRepository;
 @Configuration
 public class InfrastructureConfig {
 
-    private final RentOrderJpaRepository rentOrderJpaRepository;
+    private final RentJpaRepository rentJpaRepository;
 
-    public InfrastructureConfig(RentOrderJpaRepository rentOrderJpaRepository) {
-        this.rentOrderJpaRepository = rentOrderJpaRepository;
+    public InfrastructureConfig(RentJpaRepository rentJpaRepository) {
+        this.rentJpaRepository = rentJpaRepository;
     }
 
     //facade
@@ -43,7 +43,7 @@ public class InfrastructureConfig {
     //outgoing port adapters
     @Bean
     public RentDatabase rentDatabase() {
-        return new RentOrderRepository(rentOrderJpaRepository);
+        return new RentRepository(rentJpaRepository);
     }
 
     @Bean
