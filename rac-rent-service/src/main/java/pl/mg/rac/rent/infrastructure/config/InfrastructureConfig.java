@@ -26,7 +26,7 @@ public class InfrastructureConfig {
     //facade
     @Bean
     public RentFacade rentFacade() {
-        return new RentFacade();
+        return new RentFacade(rentApplicationService(), rentApplicationService(), rentApplicationService());
     }
 
     //application services

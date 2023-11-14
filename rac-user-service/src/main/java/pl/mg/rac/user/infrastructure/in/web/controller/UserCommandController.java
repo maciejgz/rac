@@ -30,7 +30,7 @@ public class UserCommandController {
 
     @PostMapping(value = "")
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserCommand command) throws UserRegistrationException, URISyntaxException {
-        log.debug("Blacklist user {}", command);
+        log.debug("createUser() called with: command = [" + command + "]");
         CreateUserResponse user = userFacade.createUser(command);
         return ResponseEntity.created(new URI("/user/" + user.name())).body(user);
     }

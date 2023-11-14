@@ -30,8 +30,10 @@ https://github.com/maciejgz/rac
 - User can return a car
 - User can see a history of his rents
 - Administrator can add or remove a car from the pool of the available cars
-- User is charged for the distance traveled (to simplify - the distance is calculated as a difference between the
-  current and the previous location of the car) - 1$ per km
+- User is charged for:
+  - distance traveled (to simplify - the distance is calculated as a difference between the
+    current and the previous location of the car) - 1$ per km
+  - time of the rent - 0.2$ per minute
 
 #### Non-functional
 
