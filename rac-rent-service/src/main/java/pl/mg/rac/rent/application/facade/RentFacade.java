@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.rent.application.dto.command.RequestRentCommand;
 import pl.mg.rac.rent.application.dto.command.RequestReturnCommand;
+import pl.mg.rac.rent.application.dto.exception.InvalidRentStateException;
 import pl.mg.rac.rent.application.dto.exception.RentNotFoundException;
 import pl.mg.rac.rent.application.dto.query.GetRentByIdQuery;
 import pl.mg.rac.rent.application.dto.response.RentResponse;
@@ -34,7 +35,7 @@ public class RentFacade {
         return getRentAdapter.getRent(query);
     }
 
-    public RequestReturnResponse requestReturn(RequestReturnCommand command) {
+    public RequestReturnResponse requestReturn(RequestReturnCommand command) throws InvalidRentStateException, RentNotFoundException {
         return requestReturnAdapter.requestReturn(command);
     }
 

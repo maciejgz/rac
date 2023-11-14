@@ -21,17 +21,20 @@ public enum EventType {
     RAC_CAR_RETURN_FAILED_NOT_EXIST("RAC_CAR_RETURN_FAILED_NOT_EXIST"),
 
     //RENT EVENTS
+    RAC_RENT_REQUEST_LOCATION("RAC_RENT_REQUEST_LOCATION"),
     RAC_RENT_REQUEST_USER("RAC_RENT_REQUEST_USER"),
     RAC_RENT_REQUEST_CAR("RAC_RENT_REQUEST_CAR"),
-    RAC_RENT_FAILED_USER("RAC_RENT_FAILED_USER"),
     RAC_RENT_CONFIRMATION("RAC_RENT_CONFIRMATION"),
+    RAC_RENT_FAILED_USER("RAC_RENT_FAILED_USER"),
     RAC_RENT_FAILED_CAR("RAC_RENT_FAILED_CAR"),
 
     //RETURN EVENTS
+    RAC_RETURN_REQUEST_LOCATION("RAC_RETURN_REQUEST_LOCATION"),
     RAC_RETURN_REQUEST_USER("RAC_RETURN_REQUEST_USER"),
     RAC_RETURN_REQUEST_CAR("RAC_RETURN_REQUEST_CAR"),
-    RAC_RETURN_FAILED_USER("RAC_RETURN_FAILED_USER"),
     RAC_RETURN_CONFIRMATION("RAC_RETURN_CONFIRMATION"),
+    RAC_RETURN_FAILED_LOCATION("RAC_RETURN_FAILED_LOCATION"),
+    RAC_RETURN_FAILED_USER("RAC_RETURN_FAILED_USER"),
     RAC_RETURN_FAILED_CAR("RAC_RETURN_FAILED_CAR"),
 
     //LOCATION CHANGE EVENTS
@@ -43,6 +46,15 @@ public enum EventType {
 
     EventType(String id) {
         this.id = id;
+    }
+
+    public static EventType of(String id) {
+        for (EventType eventType : EventType.values()) {
+            if (eventType.id.equalsIgnoreCase(id)) {
+                return eventType;
+            }
+        }
+        throw new IllegalArgumentException("No EventType with id " + id + " found");
     }
 
 }

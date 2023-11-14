@@ -134,13 +134,15 @@ https://github.com/maciejgz/rac
 
 #### Return related events
 
-| event ID                |   topic    | comment                                                                                              |
-|-------------------------|:----------:|:-----------------------------------------------------------------------------------------------------|
-| RAC_RETURN_REQUEST_USER | RAC_RETURN | Sent when return is requested to validate request in the user service                                |
-| RAC_RETURN_REQUEST_CAR  | RAC_RETURN | Sent when return is requested and confirmed in user service. Car service should validate the request |
-| RAC_RETURN_CONFIRMATION | RAC_RETURN | Sent when return is confirmed in car service and should be confirmed in rent service                 |
-| RAC_RETURN_FAILED_USER  | RAC_RETURN | Issue in return validation in user service                                                           |
-| RAC_RETURN_FAILED_CAR   | RAC_RETURN | Issue in return validation in car service                                                            |
+| event ID                    |   topic    | comment                                                                                                 |
+|-----------------------------|:----------:|:--------------------------------------------------------------------------------------------------------|
+| RAC_RETURN_REQUEST_LOCATION | RAC_RETURN | Sent when return is requested to validate request and calculate distance traveled                       |
+| RAC_RETURN_REQUEST_USER     | RAC_RETURN | Sent when return is requested and confirmed in location service to validate request in the user service |
+| RAC_RETURN_REQUEST_CAR      | RAC_RETURN | Sent when return is requested and confirmed in user service. Car service should validate the request    |
+| RAC_RETURN_CONFIRMATION     | RAC_RETURN | Sent when return is confirmed in car service and should be confirmed in rent service                    |
+| RAC_RETURN_FAILED_LOCATION  | RAC_RETURN | Issue in return validation in location service                                                          |
+| RAC_RETURN_FAILED_USER      | RAC_RETURN | Issue in return validation in user service                                                              |
+| RAC_RETURN_FAILED_CAR       | RAC_RETURN | Issue in return validation in car service                                                               |
 
 #### Location service events
 
@@ -159,7 +161,7 @@ https://github.com/maciejgz/rac
     - in case of success: creates a rent, starts a saga and sends a rent request to the rac-user-service (Kafka) - *
       *RAC_RENT_REQUEST_USER**
     - in case of failure: sends a rent failure to the api gateway (HTTP)
-- User service validates the request and:
+- User service validates the event and:
     - in case of success - sets the user as a renter with the rental id and sends a rent request to the
       rac-car-service (Kafka) - **RAC_RENT_REQUEST_CAR**
     - in case of failure - sends a rent failure to the rac-rent-service (Kafka) - **RAC_RENT_FAILED_USER**, then the
@@ -181,9 +183,14 @@ User is notified about the successful rent by the Websocket connection.
 - User sends a return HTTP request to the API Gateway
 - API Gateway sends a return request to the rac-rent-service (HTTP)
 - rac-rent-service validates the request and:
-    - in case of success - calculate distance traveled querying rac-location-service, sends a return request to the rac-user-service (Kafka) - *
-      *RAC_RETURN_REQUEST_USER**
+    - in case of success - calculate distance traveled querying rac-location-service by event (Kafka) - *
+      *RAC_RETURN_REQUEST_LOCATION**
     - in case of failure - sends a return failure api gateway (HTTP)
+- rac-location-service validates **RAC_RETURN_REQUEST_LOCATION**. In case of success:
+    - calculates the distance traveled and sends a return request to the rac-user-service (Kafka) - *
+    *RAC_RETURN_REQUEST_USER**
+    - in case of failure - sends a return failure to the rac-rent-service (Kafka) - **RAC_RETURN_FAILED_LOCATION**, then the
+      saga is compensated in the rac-rent-service
 - rac-user-service validates the request and:
     - in case of success - charges user for the distance traveled, sends an event to the rac-car-service (Kafka) -
       **RAC_RETURN_REQUEST_CAR**
