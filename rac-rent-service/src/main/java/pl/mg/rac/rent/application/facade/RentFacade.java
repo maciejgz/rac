@@ -13,6 +13,7 @@ import pl.mg.rac.rent.application.dto.response.RequestReturnResponse;
 import pl.mg.rac.rent.application.port.in.GetRent;
 import pl.mg.rac.rent.application.port.in.RequestRent;
 import pl.mg.rac.rent.application.port.in.RequestReturn;
+import pl.mg.rac.rent.application.service.EventApplicationService;
 
 @Slf4j
 public class RentFacade {
@@ -21,10 +22,13 @@ public class RentFacade {
     private final GetRent getRentAdapter;
     private final RequestReturn requestReturnAdapter;
 
-    public RentFacade(RequestRent requestRentAdapter, GetRent getRentAdapter, RequestReturn requestReturnAdapter) {
+    private final EventApplicationService eventApplicationService;
+
+    public RentFacade(RequestRent requestRentAdapter, GetRent getRentAdapter, RequestReturn requestReturnAdapter, EventApplicationService eventApplicationService) {
         this.requestRentAdapter = requestRentAdapter;
         this.getRentAdapter = getRentAdapter;
         this.requestReturnAdapter = requestReturnAdapter;
+        this.eventApplicationService = eventApplicationService;
     }
 
     public RequestRentResponse requestRent(RequestRentCommand command) {
@@ -40,30 +44,7 @@ public class RentFacade {
     }
 
     public void handleIncomingEvent(RacEvent<?> event) {
-        /**
-         *  String eventType = record.value().getEventType();
-         *   if ("ID1".equals(key)) {
-         *             // handle events with ID1
-         *         } else if ("ID2".equals(key)) {
-         *             // handle events with ID2
-         *         } else {
-         *             // handle other events
-         *         }
-         *
-         *
-         *         public Adapter selectAdapter(MyEvent event) {
-         *             switch (EventType.valueOf(event.getEventType())) {
-         *                 case EVENT_TYPE_1:
-         *                     return new AdapterType1();
-         *                 case EVENT_TYPE_2:
-         *                     return new AdapterType2();
-         *                 default:
-         *                     throw new IllegalArgumentException("Invalid event type: " + event.getEventType());
-         *             }
-         *         }
-         */
-        //TODO
+        eventApplicationService.handleIncomingEvent(event);
     }
-
 
 }

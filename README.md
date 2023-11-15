@@ -129,7 +129,7 @@ https://github.com/maciejgz/rac
 | RAC_RENT_REQUEST_USER | RAC_RENT | Sent when rent is requested to validate request in the user service                                |
 | RAC_RENT_REQUEST_CAR  | RAC_RENT | Sent when rent is requested and confirmed in user service. Car service should validate the request |
 | RAC_RENT_CONFIRMATION | RAC_RENT | Sent when rent is confirmed in car service and should be confirmed in rent service                 |
-| RAC_RENT_FAILED_USER  | RAC_RENT | Issue in rent validation in user service                                                           |
+| RAC_RENT_FAILED_USER  | RAC_RENT | Issue in rent validation in user service. Consumed by                                              |
 | RAC_RENT_FAILED_CAR   | RAC_RENT | Issue in rent validation in car service                                                            |
 
 #### Return related events
