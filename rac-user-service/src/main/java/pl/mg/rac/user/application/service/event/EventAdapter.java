@@ -1,4 +1,4 @@
-package pl.mg.rac.rent.application.service.event;
+package pl.mg.rac.user.application.service.event;
 
 import pl.mg.rac.commons.event.RacEvent;
 

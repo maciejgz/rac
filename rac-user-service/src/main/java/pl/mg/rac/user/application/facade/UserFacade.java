@@ -1,5 +1,6 @@
 package pl.mg.rac.user.application.facade;
 
+import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.user.application.dto.command.ChargeUserCommand;
 import pl.mg.rac.user.application.dto.command.CreateUserCommand;
 import pl.mg.rac.user.application.dto.command.DeleteUserCommand;
@@ -12,6 +13,7 @@ import pl.mg.rac.user.application.port.in.ChargeUserPort;
 import pl.mg.rac.user.application.port.in.CreateUserPort;
 import pl.mg.rac.user.application.port.in.DeleteUserPort;
 import pl.mg.rac.user.application.port.in.GetUserPort;
+import pl.mg.rac.user.application.service.EventApplicationService;
 
 /**
  * Facade for user service - it is a place where we can put all application services to be used in the controller.
@@ -23,12 +25,14 @@ public class UserFacade {
     private final DeleteUserPort deleteUserAdapter;
     private final ChargeUserPort chargeUserAdapter;
     private final GetUserPort getUserAdapter;
+    private final EventApplicationService eventApplicationService;
 
-    public UserFacade(CreateUserPort createUserAdapter, DeleteUserPort deleteUserAdapter, ChargeUserPort chargeUserAdapter, GetUserPort getUserAdapter) {
+    public UserFacade(CreateUserPort createUserAdapter, DeleteUserPort deleteUserAdapter, ChargeUserPort chargeUserAdapter, GetUserPort getUserAdapter, EventApplicationService eventApplicationService) {
         this.createUserAdapter = createUserAdapter;
         this.deleteUserAdapter = deleteUserAdapter;
         this.chargeUserAdapter = chargeUserAdapter;
         this.getUserAdapter = getUserAdapter;
+        this.eventApplicationService = eventApplicationService;
     }
 
     public CreateUserResponse createUser(CreateUserCommand command) throws UserRegistrationException {
@@ -46,4 +50,9 @@ public class UserFacade {
     public UserResponse getUser(GetUserQuery query) throws UserSearchException, UserNotFoundException {
         return getUserAdapter.getUser(query);
     }
+
+    public void handleIncomingEvent(RacEvent<?> event) {
+        eventApplicationService.handleIncomingEvent(event);
+    }
+
 }

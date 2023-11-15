@@ -1,22 +1,21 @@
 package pl.mg.rac.rent.infrastructure.config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pl.mg.rac.commons.event.RacEvent;
-import pl.mg.rac.commons.event.rent.RentConfirmationEvent;
 import pl.mg.rac.rent.application.facade.RentFacade;
 import pl.mg.rac.rent.application.port.out.RentDatabase;
 import pl.mg.rac.rent.application.port.out.RentEventPublisher;
 import pl.mg.rac.rent.application.service.EventApplicationService;
 import pl.mg.rac.rent.application.service.RentApplicationService;
 import pl.mg.rac.rent.application.service.event.EventAdapter;
-import pl.mg.rac.rent.application.service.event.RentAcceptedEventAdapter;
 import pl.mg.rac.rent.domain.service.RentDomainService;
 import pl.mg.rac.rent.infrastructure.out.messaging.RentKafkaEventPublisher;
 import pl.mg.rac.rent.infrastructure.out.persistence.RentJpaRepository;
 import pl.mg.rac.rent.infrastructure.out.persistence.RentRepository;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,9 +27,12 @@ public class InfrastructureConfig {
     private final RentJpaRepository rentJpaRepository;
     private final Map<String, EventAdapter<RacEvent<?>>> eventAdapters;
 
-    public InfrastructureConfig(RentJpaRepository rentJpaRepository, Map<String, EventAdapter<RacEvent<?>>> eventAdapters) {
+    public InfrastructureConfig(RentJpaRepository rentJpaRepository, List<EventAdapter<RacEvent<?>>> eventAdapterList) {
         this.rentJpaRepository = rentJpaRepository;
-        this.eventAdapters = eventAdapters;
+        this.eventAdapters = new HashMap<>();
+        for (EventAdapter<RacEvent<?>> eventAdapter : eventAdapterList) {
+            this.eventAdapters.put(eventAdapter.getEventType(), eventAdapter);
+        }
     }
 
     //facade
@@ -53,14 +55,6 @@ public class InfrastructureConfig {
     //domain service
     public RentDomainService rentDomainService() {
         return new RentDomainService();
-    }
-
-    // event adapters
-    //TODO add event adapters here
-    @Bean
-    @Qualifier
-    public EventAdapter<RentConfirmationEvent> rentConfirmationEventEventAdapter() {
-        return new RentAcceptedEventAdapter();
     }
 
     //outgoing port adapters
