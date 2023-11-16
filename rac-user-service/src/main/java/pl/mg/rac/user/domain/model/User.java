@@ -60,4 +60,8 @@ public class User {
         this.currentRentId = rentId;
     }
 
+    public void cancelRent() {
+        this.currentRentId = null;
+    }
+
 }

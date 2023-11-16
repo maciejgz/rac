@@ -25,7 +25,7 @@ public class RentFailedUserEventAdapter implements EventAdapter<RacEvent<?>>, Fa
                     rent.declineRent(rentFailedUserEvent.getPayload().errorCode() + ":" + rentFailedUserEvent.getPayload().errorMessage());
                     rentDatabase.save(rent);
                 });
-        //TODO return
+        //TODO return response to user over websocket
     }
 
     @Override

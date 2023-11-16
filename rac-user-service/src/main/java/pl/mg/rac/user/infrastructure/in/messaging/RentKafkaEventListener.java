@@ -26,4 +26,5 @@ public class RentKafkaEventListener {
         log.debug("listen() called with: record = [" + record + "]");
         userFacade.handleIncomingEvent(record.value());
     }
+
 }

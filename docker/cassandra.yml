@@ -1,0 +1,14 @@
+version: '3'
+services:
+  rac-cassandra:
+    image: cassandra:latest
+    container_name: rac-cassandra
+    volumes:
+      - /var/lib/docker/volumes/rac/cassandra_data:/var/lib/cassandra
+    ports:
+      - "9042:9042"
+    networks:
+      - rac-network
+
+networks:
+  rac-network:

@@ -7,7 +7,9 @@ import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.user.application.port.out.UserDatabase;
 import pl.mg.rac.user.application.port.out.UserEventPublisher;
 import pl.mg.rac.user.application.service.event.EventAdapter;
+import pl.mg.rac.user.application.service.event.RentRequestFailedCarAdapter;
 import pl.mg.rac.user.application.service.event.RentRequestUserEventAdapter;
+import pl.mg.rac.user.application.service.event.ReturnRequestFailedCarAdapter;
 
 @Configuration
 public class EventAdaptersConfig {
@@ -21,9 +23,18 @@ public class EventAdaptersConfig {
     }
 
     @Bean
-    @Qualifier("RAC_RENT_REQUEST_USER")
     public EventAdapter<RacEvent<?>> rentRequestUserAdapter() {
         return new RentRequestUserEventAdapter(userDatabase, userEventPublisher);
+    }
+
+    @Bean
+    public EventAdapter<RacEvent<?>> rentRequestFailedCarAdapter() {
+        return new RentRequestFailedCarAdapter(userDatabase);
+    }
+
+    @Bean
+    public EventAdapter<RacEvent<?>> returnRequestFailedCarAdapter() {
+        return new ReturnRequestFailedCarAdapter(userDatabase);
     }
 
 }

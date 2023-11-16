@@ -22,44 +22,37 @@ public class EventAdaptersConfig {
     @Bean
     @EventTypeQualifier(EventType.RAC_RENT_CONFIRMATION)
     public EventAdapter<RacEvent<?>> rentAcceptedEventAdapter() {
-        return new RentAcceptedEventAdapter();
+        return new RentAcceptedEventAdapter(rentDatabase);
     }
 
     @Bean
-    @EventTypeQualifier(EventType.RAC_RENT_FAILED_CAR)
     public EventAdapter<RacEvent<?>> rentFailedCarAdapter() {
-        return new RentFailedCarEventAdapter();
+        return new RentFailedCarEventAdapter(rentDatabase);
     }
 
     @Bean
-    @EventTypeQualifier(EventType.RAC_RENT_FAILED_USER)
     public EventAdapter<RacEvent<?>> rentFailedUserAdapter() {
         return new RentFailedUserEventAdapter(rentDatabase);
     }
 
     @Bean
-    @EventTypeQualifier(EventType.RAC_RETURN_CONFIRMATION)
     public EventAdapter<RacEvent<?>> returnAcceptedEventAdapter() {
-        return new ReturnAcceptedEventAdapter();
+        return new ReturnAcceptedEventAdapter(rentDatabase);
     }
 
     @Bean
-    @EventTypeQualifier(EventType.RAC_RETURN_FAILED_CAR)
     public EventAdapter<RacEvent<?>> returnFailedCarAdapter() {
-        return new ReturnFailedCarEventAdapter();
+        return new ReturnFailedCarEventAdapter(rentDatabase);
     }
 
     @Bean
-    @EventTypeQualifier(EventType.RAC_RETURN_FAILED_USER)
     public EventAdapter<RacEvent<?>> returnFailedUserAdapter() {
-        return new ReturnFailedUserEventAdapter();
+        return new ReturnFailedUserEventAdapter(rentDatabase);
     }
 
     @Bean
-    @EventTypeQualifier(EventType.RAC_RETURN_FAILED_LOCATION)
     public EventAdapter<RacEvent<?>> returnFailedLocationAdapter() {
-        return new ReturnFailedLocationEventAdapter();
+        return new ReturnFailedLocationEventAdapter(rentDatabase);
     }
-
 
 }

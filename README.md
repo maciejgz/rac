@@ -66,6 +66,7 @@ https://github.com/maciejgz/rac
 - rac-discovery-service - http://localhost:8761/ - Spring Eureka server
 - rac-configuration-service - 8888 - Spring Cloud Config
 - MongoDB - 27017 - centralized database - each microservice will have a different schema
+- Cassandra - 9042 - time series database for storing the car and user location updates
 - Message broker
     - Kafka - 9092 - message broker
     - Zookeeper
@@ -90,6 +91,7 @@ https://github.com/maciejgz/rac
 | rac-discovery-service     | 8761  | Spring Cloud Eureka - discovery service                                  |         APP         |
 | rac-configuration-service | 8888  | Spring Cloud Config - centralized config service                         |         APP         |
 | rac-mongodb               | 27017 | MongoDB - database                                                       |         DB          |
+| rac-cassandra             | 9042  | Cassandra - database                                                     |         DB          |
 | rac-kafka                 | 9092  | Kafka - Message broker                                                   |   MESSAGE BROKER    |
 | rac-zookeeper             | 2181  | Zookeeper - Kafka nodes synchronization service                          |   MESSAGE BROKER    |
 | rac-elasticsearch         | 9200  | Elasticsearch - for search...                                            |       SEARCH        |
