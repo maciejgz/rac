@@ -9,6 +9,7 @@ import pl.mg.rac.commons.event.user.payload.UserChargedPayload;
 import pl.mg.rac.commons.value.Location;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +54,19 @@ public class User {
         return balance;
     }
 
-    public void rentCar(String rentId) {
+    public BigDecimal finishRentAndCharge(Instant rentStartDate, Instant rentEndDate, double distanceTraveled) {
+        //TODO add policy to calculate rent amount
+        BigDecimal amount = calculateRentAmount(rentStartDate, rentEndDate, distanceTraveled);
+        charge(amount);
+        cancelRent();
+        return amount;
+    }
+
+    private BigDecimal calculateRentAmount(Instant rentStartDate, Instant rentEndDate, double distanceTraveled) {
+        return BigDecimal.valueOf((double) (rentEndDate.getEpochSecond() - rentStartDate.getEpochSecond()) / 60 * 0.2 + distanceTraveled * 0.1);
+    }
+
+    public void startRent(String rentId) {
         if (rentId != null && !rentId.isEmpty()) {
             throw new IllegalStateException("User already has a rent" + rentId);
         }

@@ -33,7 +33,7 @@ public class RentRequestUserEventAdapter implements EventAdapter<RacEvent<?>>, R
         Optional<User> user = userDatabase.findByName(rentRequestUserEvent.getPayload().username());
         if (user.isPresent()) {
             try {
-                user.get().rentCar(rentRequestUserEvent.getPayload().rentId());
+                user.get().startRent(rentRequestUserEvent.getPayload().rentId());
                 userDatabase.save(user.get());
                 pushRentRequestCarEvent(rentRequestUserEvent);
             } catch (IllegalStateException e) {

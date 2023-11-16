@@ -10,6 +10,8 @@ import pl.mg.rac.car.application.dto.exception.CarNotFoundException;
 import pl.mg.rac.car.application.dto.query.GetCarQuery;
 import pl.mg.rac.car.application.dto.response.*;
 import pl.mg.rac.car.application.port.in.*;
+import pl.mg.rac.car.application.service.EventApplicationService;
+import pl.mg.rac.commons.event.RacEvent;
 
 public class CarFacade {
 
@@ -18,13 +20,15 @@ public class CarFacade {
     private final RentCar rentCarAdapter;
     private final ReturnCar returnCarAdapter;
     private final GetCar getCarAdapter;
+    private final EventApplicationService eventApplicationService;
 
-    public CarFacade(AddCar addCarAdapter, DeleteCar deleteCarAdapter, RentCar rentCarAdapter, ReturnCar returnCarAdapter, GetCar getCarAdapter) {
+    public CarFacade(AddCar addCarAdapter, DeleteCar deleteCarAdapter, RentCar rentCarAdapter, ReturnCar returnCarAdapter, GetCar getCarAdapter, EventApplicationService eventApplicationService) {
         this.addCarAdapter = addCarAdapter;
         this.deleteCarAdapter = deleteCarAdapter;
         this.rentCarAdapter = rentCarAdapter;
         this.returnCarAdapter = returnCarAdapter;
         this.getCarAdapter = getCarAdapter;
+        this.eventApplicationService = eventApplicationService;
     }
 
     public AddCarResponse addCar(AddCarCommand command) throws CarAlreadyExistsException {
@@ -46,6 +50,10 @@ public class CarFacade {
 
     public GetCarResponse getCar(GetCarQuery query) throws CarNotFoundException {
         return getCarAdapter.getCar(query);
+    }
+
+    public void handleIncomingEvent(RacEvent<?> event) {
+        eventApplicationService.handleIncomingEvent(event);
     }
 
 }

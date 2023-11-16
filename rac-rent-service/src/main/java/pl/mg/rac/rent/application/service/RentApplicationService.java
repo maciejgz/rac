@@ -59,7 +59,8 @@ public class RentApplicationService implements RequestRent, GetRent, RequestRetu
                 rentEventPublisher.publishRentEvent(
                         new ReturnRequestLocationEvent(
                                 rent.get().getId(),
-                                new ReturnRequestLocationPayload(rent.get().getId(), rent.get().getUsername(), rent.get().getVin())
+                                new ReturnRequestLocationPayload(rent.get().getId(), rent.get().getUsername(),
+                                        rent.get().getVin(), rent.get().getRentStartTimestamp())
                         )
                 );
                 return new RequestReturnResponse(rent.get().getRentId(),

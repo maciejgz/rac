@@ -1,7 +1,6 @@
 package pl.mg.rac.rent.domain.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pl.mg.rac.commons.event.RacEvent;
@@ -22,6 +21,7 @@ public class Rent {
     private String username;
     private String vin;
     private Location startLocation;
+    //TODO replace with BigDecimal
     private double distanceTraveled;
     private Location endLocation;
     private Instant rentRequestTimestamp;

@@ -6,4 +6,6 @@ public interface CarEventPublisher {
 
 
     void publishCarEvent(RacEvent<?> event);
+
+    void publishRentEvent(RacEvent<?> event);
 }

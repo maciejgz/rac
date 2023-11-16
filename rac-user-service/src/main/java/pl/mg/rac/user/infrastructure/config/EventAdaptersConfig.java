@@ -6,10 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.user.application.port.out.UserDatabase;
 import pl.mg.rac.user.application.port.out.UserEventPublisher;
-import pl.mg.rac.user.application.service.event.EventAdapter;
-import pl.mg.rac.user.application.service.event.RentRequestFailedCarAdapter;
-import pl.mg.rac.user.application.service.event.RentRequestUserEventAdapter;
-import pl.mg.rac.user.application.service.event.ReturnRequestFailedCarAdapter;
+import pl.mg.rac.user.application.service.event.*;
 
 @Configuration
 public class EventAdaptersConfig {
@@ -35,6 +32,11 @@ public class EventAdaptersConfig {
     @Bean
     public EventAdapter<RacEvent<?>> returnRequestFailedCarAdapter() {
         return new ReturnRequestFailedCarAdapter(userDatabase);
+    }
+
+    @Bean
+    public EventAdapter<RacEvent<?>> returnRequestUserAdapter() {
+        return new ReturnRequestUserAdapter(userDatabase, userEventPublisher);
     }
 
 }

@@ -10,6 +10,7 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicConfig {
 
     public static final String RAC_CAR_TOPIC = "rac-car";
+    public static final String RAC_RENT_TOPIC = "rac-rent";
 
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
