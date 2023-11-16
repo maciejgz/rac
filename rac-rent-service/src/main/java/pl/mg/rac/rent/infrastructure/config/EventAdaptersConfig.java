@@ -4,10 +4,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
+import pl.mg.rac.rent.application.port.out.RentDatabase;
+import pl.mg.rac.rent.application.port.out.RentEventPublisher;
 import pl.mg.rac.rent.application.service.event.*;
 
 @Configuration
 public class EventAdaptersConfig {
+
+    private final RentDatabase rentDatabase;
+    private final RentEventPublisher eventPublisher;
+
+    public EventAdaptersConfig(RentDatabase rentDatabase, RentEventPublisher eventPublisher) {
+        this.rentDatabase = rentDatabase;
+        this.eventPublisher = eventPublisher;
+    }
 
     @Bean
     @EventTypeQualifier(EventType.RAC_RENT_CONFIRMATION)
@@ -24,7 +34,7 @@ public class EventAdaptersConfig {
     @Bean
     @EventTypeQualifier(EventType.RAC_RENT_FAILED_USER)
     public EventAdapter<RacEvent<?>> rentFailedUserAdapter() {
-        return new RentFailedUserEventAdapter();
+        return new RentFailedUserEventAdapter(rentDatabase);
     }
 
     @Bean

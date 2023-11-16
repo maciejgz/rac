@@ -19,6 +19,7 @@ public class User {
     private String name;
     private BigDecimal balance;
     private Location location;
+    private String currentRentId;
 
     @Transient
     private final List<RacEvent<? extends RacEventPayload>> events;
@@ -31,6 +32,7 @@ public class User {
         this.id = id;
         this.name = name;
         this.balance = balance;
+        this.location = location;
         this.events = new ArrayList<>();
     }
 
@@ -49,6 +51,13 @@ public class User {
         addEvent(new UserChargedEvent(name, new UserChargedPayload(name, balance, balance.add(amount))));
         balance = balance.add(amount);
         return balance;
+    }
+
+    public void rentCar(String rentId) {
+        if (rentId != null && !rentId.isEmpty()) {
+            throw new IllegalStateException("User already has a rent" + rentId);
+        }
+        this.currentRentId = rentId;
     }
 
 }

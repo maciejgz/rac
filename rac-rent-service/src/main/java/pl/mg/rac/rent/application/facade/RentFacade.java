@@ -21,7 +21,6 @@ public class RentFacade {
     private final RequestRent requestRentAdapter;
     private final GetRent getRentAdapter;
     private final RequestReturn requestReturnAdapter;
-
     private final EventApplicationService eventApplicationService;
 
     public RentFacade(RequestRent requestRentAdapter, GetRent getRentAdapter, RequestReturn requestReturnAdapter, EventApplicationService eventApplicationService) {
