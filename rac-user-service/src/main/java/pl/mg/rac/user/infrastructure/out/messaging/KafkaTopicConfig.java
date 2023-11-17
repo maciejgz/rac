@@ -9,6 +9,7 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaTopicConfig {
 
+    public static final String RAC_RENT_TOPIC = "rac-rent";
     public static final String RAC_USER_TOPIC = "rac-user";
 
     @Value(value = "${spring.kafka.bootstrap-servers}")

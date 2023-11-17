@@ -95,7 +95,7 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
         Optional<Car> car = carDatabase.getCarByVin(command.vin());
         if (car.isPresent()) {
             try {
-                car.get().returnCar(command.rentalId(), command.distanceTraveled(), command.location());
+                car.get().returnCar(command.rentalId(), command.distanceTraveled());
                 carDatabase.save(car.get());
                 for (RacEvent<?> event : car.get().getEvents()) {
                     eventPublisher.publishCarEvent(event);

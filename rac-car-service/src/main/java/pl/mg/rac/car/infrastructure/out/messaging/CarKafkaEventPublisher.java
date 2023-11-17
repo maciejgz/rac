@@ -18,4 +18,9 @@ public class CarKafkaEventPublisher implements CarEventPublisher {
     public void publishCarEvent(RacEvent<?> event) {
         kafkaTemplate.send(KafkaTopicConfig.RAC_CAR_TOPIC, UUID.randomUUID().toString(), event);
     }
+
+    @Override
+    public void publishRentEvent(RacEvent<?> event) {
+        kafkaTemplate.send(KafkaTopicConfig.RAC_RENT_TOPIC, UUID.randomUUID().toString(), event);
+    }
 }

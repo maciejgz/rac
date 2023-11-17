@@ -27,7 +27,7 @@ spring:
             - Path=/api/rent/**, /api/rent
           filters:
             - RewritePath=/api/rent/(?<segment>.*), /rent/${segment}
-            - RewritePath=/api/route, /route
+            - RewritePath=/api/rent, /rent
         - id: search-service-api-route
           uri: http://localhost:8083
           predicates:

@@ -54,14 +54,12 @@ public class Car {
         this.rentalId = rentalId;
     }
 
-    public void returnCar(String rentalId, Double distanceTraveled, Location location) throws CarAlreadyReturnedException {
+    public void returnCar(String rentalId, Double distanceTraveled) throws CarAlreadyReturnedException {
         if (!rented) {
             throw new CarAlreadyReturnedException("Car with vin: " + vin + " is already returned. Last rental id: " + rentalId);
         }
         this.rented = false;
-        this.addDistanceTraveled(distanceTraveled);
         this.rentalId = rentalId;
-        this.updateLocation(location);
         this.addEvent(new CarReturnSuccessEvent(vin, new CarReturnSuccessPayload(vin, rentalId, location, distanceTraveled, mileage)));
     }
 
