@@ -1,6 +1,7 @@
 package pl.mg.rac.user.domain.model;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Transient;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.RacEventPayload;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Slf4j
 public class User {
 
     private String id;
@@ -62,6 +64,12 @@ public class User {
         return amount;
     }
 
+    public void rollbackRentReturn(String rentId, BigDecimal amount) {
+        log.debug("rollbackRentReturn() called with: rentId = [" + rentId + "], amount = [" + amount + "]");
+        this.currentRentId = rentId;
+        this.balance = balance.subtract(amount);
+    }
+
     private BigDecimal calculateRentAmount(Instant rentStartDate, Instant rentEndDate, double distanceTraveled) {
         return BigDecimal.valueOf((double) (rentEndDate.getEpochSecond() - rentStartDate.getEpochSecond()) / 60 * 0.2 + distanceTraveled * 0.1);
     }
@@ -72,6 +80,7 @@ public class User {
         }
         this.currentRentId = rentId;
     }
+
 
     public void cancelRent() {
         this.currentRentId = null;

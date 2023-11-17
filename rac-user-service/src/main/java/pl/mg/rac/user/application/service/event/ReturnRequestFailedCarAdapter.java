@@ -21,12 +21,13 @@ public class ReturnRequestFailedCarAdapter implements EventAdapter<RacEvent<?>>,
 
     @Override
     public void handle(RacEvent<?> event) {
-        ReturnFailedCarEvent returnRequestUserEvent = (ReturnFailedCarEvent) event;
+        ReturnFailedCarEvent returnFailedCarEvent = (ReturnFailedCarEvent) event;
         log.debug("ReturnRequestFailedCarAdapter.handle() called with: event = [" + event + "]");
-        Optional<User> user = userDatabase.findByName(returnRequestUserEvent.getPayload().username());
+        Optional<User> user = userDatabase.findByName(returnFailedCarEvent.getPayload().username());
         if (user.isPresent()) {
-            user.ifPresent(User::cancelRent);
+            user.get().rollbackRentReturn(returnFailedCarEvent.getPayload().rentId(), returnFailedCarEvent.getPayload().chargedAmount());
             userDatabase.save(user.get());
+            // TODO make return issue saga as a sequence - here event to rent service should be pushed
         }
     }
 
