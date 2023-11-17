@@ -15,7 +15,7 @@ spring:
       properties:
         spring.json.trusted.packages: '*'
   cassandra:
-    keyspace-name: rac-location
+    keyspace-name: "\"rac-location\""
     contact-points: localhost
     port: 9042
     schema-action: CREATE_IF_NOT_EXISTS
