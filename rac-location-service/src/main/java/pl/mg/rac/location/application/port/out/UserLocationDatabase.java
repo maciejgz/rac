@@ -1,8 +1,10 @@
 package pl.mg.rac.location.application.port.out;
 
-import pl.mg.rac.location.domain.model.CarLocation;
+import pl.mg.rac.location.domain.model.UserLocation;
 
 public interface UserLocationDatabase {
-    CarLocation saveUserLocation(String username, CarLocation carLocation);
+    UserLocation saveUserLocation(UserLocation carLocation);
+
+    UserLocation findLatestLocation(String username);
 
 }

@@ -3,12 +3,11 @@ package pl.mg.rac.location.infrastructure.in.web.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import pl.mg.rac.commons.api.dto.ApiError;
 import pl.mg.rac.location.application.dto.command.UpdateCarLocationCommand;
 import pl.mg.rac.location.application.dto.command.UpdateUserLocationCommand;
+import pl.mg.rac.location.application.dto.exception.LocationUpdateException;
 import pl.mg.rac.location.application.facade.LocationFacade;
 
 @RestController
@@ -23,17 +22,22 @@ public class LocationCommandController {
     }
 
     @PostMapping(value = "/user")
-    public ResponseEntity<Void> updateUserLocation(@RequestBody UpdateUserLocationCommand command) {
+    public ResponseEntity<Void> updateUserLocation(@RequestBody UpdateUserLocationCommand command) throws LocationUpdateException {
         log.debug("updateUserLocation() called with: command = [" + command + "]");
         locationFacade.updateUserLocation(command);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(value = "/car")
-    public ResponseEntity<Void> updateCarLocation(@RequestBody UpdateCarLocationCommand command) {
+    public ResponseEntity<Void> updateCarLocation(@RequestBody UpdateCarLocationCommand command) throws LocationUpdateException {
         log.debug("updateCarLocation() called with: command = [" + command + "]");
         locationFacade.updateCarLocation(command);
         return ResponseEntity.ok().build();
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleDeletionException(LocationUpdateException e) {
+        return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
     }
 
 }

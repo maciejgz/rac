@@ -2,25 +2,31 @@ package pl.mg.rac.rent.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import pl.mg.rac.commons.event.EventType;
+import org.springframework.core.annotation.Order;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.rent.application.port.out.RentDatabase;
 import pl.mg.rac.rent.application.port.out.RentEventPublisher;
 import pl.mg.rac.rent.application.service.event.*;
+import pl.mg.rac.rent.infrastructure.out.messaging.RentKafkaEventPublisher;
+import pl.mg.rac.rent.infrastructure.out.persistence.RentJpaRepository;
+import pl.mg.rac.rent.infrastructure.out.persistence.RentRepository;
 
 @Configuration
 public class EventAdaptersConfig {
 
+    //FIXME get rid of circular dependency
     private final RentDatabase rentDatabase;
     private final RentEventPublisher eventPublisher;
 
-    public EventAdaptersConfig(RentDatabase rentDatabase, RentEventPublisher eventPublisher) {
+    private final RentJpaRepository rentJpaRepository;
+
+    public EventAdaptersConfig(RentDatabase rentDatabase, RentEventPublisher eventPublisher, RentJpaRepository rentJpaRepository) {
         this.rentDatabase = rentDatabase;
         this.eventPublisher = eventPublisher;
+        this.rentJpaRepository = rentJpaRepository;
     }
 
     @Bean
-    @EventTypeQualifier(EventType.RAC_RENT_CONFIRMATION)
     public EventAdapter<RacEvent<?>> rentAcceptedEventAdapter() {
         return new RentAcceptedEventAdapter(rentDatabase);
     }
@@ -53,6 +59,17 @@ public class EventAdaptersConfig {
     @Bean
     public EventAdapter<RacEvent<?>> returnFailedLocationAdapter() {
         return new ReturnFailedLocationEventAdapter(rentDatabase);
+    }
+
+    //outgoing port adapters
+    @Bean
+    public RentDatabase rentDatabase() {
+        return new RentRepository(rentJpaRepository);
+    }
+
+    @Bean
+    public RentEventPublisher rentEventPublisher() {
+        return new RentKafkaEventPublisher();
     }
 
 }

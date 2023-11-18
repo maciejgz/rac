@@ -42,7 +42,8 @@ public class InfrastructureConfig {
     //facade
     @Bean
     public LocationFacade rentFacade() {
-        return new LocationFacade(locationApplicationService(), locationApplicationService());
+        return new LocationFacade(locationApplicationService(), locationApplicationService(),
+                locationApplicationService(), locationApplicationService());
     }
 
     //application services

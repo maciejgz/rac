@@ -1,6 +1,5 @@
 package pl.mg.rac.user.infrastructure.config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pl.mg.rac.commons.event.RacEvent;
@@ -10,6 +9,8 @@ import pl.mg.rac.user.application.service.event.*;
 
 @Configuration
 public class EventAdaptersConfig {
+
+    //FIXME get rid of circular dependency
 
     private final UserDatabase userDatabase;
     private final UserEventPublisher userEventPublisher;

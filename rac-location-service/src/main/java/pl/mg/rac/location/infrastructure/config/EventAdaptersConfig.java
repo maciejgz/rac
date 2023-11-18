@@ -7,6 +7,7 @@ import pl.mg.rac.location.application.port.out.LocationEventPublisher;
 @Configuration
 public class EventAdaptersConfig {
 
+    //FIXME get rid of circular dependency
     private final CarLocationDatabase carLocationDatabase;
     private final LocationEventPublisher eventPublisher;
 

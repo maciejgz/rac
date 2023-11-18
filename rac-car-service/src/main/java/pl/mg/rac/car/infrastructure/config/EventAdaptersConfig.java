@@ -12,6 +12,7 @@ import pl.mg.rac.commons.event.RacEvent;
 @Configuration
 public class EventAdaptersConfig {
 
+    //FIXME get rid of circular dependency
     private final CarDatabase carDatabase;
     private final CarEventPublisher eventPublisher;
 

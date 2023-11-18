@@ -7,16 +7,16 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class CarLocation {
+public class UserLocation {
 
     private final UUID id;
-    private final String vin;
+    private final String username;
     private final Location location;
     private final Instant timestamp;
 
-    public CarLocation(UUID id, String vin, Location location, Instant timestamp) {
+    public UserLocation(UUID id, String username, Location location, Instant timestamp) {
         this.id = id;
-        this.vin = vin;
+        this.username = username;
         this.location = location;
         this.timestamp = timestamp;
     }

@@ -3,6 +3,8 @@ server:
 
 
 spring:
+  main:
+    allow-circular-references: true
   application:
     name: rac-car-service
   data:
