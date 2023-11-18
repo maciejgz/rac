@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import pl.mg.rac.commons.value.Location;
 import pl.mg.rac.location.application.dto.command.UpdateCarLocationCommand;
 import pl.mg.rac.location.application.dto.command.UpdateUserLocationCommand;
+import pl.mg.rac.location.application.dto.exception.LocationNotFoundException;
 import pl.mg.rac.location.application.dto.exception.LocationUpdateException;
 import pl.mg.rac.location.application.port.in.GetCarLocation;
 import pl.mg.rac.location.application.port.in.GetUserLocation;
@@ -16,7 +17,6 @@ import pl.mg.rac.location.domain.model.CarLocation;
 import pl.mg.rac.location.domain.model.UserLocation;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Slf4j
 public class LocationApplicationService implements UpdateCarLocation, UpdateUserLocation, GetCarLocation, GetUserLocation {
@@ -35,7 +35,7 @@ public class LocationApplicationService implements UpdateCarLocation, UpdateUser
     public void updateCarLocation(UpdateCarLocationCommand command) throws LocationUpdateException {
         log.debug("updateCarLocation() called with: command = [" + command + "]");
         try {
-            CarLocation location = new CarLocation(UUID.randomUUID(),
+            CarLocation location = new CarLocation(
                     command.vin(),
                     command.location(),
                     Instant.now());
@@ -49,7 +49,7 @@ public class LocationApplicationService implements UpdateCarLocation, UpdateUser
     public void updateUserLocation(UpdateUserLocationCommand command) throws LocationUpdateException {
         log.debug("updateUserLocation() called with: command = [" + command + "]");
         try {
-            UserLocation location = new UserLocation(UUID.randomUUID(),
+            UserLocation location = new UserLocation(
                     command.username(),
                     command.location(),
                     Instant.now());
@@ -60,12 +60,12 @@ public class LocationApplicationService implements UpdateCarLocation, UpdateUser
     }
 
     @Override
-    public Location getCarLocation(String vin) {
+    public Location getCarLocation(String vin) throws LocationNotFoundException {
         return carLocationDatabase.findLatestLocation(vin).getLocation();
     }
 
     @Override
-    public Location getUserLocation(String username) {
+    public Location getUserLocation(String username) throws LocationNotFoundException {
         return userLocationDatabase.findLatestLocation(username).getLocation();
     }
 }

@@ -1,11 +1,13 @@
 package pl.mg.rac.location.infrastructure.out.persistence;
 
 import pl.mg.rac.commons.value.Location;
+import pl.mg.rac.location.application.dto.exception.LocationNotFoundException;
 import pl.mg.rac.location.application.port.out.UserLocationDatabase;
 import pl.mg.rac.location.domain.model.UserLocation;
 import pl.mg.rac.location.infrastructure.out.persistence.entity.UserLocationEntity;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 public class UserLocationRepository implements UserLocationDatabase {
 
@@ -18,26 +20,28 @@ public class UserLocationRepository implements UserLocationDatabase {
     @Override
     public UserLocation saveUserLocation(UserLocation userLocation) {
         UserLocationEntity entity = new UserLocationEntity(
-                userLocation.getId(),
-                userLocation.getUsername(),
+                new UserLocationEntity.UserKey(userLocation.getUsername(), userLocation.getTimestamp()),
                 BigDecimal.valueOf(userLocation.getLocation().latitude()),
-                BigDecimal.valueOf(userLocation.getLocation().longitude()),
-                userLocation.getTimestamp()
+                BigDecimal.valueOf(userLocation.getLocation().longitude())
         );
         return ofEntity(userRepository.save(entity));
     }
 
     @Override
-    public UserLocation findLatestLocation(String username) {
-        return ofEntity(userRepository.findFirstByUsernameOrderByTimestampDesc(username));
+    public UserLocation findLatestLocation(String username) throws LocationNotFoundException {
+        Optional<UserLocationEntity> user = userRepository.findFirstByKeyUsernameOrderByKeyTimestampDesc(username);
+        if (user.isPresent()) {
+            return ofEntity(user.get());
+        } else {
+            throw new LocationNotFoundException("Location for username " + username + " not found");
+        }
     }
 
     private static UserLocation ofEntity(UserLocationEntity entity) {
         return new UserLocation(
-                entity.getId(),
-                entity.getUsername(),
+                entity.getKey().getUsername(),
                 new Location(entity.getLatitude().doubleValue(), entity.getLongitude().doubleValue()),
-                entity.getTimestamp()
+                entity.getKey().getTimestamp()
         );
     }
 }

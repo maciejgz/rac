@@ -9,13 +9,11 @@ import java.util.UUID;
 @Getter
 public class UserLocation {
 
-    private final UUID id;
     private final String username;
     private final Location location;
     private final Instant timestamp;
 
-    public UserLocation(UUID id, String username, Location location, Instant timestamp) {
-        this.id = id;
+    public UserLocation( String username, Location location, Instant timestamp) {
         this.username = username;
         this.location = location;
         this.timestamp = timestamp;
