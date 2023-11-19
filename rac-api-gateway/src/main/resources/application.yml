@@ -44,7 +44,13 @@ spring:
           filters:
             - RewritePath=/api/location/(?<segment>.*), /location/${segment}
             - RewritePath=/api/location, /location
-
+        - id: simulation-service-api-route
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/simulation/**, /api/simulation
+          filters:
+            - RewritePath=/api/simulation/(?<segment>.*), /simulation/${segment}
+            - RewritePath=/api/simulation, /simulation
 
 ## Discovery Service
 eureka:

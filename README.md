@@ -61,8 +61,9 @@ https://github.com/maciejgz/rac
 - rac-rent-service - 8082 - Renting service
 - rac-search-service - 8083 - search functionality
 - rac-car-service - 8084 - car fleet management
-- rac-carLocation-service - 8085 - gathering carLocation data of the cars and users. All the agents are sending the data to
+- rac-location-service - 8085 - gathering carLocation data of the cars and users. All the agents are sending the data to
   this service. Should use Cassandra column database for storing the carLocation data.
+- rac-simulation-service - 8086 - simulates the data of the cars and users
 - rac-discovery-service - http://localhost:8761/ - Spring Eureka server
 - rac-configuration-service - 8888 - Spring Cloud Config
 - MongoDB - 27017 - centralized database - each microservice will have a different schema
@@ -87,7 +88,8 @@ https://github.com/maciejgz/rac
 | rac-rent-service          | 8082  | renting service                                                          |         APP         |
 | rac-search-service        | 8083  | search service                                                           |         APP         |
 | rac-car-service           | 8084  | car fleet management                                                     |         APP         |
-| rac-carLocation-service      | 8085  | Cars carLocation service                                                    |         APP         |
+| rac-location-service      | 8085  | Cars and users location service                                          |         APP         |
+| rac-simulation-service    | 8086  | Simulation service                                                       |         APP         |
 | rac-discovery-service     | 8761  | Spring Cloud Eureka - discovery service                                  |         APP         |
 | rac-configuration-service | 8888  | Spring Cloud Config - centralized config service                         |         APP         |
 | rac-mongodb               | 27017 | MongoDB - database                                                       |         DB          |
@@ -136,20 +138,20 @@ https://github.com/maciejgz/rac
 
 #### Return related events
 
-| event ID                    |   topic    | comment                                                                                                 |
-|-----------------------------|:----------:|:--------------------------------------------------------------------------------------------------------|
-| RAC_RETURN_REQUEST_LOCATION | RAC_RETURN | Sent when return is requested to validate request and calculate distance traveled                       |
+| event ID                    |   topic    | comment                                                                                                    |
+|-----------------------------|:----------:|:-----------------------------------------------------------------------------------------------------------|
+| RAC_RETURN_REQUEST_LOCATION | RAC_RETURN | Sent when return is requested to validate request and calculate distance traveled                          |
 | RAC_RETURN_REQUEST_USER     | RAC_RETURN | Sent when return is requested and confirmed in carLocation service to validate request in the user service |
-| RAC_RETURN_REQUEST_CAR      | RAC_RETURN | Sent when return is requested and confirmed in user service. Car service should validate the request    |
-| RAC_RETURN_CONFIRMATION     | RAC_RETURN | Sent when return is confirmed in car service and should be confirmed in rent service                    |
+| RAC_RETURN_REQUEST_CAR      | RAC_RETURN | Sent when return is requested and confirmed in user service. Car service should validate the request       |
+| RAC_RETURN_CONFIRMATION     | RAC_RETURN | Sent when return is confirmed in car service and should be confirmed in rent service                       |
 | RAC_RETURN_FAILED_LOCATION  | RAC_RETURN | Issue in return validation in carLocation service                                                          |
-| RAC_RETURN_FAILED_USER      | RAC_RETURN | Issue in return validation in user service                                                              |
-| RAC_RETURN_FAILED_CAR       | RAC_RETURN | Issue in return validation in car service                                                               |
+| RAC_RETURN_FAILED_USER      | RAC_RETURN | Issue in return validation in user service                                                                 |
+| RAC_RETURN_FAILED_CAR       | RAC_RETURN | Issue in return validation in car service                                                                  |
 
 #### Location service events
 
-| event ID                  |       topic       | comment                                 |
-|---------------------------|:-----------------:|:----------------------------------------|
+| event ID                  |       topic       | comment                                    |
+|---------------------------|:-----------------:|:-------------------------------------------|
 | RAC_LOCATION_USER_CHANGED | RAC_LOCATION_USER | Sent when user has changed his carLocation |
 | RAC_LOCATION_CAR_CHANGED  | RAC_LOCATION_CAR  | Sent when car has changed his carLocation  |
 
