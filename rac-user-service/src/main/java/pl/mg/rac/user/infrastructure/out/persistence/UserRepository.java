@@ -35,6 +35,8 @@ public class UserRepository implements UserDatabase {
     }
 
     private User mapToDomainUser(UserEntity userEntity) {
-        return new User(userEntity.getId(), userEntity.getName(), userEntity.getBalance(), userEntity.getLocation());
+        return new User(userEntity.getId(), userEntity.getName(),
+                userEntity.getBalance(), userEntity.getLocation(),
+                userEntity.getCurrentRentId());
     }
 }

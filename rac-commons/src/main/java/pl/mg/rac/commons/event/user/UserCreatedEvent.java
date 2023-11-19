@@ -1,12 +1,16 @@
 package pl.mg.rac.commons.event.user;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.user.payload.UserCreatedPayload;
 
 public class UserCreatedEvent extends RacEvent<UserCreatedPayload> {
 
-    public UserCreatedEvent(String aggregateId, UserCreatedPayload payload) {
+    @JsonCreator
+    public UserCreatedEvent(@JsonProperty("aggregateId") String aggregateId,
+                            @JsonProperty("payload") UserCreatedPayload payload) {
         super(aggregateId, payload);
     }
 

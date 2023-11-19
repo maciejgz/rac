@@ -31,12 +31,13 @@ public class User {
         this.events = new ArrayList<>();
     }
 
-    public User(String id, String name, BigDecimal balance, Location location) {
+    public User(String id, String name, BigDecimal balance, Location location, String currentRentId) {
         this.id = id;
         this.name = name;
         this.balance = balance;
         this.location = location;
         this.events = new ArrayList<>();
+        this.currentRentId = currentRentId;
     }
 
     public User(String name, BigDecimal balance, Location location) {
@@ -56,7 +57,7 @@ public class User {
         return balance;
     }
 
-    public BigDecimal finishRentAndCharge(Instant rentStartDate, Instant rentEndDate, double distanceTraveled) {
+    public BigDecimal finishRentAndCharge(Instant rentStartDate, Instant rentEndDate, BigDecimal distanceTraveled) {
         //TODO add policy to calculate rent amount
         BigDecimal amount = calculateRentAmount(rentStartDate, rentEndDate, distanceTraveled);
         charge(amount);
@@ -70,12 +71,13 @@ public class User {
         this.balance = balance.subtract(amount);
     }
 
-    private BigDecimal calculateRentAmount(Instant rentStartDate, Instant rentEndDate, double distanceTraveled) {
-        return BigDecimal.valueOf((double) (rentEndDate.getEpochSecond() - rentStartDate.getEpochSecond()) / 60 * 0.2 + distanceTraveled * 0.1);
+    private BigDecimal calculateRentAmount(Instant rentStartDate, Instant rentEndDate, BigDecimal distanceTraveled) {
+        return BigDecimal.valueOf((double) (rentEndDate.getEpochSecond() - rentStartDate.getEpochSecond()) / 60 * 0.2)
+                .add(distanceTraveled.multiply(BigDecimal.valueOf(0.1)));
     }
 
     public void startRent(String rentId) {
-        if (rentId != null && !rentId.isEmpty()) {
+        if (this.currentRentId != null && !this.currentRentId.isEmpty()) {
             throw new IllegalStateException("User already has a rent" + rentId);
         }
         this.currentRentId = rentId;

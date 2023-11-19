@@ -33,6 +33,6 @@ public class ReturnRequestFailedCarAdapter implements EventAdapter<RacEvent<?>>,
 
     @Override
     public String getEventType() {
-        return EventType.RAC_RENT_FAILED_CAR.name();
+        return EventType.RAC_RETURN_FAILED_CAR.name();
     }
 }

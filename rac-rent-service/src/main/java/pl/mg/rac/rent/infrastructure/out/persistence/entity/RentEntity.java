@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import pl.mg.rac.commons.value.Location;
 import pl.mg.rac.rent.domain.model.RentStatus;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Document(collection = "rent")
@@ -20,7 +21,7 @@ public class RentEntity {
     private String username;
     private String vin;
     private Location startLocation;
-    private double distanceTraveled;
+    private BigDecimal distanceTraveled;
     private Location endLocation;
     private Instant rentRequestTimestamp;
     private Instant rentStartTimestamp;

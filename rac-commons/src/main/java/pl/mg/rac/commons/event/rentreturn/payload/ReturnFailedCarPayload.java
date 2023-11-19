@@ -6,6 +6,6 @@ import pl.mg.rac.commons.value.Location;
 import java.math.BigDecimal;
 
 public record ReturnFailedCarPayload(String rentId, String username, String vin,
-                                     Location endLocation, double distanceTraveled, BigDecimal chargedAmount,
+                                     Location endLocation, BigDecimal distanceTraveled, BigDecimal chargedAmount,
                                      String errorCode, String errorMessage) implements RacEventPayload {
 }

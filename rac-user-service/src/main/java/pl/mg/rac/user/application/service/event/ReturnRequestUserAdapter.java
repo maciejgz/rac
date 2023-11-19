@@ -45,7 +45,7 @@ public class ReturnRequestUserAdapter implements EventAdapter<RacEvent<?>>, Rent
                                     chargedAmount
                             )
                     );
-                    userEventPublisher.publishUserEvent(eventToPush);
+                    userEventPublisher.publishReturnRequestCarEvent(eventToPush);
                 });
     }
 

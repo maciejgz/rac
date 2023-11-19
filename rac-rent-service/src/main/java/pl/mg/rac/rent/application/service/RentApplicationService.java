@@ -58,8 +58,8 @@ public class RentApplicationService implements RequestRent, GetRent, RequestRetu
                 rentDatabase.save(rent.get());
                 rentEventPublisher.publishRentEvent(
                         new ReturnRequestLocationEvent(
-                                rent.get().getId(),
-                                new ReturnRequestLocationPayload(rent.get().getId(), rent.get().getUsername(),
+                                rent.get().getRentId(),
+                                new ReturnRequestLocationPayload(rent.get().getRentId(), rent.get().getUsername(),
                                         rent.get().getVin(), rent.get().getRentStartTimestamp())
                         )
                 );
@@ -69,7 +69,7 @@ public class RentApplicationService implements RequestRent, GetRent, RequestRetu
                         rent.get().getStatus(),
                         rent.get().getStatusReason());
             } catch (Exception e) {
-                log.error("Error while requesting return", e);
+                log.error("Error while requesting return");
                 throw new InvalidRentStateException("Error while requesting return", e);
             }
         } else {

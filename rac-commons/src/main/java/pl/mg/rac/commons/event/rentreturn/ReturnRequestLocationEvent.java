@@ -1,12 +1,15 @@
 package pl.mg.rac.commons.event.rentreturn;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.rentreturn.payload.ReturnRequestLocationPayload;
 
 public class ReturnRequestLocationEvent extends RacEvent<ReturnRequestLocationPayload> {
 
-    public ReturnRequestLocationEvent(String aggregateId, ReturnRequestLocationPayload payload) {
+    @JsonCreator
+    public ReturnRequestLocationEvent(@JsonProperty("aggregateId") String aggregateId, @JsonProperty("payload")  ReturnRequestLocationPayload payload) {
         super(aggregateId, payload);
     }
 

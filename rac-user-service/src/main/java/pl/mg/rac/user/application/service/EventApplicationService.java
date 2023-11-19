@@ -1,11 +1,12 @@
 package pl.mg.rac.user.application.service;
 
+import lombok.extern.slf4j.Slf4j;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.user.application.service.event.EventAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
-
+@Slf4j
 public class EventApplicationService {
 
     private final Map<String, EventAdapter<RacEvent<?>>> eventAdapters;
@@ -21,8 +22,9 @@ public class EventApplicationService {
         String eventType = event.getEventType();
         EventAdapter<RacEvent<?>> adapter = eventAdapters.get(eventType);
         if (adapter == null) {
-            throw new IllegalArgumentException("No adapter registered for event type: " + eventType);
+            log.warn("No adapter registered for event type: " + eventType);
+        } else {
+            adapter.handle(event);
         }
-        adapter.handle(event);
     }
 }

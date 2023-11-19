@@ -23,12 +23,10 @@ public class LocationApplicationService implements UpdateCarLocation, UpdateUser
 
     private final CarLocationDatabase carLocationDatabase;
     private final UserLocationDatabase userLocationDatabase;
-    private final LocationEventPublisher eventPublisher;
 
     public LocationApplicationService(CarLocationDatabase carLocationDatabase, UserLocationDatabase userLocationDatabase, LocationEventPublisher eventPublisher) {
         this.carLocationDatabase = carLocationDatabase;
         this.userLocationDatabase = userLocationDatabase;
-        this.eventPublisher = eventPublisher;
     }
 
     @Override

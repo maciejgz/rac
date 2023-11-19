@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import pl.mg.rac.commons.value.Location;
 
+import java.math.BigDecimal;
+
 @Document(collection = "car")
 @Data
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class CarEntity {
     private String vin;
     private Location location;
     private Boolean rented;
-    private Double mileage;
+    private BigDecimal mileage;
     @Field("rental_id")
     private String rentalId;
 

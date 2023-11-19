@@ -3,6 +3,7 @@ package pl.mg.rac.rent.application.dto.response;
 import pl.mg.rac.commons.value.Location;
 import pl.mg.rac.rent.domain.model.RentStatus;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 public record RentResponse(
@@ -10,7 +11,7 @@ public record RentResponse(
         String username,
         String vin,
         Location startLocation,
-        double distanceTraveled,
+        BigDecimal distanceTraveled,
         Location endLocation,
         Instant rentRequestTimestamp,
         Instant rentStartTimestamp,

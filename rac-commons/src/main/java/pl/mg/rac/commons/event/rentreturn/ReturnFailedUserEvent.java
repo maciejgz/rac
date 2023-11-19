@@ -1,12 +1,15 @@
 package pl.mg.rac.commons.event.rentreturn;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.rentreturn.payload.ReturnFailedUserPayload;
 
 public class ReturnFailedUserEvent extends RacEvent<ReturnFailedUserPayload> {
 
-    public ReturnFailedUserEvent(String aggregateId, ReturnFailedUserPayload payload) {
+    @JsonCreator
+    public ReturnFailedUserEvent(@JsonProperty("aggregateId") String aggregateId, @JsonProperty("payload")  ReturnFailedUserPayload payload) {
         super(aggregateId, payload);
     }
 
