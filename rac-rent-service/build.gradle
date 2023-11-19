@@ -42,6 +42,10 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
     compileOnly 'org.projectlombok:lombok'
     implementation 'pl.mg.rac:rac-commons:0.0.1-SNAPSHOT'
     implementation project(path: ':rac-commons')

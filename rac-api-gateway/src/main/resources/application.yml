@@ -24,10 +24,12 @@ spring:
         - id: rent-service-api-route
           uri: http://localhost:8082
           predicates:
-            - Path=/api/rent/**, /api/rent
+            - Path=/api/rent/**, /api/rent, /api/return, /api/return/**
           filters:
             - RewritePath=/api/rent/(?<segment>.*), /rent/${segment}
+            - RewritePath=/api/return/(?<segment>.*), /return/${segment}
             - RewritePath=/api/rent, /rent
+            - RewritePath=/api/return, /return
         - id: search-service-api-route
           uri: http://localhost:8083
           predicates:

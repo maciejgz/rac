@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 public record ReturnRequestCarPayload(String rentId, String username, String vin,
-                                      double distanceTraveled,
+                                      BigDecimal distanceTraveled,
                                       Instant rentStartDate,
                                       BigDecimal chargedAmount) implements RacEventPayload {
 }

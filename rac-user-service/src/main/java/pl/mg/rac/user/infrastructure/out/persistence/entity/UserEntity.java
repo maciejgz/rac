@@ -20,6 +20,7 @@ public class UserEntity {
     private String name;
     private BigDecimal balance;
     private Location location;
+    private String currentRentId;
 
     public static UserEntity ofUser(User user) {
         UserEntity userEntity = new UserEntity();
@@ -27,6 +28,7 @@ public class UserEntity {
         userEntity.setName(user.getName());
         userEntity.setBalance(user.getBalance());
         userEntity.setLocation(user.getLocation());
+        userEntity.setCurrentRentId(user.getCurrentRentId());
         return userEntity;
     }
 }

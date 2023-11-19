@@ -7,8 +7,10 @@ import pl.mg.rac.car.domain.exception.CarAlreadyRentedException;
 import pl.mg.rac.car.domain.model.Car;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
+import pl.mg.rac.commons.event.rent.RentConfirmationEvent;
 import pl.mg.rac.commons.event.rent.RentFailedCarEvent;
 import pl.mg.rac.commons.event.rent.RentRequestCarEvent;
+import pl.mg.rac.commons.event.rent.payload.RentConfirmationPayload;
 import pl.mg.rac.commons.event.rent.payload.RentFailedCarPayload;
 
 import java.util.Optional;
@@ -32,7 +34,7 @@ public class RentRequestCarAdapter implements EventAdapter<RacEvent<?>> {
             try {
                 car.get().rentCar(rentRequestCarEvent.getPayload().rentId());
                 carDatabase.save(car.get());
-                eventPublisher.publishRentEvent(rentRequestCarEvent);
+                publishRentConfirmedEvent(rentRequestCarEvent, car.get());
             } catch (CarAlreadyRentedException e) {
                 String errorMessage = "rentConfirmationEvent: car " + rentRequestCarEvent.getPayload().vin()
                         + " already has rent " + rentRequestCarEvent.getPayload().rentId();
@@ -43,6 +45,19 @@ public class RentRequestCarAdapter implements EventAdapter<RacEvent<?>> {
             log.warn("Car with VIN: {} not found", rentRequestCarEvent.getPayload().vin());
             publishCarNotFoundEvent(rentRequestCarEvent);
         }
+    }
+
+    private void publishRentConfirmedEvent(RentRequestCarEvent rentRequestCarEvent, Car car) {
+        eventPublisher.publishRentEvent(
+                new RentConfirmationEvent(
+                        rentRequestCarEvent.getPayload().rentId(),
+                        new RentConfirmationPayload(
+                                rentRequestCarEvent.getPayload().rentId(),
+                                rentRequestCarEvent.getPayload().username(),
+                                rentRequestCarEvent.getPayload().vin(),
+                                car.getLocation()
+                        ))
+        );
     }
 
     private void publishRentFailedEvent(RentRequestCarEvent rentRequestCarEvent, String errorMessage) {

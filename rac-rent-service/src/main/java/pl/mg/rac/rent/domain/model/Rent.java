@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.value.Location;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,7 @@ public class Rent {
     private String username;
     private String vin;
     private Location startLocation;
-    //TODO replace with BigDecimal
-    private double distanceTraveled;
+    private BigDecimal distanceTraveled;
     private Location endLocation;
     private Instant rentRequestTimestamp;
     private Instant rentStartTimestamp;
@@ -40,7 +40,7 @@ public class Rent {
         rent.username = username;
         rent.vin = vin;
         rent.startLocation = location;
-        rent.distanceTraveled = 0;
+        rent.distanceTraveled = BigDecimal.ZERO;
         rent.rentRequestTimestamp = Instant.now();
         return rent;
     }
@@ -61,7 +61,7 @@ public class Rent {
         this.returnRequestTimestamp = Instant.now();
     }
 
-    public void acceptReturn(Location location, double distanceTraveled) {
+    public void acceptReturn(Location location, BigDecimal distanceTraveled) {
         this.moveToReturnAcceptedStatus(location);
         this.distanceTraveled = distanceTraveled;
         this.rentEndTimestamp = Instant.now();

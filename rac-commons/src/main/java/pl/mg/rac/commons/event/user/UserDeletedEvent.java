@@ -1,12 +1,15 @@
 package pl.mg.rac.commons.event.user;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.user.payload.UserDeletedPayload;
 
 public class UserDeletedEvent extends RacEvent<UserDeletedPayload> {
 
-    public UserDeletedEvent(String aggregateId, UserDeletedPayload payload) {
+    @JsonCreator
+    public UserDeletedEvent(@JsonProperty("aggregateId") String aggregateId, @JsonProperty("payload") UserDeletedPayload payload) {
         super(aggregateId, payload);
     }
 

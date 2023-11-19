@@ -1,12 +1,15 @@
 package pl.mg.rac.commons.event.car;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.car.payload.CarRentFailedNotExistsPayload;
 
 public class CarRentFailedNotExistsEvent extends RacEvent<CarRentFailedNotExistsPayload> {
-
-    public CarRentFailedNotExistsEvent(String aggregateId, CarRentFailedNotExistsPayload payload) {
+    @JsonCreator
+    public CarRentFailedNotExistsEvent(@JsonProperty(value = "aggregateId") String aggregateId,
+                                       @JsonProperty("payload") CarRentFailedNotExistsPayload payload) {
         super(aggregateId, payload);
     }
 

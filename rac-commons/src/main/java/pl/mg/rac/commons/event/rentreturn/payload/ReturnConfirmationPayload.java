@@ -6,6 +6,6 @@ import pl.mg.rac.commons.value.Location;
 import java.math.BigDecimal;
 
 public record ReturnConfirmationPayload(String rentId, String username, String vin,
-                                        Location endLocation, double distanceTraveled,
+                                        Location endLocation, BigDecimal distanceTraveled,
                                         BigDecimal chargedAmount) implements RacEventPayload {
 }
