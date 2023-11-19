@@ -15,8 +15,6 @@ import pl.mg.rac.rent.infrastructure.out.messaging.RentKafkaEventPublisher;
 import pl.mg.rac.rent.infrastructure.out.persistence.RentJpaRepository;
 import pl.mg.rac.rent.infrastructure.out.persistence.RentRepository;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,7 +25,7 @@ public class InfrastructureConfig {
 
     private final RentJpaRepository rentJpaRepository;
 
-    public InfrastructureConfig( RentJpaRepository rentJpaRepository) {
+    public InfrastructureConfig(RentJpaRepository rentJpaRepository) {
         this.rentJpaRepository = rentJpaRepository;
     }
 
@@ -57,7 +55,6 @@ public class InfrastructureConfig {
     }
 
 
-
     //outgoing port adapters
     @Bean
     public RentDatabase rentDatabase() {
@@ -68,7 +65,6 @@ public class InfrastructureConfig {
     public RentEventPublisher rentEventPublisher() {
         return new RentKafkaEventPublisher();
     }
-
 
 
     @Bean
