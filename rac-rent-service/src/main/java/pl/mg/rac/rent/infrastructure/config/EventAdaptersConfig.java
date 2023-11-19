@@ -26,50 +26,5 @@ public class EventAdaptersConfig {
         this.rentJpaRepository = rentJpaRepository;
     }
 
-    @Bean
-    public EventAdapter<RacEvent<?>> rentAcceptedEventAdapter() {
-        return new RentAcceptedEventAdapter(rentDatabase);
-    }
-
-    @Bean
-    public EventAdapter<RacEvent<?>> rentFailedCarAdapter() {
-        return new RentFailedCarEventAdapter(rentDatabase);
-    }
-
-    @Bean
-    public EventAdapter<RacEvent<?>> rentFailedUserAdapter() {
-        return new RentFailedUserEventAdapter(rentDatabase);
-    }
-
-    @Bean
-    public EventAdapter<RacEvent<?>> returnAcceptedEventAdapter() {
-        return new ReturnAcceptedEventAdapter(rentDatabase);
-    }
-
-    @Bean
-    public EventAdapter<RacEvent<?>> returnFailedCarAdapter() {
-        return new ReturnFailedCarEventAdapter(rentDatabase);
-    }
-
-    @Bean
-    public EventAdapter<RacEvent<?>> returnFailedUserAdapter() {
-        return new ReturnFailedUserEventAdapter(rentDatabase);
-    }
-
-    @Bean
-    public EventAdapter<RacEvent<?>> returnFailedLocationAdapter() {
-        return new ReturnFailedLocationEventAdapter(rentDatabase);
-    }
-
-    //outgoing port adapters
-    @Bean
-    public RentDatabase rentDatabase() {
-        return new RentRepository(rentJpaRepository);
-    }
-
-    @Bean
-    public RentEventPublisher rentEventPublisher() {
-        return new RentKafkaEventPublisher();
-    }
 
 }

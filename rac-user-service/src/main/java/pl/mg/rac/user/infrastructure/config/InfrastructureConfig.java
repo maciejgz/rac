@@ -2,20 +2,19 @@ package pl.mg.rac.user.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.user.application.facade.UserFacade;
 import pl.mg.rac.user.application.port.out.UserDatabase;
 import pl.mg.rac.user.application.port.out.UserEventPublisher;
 import pl.mg.rac.user.application.service.EventApplicationService;
 import pl.mg.rac.user.application.service.UserApplicationService;
-import pl.mg.rac.user.application.service.event.EventAdapter;
+import pl.mg.rac.user.application.service.event.*;
 import pl.mg.rac.user.domain.service.UserDomainService;
 import pl.mg.rac.user.infrastructure.out.messaging.UserKafkaEventPublisher;
 import pl.mg.rac.user.infrastructure.out.persistence.UserJpaRepository;
 import pl.mg.rac.user.infrastructure.out.persistence.UserRepository;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,20 +24,16 @@ import java.util.Map;
 public class InfrastructureConfig {
 
     private final UserJpaRepository userJpaRepository;
-    private final Map<String, EventAdapter<RacEvent<?>>> eventAdapters;
 
-    public InfrastructureConfig(UserJpaRepository userJpaRepository, List<EventAdapter<RacEvent<?>>> eventAdapterList) {
+    public InfrastructureConfig(UserJpaRepository userJpaRepository) {
         this.userJpaRepository = userJpaRepository;
-        this.eventAdapters = new HashMap<>();
-        for (EventAdapter<RacEvent<?>> eventAdapter : eventAdapterList) {
-            this.eventAdapters.put(eventAdapter.getEventType(), eventAdapter);
-        }
     }
 
     //facade
     @Bean
-    public UserFacade userFacade() {
-        return new UserFacade(userApplicationService(), userApplicationService(), userApplicationService(), userApplicationService(), eventApplicationService());
+    public UserFacade userFacade(EventApplicationService eventApplicationService) {
+        return new UserFacade(userApplicationService(), userApplicationService(), userApplicationService(),
+                userApplicationService(), eventApplicationService);
     }
 
     //application services
@@ -48,7 +43,8 @@ public class InfrastructureConfig {
     }
 
     @Bean
-    EventApplicationService eventApplicationService() {
+    @Lazy
+    EventApplicationService eventApplicationService(Map<String, EventAdapter<RacEvent<?>>> eventAdapters) {
         return new EventApplicationService(eventAdapters);
     }
 
@@ -69,5 +65,25 @@ public class InfrastructureConfig {
         return new UserKafkaEventPublisher();
     }
 
+    //event adapters
+    @Bean
+    public EventAdapter<RacEvent<?>> rentRequestUserAdapter() {
+        return new RentRequestUserEventAdapter(userDatabase(), userEventPublisher());
+    }
+
+    @Bean
+    public EventAdapter<RacEvent<?>> rentRequestFailedCarAdapter() {
+        return new RentRequestFailedCarAdapter(userDatabase());
+    }
+
+    @Bean
+    public EventAdapter<RacEvent<?>> returnRequestFailedCarAdapter() {
+        return new ReturnRequestFailedCarAdapter(userDatabase());
+    }
+
+    @Bean
+    public EventAdapter<RacEvent<?>> returnRequestUserAdapter() {
+        return new ReturnRequestUserAdapter(userDatabase(), userEventPublisher());
+    }
 
 }

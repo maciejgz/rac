@@ -2,22 +2,23 @@ package pl.mg.rac.location.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.location.application.facade.LocationFacade;
 import pl.mg.rac.location.application.port.out.CarLocationDatabase;
 import pl.mg.rac.location.application.port.out.LocationEventPublisher;
 import pl.mg.rac.location.application.port.out.UserLocationDatabase;
+import pl.mg.rac.location.application.service.EventApplicationService;
 import pl.mg.rac.location.application.service.LocationApplicationService;
 import pl.mg.rac.location.application.service.event.EventAdapter;
-import pl.mg.rac.location.domain.service.LocationDomainService;
+import pl.mg.rac.location.application.service.event.ReturnLocationEventAdapter;
+import pl.mg.rac.location.domain.service.CarLocationDomainService;
 import pl.mg.rac.location.infrastructure.out.messaging.LocationKafkaEventPublisher;
 import pl.mg.rac.location.infrastructure.out.persistence.CarLocationJpaRepository;
 import pl.mg.rac.location.infrastructure.out.persistence.CarLocationRepository;
 import pl.mg.rac.location.infrastructure.out.persistence.UserLocationJpaRepository;
 import pl.mg.rac.location.infrastructure.out.persistence.UserLocationRepository;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,22 +29,17 @@ public class InfrastructureConfig {
 
     private final CarLocationJpaRepository carLocationJpaRepository;
     private final UserLocationJpaRepository userLocationJpaRepository;
-    private final Map<String, EventAdapter<RacEvent<?>>> eventAdapters;
 
-    public InfrastructureConfig(CarLocationJpaRepository carLocationJpaRepository, List<EventAdapter<RacEvent<?>>> eventAdapterList, UserLocationJpaRepository userLocationJpaRepository) {
+    public InfrastructureConfig(CarLocationJpaRepository carLocationJpaRepository, UserLocationJpaRepository userLocationJpaRepository) {
         this.carLocationJpaRepository = carLocationJpaRepository;
         this.userLocationJpaRepository = userLocationJpaRepository;
-        this.eventAdapters = new HashMap<>();
-        for (EventAdapter<RacEvent<?>> eventAdapter : eventAdapterList) {
-            this.eventAdapters.put(eventAdapter.getEventType(), eventAdapter);
-        }
     }
 
     //facade
     @Bean
-    public LocationFacade rentFacade() {
+    public LocationFacade Facade(EventApplicationService eventApplicationService) {
         return new LocationFacade(locationApplicationService(), locationApplicationService(),
-                locationApplicationService(), locationApplicationService());
+                locationApplicationService(), locationApplicationService(), eventApplicationService);
     }
 
     //application services
@@ -52,9 +48,15 @@ public class InfrastructureConfig {
         return new LocationApplicationService(carLocationDatabase(), userLocationDatabase(), locationEventPublisher());
     }
 
+    @Lazy
+    @Bean
+    public EventApplicationService eventApplicationService(Map<String, EventAdapter<RacEvent<?>>> eventAdapters) {
+        return new EventApplicationService(eventAdapters);
+    }
+
     //domain service
-    public LocationDomainService locationDomainService() {
-        return new LocationDomainService();
+    public CarLocationDomainService locationDomainService() {
+        return new CarLocationDomainService();
     }
 
     //outgoing port adapters
@@ -71,6 +73,12 @@ public class InfrastructureConfig {
     @Bean
     public LocationEventPublisher locationEventPublisher() {
         return new LocationKafkaEventPublisher();
+    }
+
+    // adapters
+    @Bean
+    public EventAdapter<RacEvent<?>> rentRequestLocationAdapter() {
+        return new ReturnLocationEventAdapter(carLocationDatabase(), locationEventPublisher(), locationDomainService());
     }
 
 }
