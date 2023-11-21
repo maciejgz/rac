@@ -30,7 +30,7 @@ publishing {
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
     compileOnly('org.projectlombok:lombok:1.18.30')
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 }

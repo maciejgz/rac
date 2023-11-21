@@ -31,9 +31,9 @@ https://github.com/maciejgz/rac
 - User can see a history of his rents
 - Administrator can add or remove a car from the pool of the available cars
 - User is charged for:
-  - distance traveled (to simplify - the distance is calculated as a difference between the
-    current and the previous carLocation of the car) - 1$ per km
-  - time of the rent - 0.2$ per minute
+    - distance traveled (to simplify - the distance is calculated as a difference between the
+      current and the previous carLocation of the car) - 1$ per km
+    - time of the rent - 0.2$ per minute
 
 #### Non-functional
 
@@ -178,7 +178,8 @@ https://github.com/maciejgz/rac
 
 When a rental is initiated, customer and car GPS agents should increase the frequency of data sending to the carLocation
 service - once per 5s. Location service should update the car and user carLocation in the database and push
-notifications (**RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search, car, user and rent
+notifications (**RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search,
+car, user and rent
 service).
 User is notified about the successful rent by the Websocket connection.
 
@@ -192,8 +193,9 @@ User is notified about the successful rent by the Websocket connection.
     - in case of failure - sends a return failure api gateway (HTTP)
 - rac-carLocation-service validates **RAC_RETURN_REQUEST_LOCATION**. In case of success:
     - calculates the distance traveled and sends a return request to the rac-user-service (Kafka) - *
-    *RAC_RETURN_REQUEST_USER**
-    - in case of failure - sends a return failure to the rac-rent-service (Kafka) - **RAC_RETURN_FAILED_LOCATION**, then the
+      *RAC_RETURN_REQUEST_USER**
+    - in case of failure - sends a return failure to the rac-rent-service (Kafka) - **RAC_RETURN_FAILED_LOCATION**, then
+      the
       saga is compensated in the rac-rent-service
 - rac-user-service validates the request and:
     - in case of success - charges user for the distance traveled, sends an event to the rac-car-service (Kafka) -
@@ -208,7 +210,8 @@ User is notified about the successful rent by the Websocket connection.
       Then the saga is compensated in the rac-rent-service and rac-user-service (charged money
       is returned to the user).
 - rac-rent-service sends a return success to the api gateway (HTTP). In case of failure, the saga is compensated in the
-  rac-rent-service and error message has to be returned to the api gateway over websocket. User then has to contact the support.
+  rac-rent-service and error message has to be returned to the api gateway over websocket. User then has to contact the
+  support.
 
 When a rental is finished, customer and car GPS agents should decrease the frequency of data sending to the carLocation
 service - once per 30s.
@@ -216,6 +219,22 @@ Location service should update the car and user carLocation in the database and 
 **RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search, car, user and rent
 service).
 User is notified about the successful return by the Websocket connection.
+
+### Simulation service
+
+Simulation service let to simulate the data of the cars and users. It is used for testing purposes.
+Simulation is configured through the config service. It is possible to configure the number of concurrent threads
+simulating active sessions of users and administrators adding or removing cars from the pool of available cars.
+Scenarios have a probability to be executed. It is possible to configure the probability of each scenario.
+
+Possible simulation scenarios:
+
+- User registers
+- User unregisters
+- Administrator adds a car
+- Administrator removes a car from the pool of available cars
+- User rents a car - then localizations of the user and the car are updated and then user returns the car
+- User tries to rent already rented car
 
 ## Build and run
 
