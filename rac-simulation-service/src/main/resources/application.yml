@@ -9,3 +9,9 @@ spring:
 logging:
   level:
     pl.mg.rac: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
