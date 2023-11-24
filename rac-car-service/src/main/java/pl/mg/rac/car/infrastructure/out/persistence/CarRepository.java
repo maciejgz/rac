@@ -34,6 +34,11 @@ public class CarRepository implements CarDatabase {
         carJpaRepository.deleteByVin(vin);
     }
 
+    @Override
+    public Optional<Car> getRandomCar() {
+        return carJpaRepository.getRandomCar().map(this::mapToAggregate);
+    }
+
     private Car mapToAggregate(CarEntity carEntity) {
         return new Car(carEntity.getId(), carEntity.getVin(), carEntity.getLocation(), carEntity.getRented(), carEntity.getMileage(), carEntity.getRentalId());
     }

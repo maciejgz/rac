@@ -6,12 +6,13 @@ import java.util.Optional;
 
 public interface UserDatabase {
 
-    public boolean exists(String name);
+    boolean exists(String name);
 
-    public User save(User user);
+    User save(User user);
 
-    public void delete(User user);
+    void delete(User user);
 
-    public Optional<User> findByName(String name);
+    Optional<User> findByName(String name);
 
+    Optional<User> getRandomUser();
 }

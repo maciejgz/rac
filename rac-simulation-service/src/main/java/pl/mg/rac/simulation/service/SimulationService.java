@@ -5,6 +5,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import pl.mg.rac.simulation.model.scenario.SimulationScenario;
 
+import java.security.SecureRandom;
 import java.util.Comparator;
 import java.util.List;
 
@@ -27,7 +28,8 @@ public class SimulationService {
     }
 
     public void executeScenario() {
-        double random = Math.random();
+        SecureRandom secureRandom = new SecureRandom();
+        double random = secureRandom.nextDouble();
         for (SimulationScenario scenario : scenarios) {
             log.debug("Scenario: " + scenario.getClass().getSimpleName() + " probability: " + scenario.getProbability());
         }

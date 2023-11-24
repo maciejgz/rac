@@ -20,12 +20,17 @@ public class CarQueryController {
         this.carFacade = carFacade;
     }
 
+    @GetMapping(value = "/random")
+    public ResponseEntity<GetCarResponse> getRandomUser() throws CarNotFoundException {
+        GetCarResponse car = carFacade.getRandomCar();
+        return ResponseEntity.ok(car);
+    }
+
     @GetMapping(value = "/{vin}")
     public ResponseEntity<GetCarResponse> getUser(@PathVariable String vin) throws CarNotFoundException {
         GetCarResponse car = carFacade.getCar(new GetCarQuery(vin));
         return ResponseEntity.ok(car);
     }
-
 
     @ExceptionHandler
     public ResponseEntity<Void> handleException(CarNotFoundException e) {

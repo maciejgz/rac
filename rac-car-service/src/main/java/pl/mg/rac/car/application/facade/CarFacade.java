@@ -20,14 +20,16 @@ public class CarFacade {
     private final RentCar rentCarAdapter;
     private final ReturnCar returnCarAdapter;
     private final GetCar getCarAdapter;
+    private final GetRandomCar getRandomCarAdapter;
     private final EventApplicationService eventApplicationService;
 
-    public CarFacade(AddCar addCarAdapter, DeleteCar deleteCarAdapter, RentCar rentCarAdapter, ReturnCar returnCarAdapter, GetCar getCarAdapter, EventApplicationService eventApplicationService) {
+    public CarFacade(AddCar addCarAdapter, DeleteCar deleteCarAdapter, RentCar rentCarAdapter, ReturnCar returnCarAdapter, GetCar getCarAdapter, GetRandomCar getRandomCarAdapter, EventApplicationService eventApplicationService) {
         this.addCarAdapter = addCarAdapter;
         this.deleteCarAdapter = deleteCarAdapter;
         this.rentCarAdapter = rentCarAdapter;
         this.returnCarAdapter = returnCarAdapter;
         this.getCarAdapter = getCarAdapter;
+        this.getRandomCarAdapter = getRandomCarAdapter;
         this.eventApplicationService = eventApplicationService;
     }
 
@@ -56,4 +58,7 @@ public class CarFacade {
         eventApplicationService.handleIncomingEvent(event);
     }
 
+    public GetCarResponse getRandomCar() throws CarNotFoundException {
+        return getRandomCarAdapter.getRandomCar();
+    }
 }

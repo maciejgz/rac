@@ -13,4 +13,6 @@ public interface CarDatabase {
     Car save(Car car);
 
     void deleteByVin(String vin);
+
+    Optional<Car> getRandomCar();
 }

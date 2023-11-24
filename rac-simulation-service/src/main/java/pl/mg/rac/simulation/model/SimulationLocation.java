@@ -2,6 +2,7 @@ package pl.mg.rac.simulation.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.SecureRandom;
 
 public record SimulationLocation(BigDecimal latitude, BigDecimal longitude) {
 
@@ -22,8 +23,10 @@ public record SimulationLocation(BigDecimal latitude, BigDecimal longitude) {
         // Convert radius from kilometers to meters
         double radiusInRad = radius / ((double) EARTH_RADIUS_KM / 1000);
 
-        double u = Math.random();
-        double v = Math.random();
+        SecureRandom random = new SecureRandom();
+
+        double u = random.nextDouble();
+        double v = random.nextDouble();
         double w = radiusInRad * Math.sqrt(u);
         double t = 2 * Math.PI * v;
         double x = w * Math.cos(t);
@@ -33,8 +36,8 @@ public record SimulationLocation(BigDecimal latitude, BigDecimal longitude) {
         double newLat = lat + y * 180 / Math.PI;
         double newLon = lon + x * 180 / Math.PI / Math.cos(lat * Math.PI / 180);
 
-        BigDecimal newLatitude = new BigDecimal(newLat).setScale(6, RoundingMode.HALF_UP);
-        BigDecimal newLongitude = new BigDecimal(newLon).setScale(6, RoundingMode.HALF_UP);
+        BigDecimal newLatitude = BigDecimal.valueOf(newLat).setScale(6, RoundingMode.HALF_UP);
+        BigDecimal newLongitude = BigDecimal.valueOf(newLon).setScale(6, RoundingMode.HALF_UP);
 
         return new SimulationLocation(newLatitude, newLongitude);
     }
@@ -65,5 +68,14 @@ public record SimulationLocation(BigDecimal latitude, BigDecimal longitude) {
         return BigDecimal.valueOf(distance / 1000).setScale(2, RoundingMode.HALF_DOWN);
     }
 
+    /**
+     * @return random location in Poland
+     */
+    public static SimulationLocation getRandomLocationInWarsaw() {
+        //return random location in Warsaw
+        BigDecimal latitude = BigDecimal.valueOf(52.0 + Math.random());
+        BigDecimal longitude = BigDecimal.valueOf(20.0 + Math.random() * 2);
+        return new SimulationLocation(latitude, longitude);
+    }
 }
 

@@ -23,7 +23,7 @@ import pl.mg.rac.commons.event.car.payload.*;
 import java.util.Optional;
 
 @Slf4j
-public class CarApplicationService implements AddCar, DeleteCar, RentCar, ReturnCar, GetCar {
+public class CarApplicationService implements AddCar, DeleteCar, RentCar, ReturnCar, GetCar, GetRandomCar {
 
     private final CarDatabase carDatabase;
     private final CarEventPublisher eventPublisher;
@@ -111,6 +111,17 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
             eventPublisher.publishCarEvent(new CarReturnFailedNotExistsEvent(command.vin(),
                     new CarReturnFailedNotExistsPayload(command.vin(), command.rentalId(), command.location(), command.distanceTraveled())));
             throw new CarNotFoundException("Car with vin: " + command.vin() + " not found.");
+        }
+    }
+
+    @Override
+    public GetCarResponse getRandomCar() throws CarNotFoundException {
+        log.debug("getRandomCar() called");
+        Optional<Car> car = carDatabase.getRandomCar();
+        if (car.isEmpty()) {
+            throw new CarNotFoundException("No cars in database");
+        } else {
+            return new GetCarResponse(car.get().getVin(), car.get().getLocation(), car.get().getRented(), car.get().getMileage(), car.get().getRentalId());
         }
     }
 }
