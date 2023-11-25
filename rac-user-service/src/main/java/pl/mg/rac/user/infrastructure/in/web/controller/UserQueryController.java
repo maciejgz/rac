@@ -22,6 +22,13 @@ public class UserQueryController {
         this.userFacade = userFacade;
     }
 
+
+    @GetMapping(value = "/random")
+    public ResponseEntity<UserResponse> getRandomUser() throws UserSearchException, UserNotFoundException {
+        UserResponse user = userFacade.getRandomUser();
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping(value = "/{name}")
     public ResponseEntity<UserResponse> getUser(@PathVariable String name) throws UserSearchException, UserNotFoundException {
         UserResponse user = userFacade.getUser(new GetUserQuery(name));

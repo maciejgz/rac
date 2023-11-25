@@ -30,7 +30,6 @@ public class Car {
     private final List<RacEvent<? extends RacEventPayload>> events = new ArrayList<>();
 
     public static Car create(String vin, BigDecimal mileage, Location location) {
-        //TODO add validation
         return new Car(vin, location, false, mileage, null);
     }
 

@@ -7,6 +7,7 @@ import pl.mg.rac.car.application.dto.command.ReturnCarCommand;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyExistsException;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyNotExistException;
 import pl.mg.rac.car.application.dto.exception.CarNotFoundException;
+import pl.mg.rac.car.application.dto.exception.CarRentedException;
 import pl.mg.rac.car.application.dto.query.GetCarQuery;
 import pl.mg.rac.car.application.dto.response.*;
 import pl.mg.rac.car.application.port.in.*;
@@ -20,14 +21,16 @@ public class CarFacade {
     private final RentCar rentCarAdapter;
     private final ReturnCar returnCarAdapter;
     private final GetCar getCarAdapter;
+    private final GetRandomCar getRandomCarAdapter;
     private final EventApplicationService eventApplicationService;
 
-    public CarFacade(AddCar addCarAdapter, DeleteCar deleteCarAdapter, RentCar rentCarAdapter, ReturnCar returnCarAdapter, GetCar getCarAdapter, EventApplicationService eventApplicationService) {
+    public CarFacade(AddCar addCarAdapter, DeleteCar deleteCarAdapter, RentCar rentCarAdapter, ReturnCar returnCarAdapter, GetCar getCarAdapter, GetRandomCar getRandomCarAdapter, EventApplicationService eventApplicationService) {
         this.addCarAdapter = addCarAdapter;
         this.deleteCarAdapter = deleteCarAdapter;
         this.rentCarAdapter = rentCarAdapter;
         this.returnCarAdapter = returnCarAdapter;
         this.getCarAdapter = getCarAdapter;
+        this.getRandomCarAdapter = getRandomCarAdapter;
         this.eventApplicationService = eventApplicationService;
     }
 
@@ -35,7 +38,7 @@ public class CarFacade {
         return addCarAdapter.addCar(command);
     }
 
-    public DeleteCarResponse deleteCar(DeleteCarCommand command) throws CarAlreadyNotExistException {
+    public DeleteCarResponse deleteCar(DeleteCarCommand command) throws CarAlreadyNotExistException, CarRentedException {
         return deleteCarAdapter.deleteCar(command);
     }
 
@@ -56,4 +59,7 @@ public class CarFacade {
         eventApplicationService.handleIncomingEvent(event);
     }
 
+    public GetCarResponse getRandomCar() throws CarNotFoundException {
+        return getRandomCarAdapter.getRandomCar();
+    }
 }

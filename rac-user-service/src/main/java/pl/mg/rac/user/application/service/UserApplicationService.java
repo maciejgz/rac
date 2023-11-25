@@ -18,10 +18,7 @@ import pl.mg.rac.user.application.dto.query.GetUserQuery;
 import pl.mg.rac.user.application.dto.response.ChargeUserResponse;
 import pl.mg.rac.user.application.dto.response.CreateUserResponse;
 import pl.mg.rac.user.application.dto.response.UserResponse;
-import pl.mg.rac.user.application.port.in.ChargeUserPort;
-import pl.mg.rac.user.application.port.in.CreateUserPort;
-import pl.mg.rac.user.application.port.in.DeleteUserPort;
-import pl.mg.rac.user.application.port.in.GetUserPort;
+import pl.mg.rac.user.application.port.in.*;
 import pl.mg.rac.user.application.port.out.UserDatabase;
 import pl.mg.rac.user.application.port.out.UserEventPublisher;
 import pl.mg.rac.user.domain.exception.UserNotExistException;
@@ -30,12 +27,13 @@ import pl.mg.rac.user.domain.model.User;
 import pl.mg.rac.user.domain.service.UserDomainService;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Responsible for transaction handling and domain services coordination - it is a facade for domain services.
  */
 @Slf4j
-public class UserApplicationService implements CreateUserPort, DeleteUserPort, ChargeUserPort, GetUserPort {
+public class UserApplicationService implements CreateUserPort, DeleteUserPort, ChargeUserPort, GetUserPort, GetRandomUserPort {
 
     private final UserDomainService userDomainService;
     private final UserEventPublisher userEventPublisher;
@@ -82,6 +80,10 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
     public void deleteUser(DeleteUserCommand command) throws UserDeletionException {
         log.debug("deleteUser() called with: command = [" + command + "]");
         try {
+            Optional<User> userOpt = userDatabase.findByName(command.name());
+            if (userOpt.isPresent() && userOpt.get().getCurrentRentId() != null) {
+                throw new UserDeletionException("User with name " + command.name() + " has active rent");
+            }
             userDatabase.delete(userDatabase.findByName(command.name()).orElseThrow(
                     () -> new UserNotExistException("User with name " + command.name() + " not exists")));
             List<RacEvent<?>> domainEvents = List.of(new UserDeletedEvent(command.name(), new UserDeletedPayload(command.name())));
@@ -97,6 +99,17 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
         log.debug("getUser() called with: name = [" + query + "]");
         User user = userDatabase.findByName(query.name()).orElseThrow(
                 () -> new UserNotFoundException("User with name " + query.name() + " not exists"));
-        return new UserResponse(user.getName(), user.getBalance());
+        return new UserResponse(user.getName(), user.getBalance(), user.getLocation());
+    }
+
+    @Override
+    public UserResponse getRandomUser() throws UserNotFoundException {
+        log.debug("getRandomUser() called");
+        Optional<User> user = userDatabase.getRandomUser();
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("No users in database");
+        } else {
+            return new UserResponse(user.get().getName(), user.get().getBalance(), user.get().getLocation());
+        }
     }
 }

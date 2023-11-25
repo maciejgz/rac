@@ -1,8 +1,13 @@
 package pl.mg.rac.commons.event;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
+@RequiredArgsConstructor
 public enum EventType {
 
     //USER EVENTS
@@ -43,17 +48,20 @@ public enum EventType {
 
     private final String id;
 
-    EventType(String id) {
-        this.id = id;
+    private static final Map<String, EventType> BY_ID = new HashMap<>();
+
+    static {
+        for (EventType eventType : values()) {
+            BY_ID.put(eventType.id, eventType);
+        }
     }
 
     public static EventType of(String id) {
-        for (EventType eventType : EventType.values()) {
-            if (eventType.id.equalsIgnoreCase(id)) {
-                return eventType;
-            }
+        EventType eventType = BY_ID.get(id);
+        if (eventType == null) {
+            throw new IllegalArgumentException("No EventType with id " + id + " found");
         }
-        throw new IllegalArgumentException("No EventType with id " + id + " found");
+        return eventType;
     }
 
 }

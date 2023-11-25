@@ -1,7 +1,9 @@
 package pl.mg.rac.commons.value;
 
+import java.math.BigDecimal;
+
 public record Location(
-        double latitude,
-        double longitude
+        BigDecimal latitude,
+        BigDecimal longitude
 ) {
 }

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.rent.RentFailedCarEvent;
-import pl.mg.rac.commons.event.rent.RentFailedUserEvent;
 import pl.mg.rac.rent.application.port.in.FailedRentCar;
 import pl.mg.rac.rent.application.port.out.RentDatabase;
 

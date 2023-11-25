@@ -1,0 +1,9 @@
+rac:
+  simulation:
+    probability:
+      add-car-scenario: 0.35
+      add-user-scenario: 0.35
+      remove-user-scenario: 0.00
+      remove-car-scenario: 0.00
+      rent-car-scenario: 0.3
+      rent-already-rented-car-scenario: 0.0

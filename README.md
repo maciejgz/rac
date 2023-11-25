@@ -31,9 +31,9 @@ https://github.com/maciejgz/rac
 - User can see a history of his rents
 - Administrator can add or remove a car from the pool of the available cars
 - User is charged for:
-  - distance traveled (to simplify - the distance is calculated as a difference between the
-    current and the previous carLocation of the car) - 1$ per km
-  - time of the rent - 0.2$ per minute
+    - distance traveled (to simplify - the distance is calculated as a difference between the
+      current and the previous carLocation of the car) - 1$ per km
+    - time of the rent - 0.2$ per minute
 
 #### Non-functional
 
@@ -61,8 +61,9 @@ https://github.com/maciejgz/rac
 - rac-rent-service - 8082 - Renting service
 - rac-search-service - 8083 - search functionality
 - rac-car-service - 8084 - car fleet management
-- rac-carLocation-service - 8085 - gathering carLocation data of the cars and users. All the agents are sending the data to
+- rac-location-service - 8085 - gathering carLocation data of the cars and users. All the agents are sending the data to
   this service. Should use Cassandra column database for storing the carLocation data.
+- rac-simulation-service - 8086 - simulates the data of the cars and users
 - rac-discovery-service - http://localhost:8761/ - Spring Eureka server
 - rac-configuration-service - 8888 - Spring Cloud Config
 - MongoDB - 27017 - centralized database - each microservice will have a different schema
@@ -87,7 +88,8 @@ https://github.com/maciejgz/rac
 | rac-rent-service          | 8082  | renting service                                                          |         APP         |
 | rac-search-service        | 8083  | search service                                                           |         APP         |
 | rac-car-service           | 8084  | car fleet management                                                     |         APP         |
-| rac-carLocation-service      | 8085  | Cars carLocation service                                                    |         APP         |
+| rac-location-service      | 8085  | Cars and users location service                                          |         APP         |
+| rac-simulation-service    | 8086  | Simulation service                                                       |         APP         |
 | rac-discovery-service     | 8761  | Spring Cloud Eureka - discovery service                                  |         APP         |
 | rac-configuration-service | 8888  | Spring Cloud Config - centralized config service                         |         APP         |
 | rac-mongodb               | 27017 | MongoDB - database                                                       |         DB          |
@@ -136,20 +138,20 @@ https://github.com/maciejgz/rac
 
 #### Return related events
 
-| event ID                    |   topic    | comment                                                                                                 |
-|-----------------------------|:----------:|:--------------------------------------------------------------------------------------------------------|
-| RAC_RETURN_REQUEST_LOCATION | RAC_RETURN | Sent when return is requested to validate request and calculate distance traveled                       |
+| event ID                    |   topic    | comment                                                                                                    |
+|-----------------------------|:----------:|:-----------------------------------------------------------------------------------------------------------|
+| RAC_RETURN_REQUEST_LOCATION | RAC_RETURN | Sent when return is requested to validate request and calculate distance traveled                          |
 | RAC_RETURN_REQUEST_USER     | RAC_RETURN | Sent when return is requested and confirmed in carLocation service to validate request in the user service |
-| RAC_RETURN_REQUEST_CAR      | RAC_RETURN | Sent when return is requested and confirmed in user service. Car service should validate the request    |
-| RAC_RETURN_CONFIRMATION     | RAC_RETURN | Sent when return is confirmed in car service and should be confirmed in rent service                    |
+| RAC_RETURN_REQUEST_CAR      | RAC_RETURN | Sent when return is requested and confirmed in user service. Car service should validate the request       |
+| RAC_RETURN_CONFIRMATION     | RAC_RETURN | Sent when return is confirmed in car service and should be confirmed in rent service                       |
 | RAC_RETURN_FAILED_LOCATION  | RAC_RETURN | Issue in return validation in carLocation service                                                          |
-| RAC_RETURN_FAILED_USER      | RAC_RETURN | Issue in return validation in user service                                                              |
-| RAC_RETURN_FAILED_CAR       | RAC_RETURN | Issue in return validation in car service                                                               |
+| RAC_RETURN_FAILED_USER      | RAC_RETURN | Issue in return validation in user service                                                                 |
+| RAC_RETURN_FAILED_CAR       | RAC_RETURN | Issue in return validation in car service                                                                  |
 
 #### Location service events
 
-| event ID                  |       topic       | comment                                 |
-|---------------------------|:-----------------:|:----------------------------------------|
+| event ID                  |       topic       | comment                                    |
+|---------------------------|:-----------------:|:-------------------------------------------|
 | RAC_LOCATION_USER_CHANGED | RAC_LOCATION_USER | Sent when user has changed his carLocation |
 | RAC_LOCATION_CAR_CHANGED  | RAC_LOCATION_CAR  | Sent when car has changed his carLocation  |
 
@@ -176,7 +178,8 @@ https://github.com/maciejgz/rac
 
 When a rental is initiated, customer and car GPS agents should increase the frequency of data sending to the carLocation
 service - once per 5s. Location service should update the car and user carLocation in the database and push
-notifications (**RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search, car, user and rent
+notifications (**RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search,
+car, user and rent
 service).
 User is notified about the successful rent by the Websocket connection.
 
@@ -190,8 +193,9 @@ User is notified about the successful rent by the Websocket connection.
     - in case of failure - sends a return failure api gateway (HTTP)
 - rac-carLocation-service validates **RAC_RETURN_REQUEST_LOCATION**. In case of success:
     - calculates the distance traveled and sends a return request to the rac-user-service (Kafka) - *
-    *RAC_RETURN_REQUEST_USER**
-    - in case of failure - sends a return failure to the rac-rent-service (Kafka) - **RAC_RETURN_FAILED_LOCATION**, then the
+      *RAC_RETURN_REQUEST_USER**
+    - in case of failure - sends a return failure to the rac-rent-service (Kafka) - **RAC_RETURN_FAILED_LOCATION**, then
+      the
       saga is compensated in the rac-rent-service
 - rac-user-service validates the request and:
     - in case of success - charges user for the distance traveled, sends an event to the rac-car-service (Kafka) -
@@ -206,7 +210,8 @@ User is notified about the successful rent by the Websocket connection.
       Then the saga is compensated in the rac-rent-service and rac-user-service (charged money
       is returned to the user).
 - rac-rent-service sends a return success to the api gateway (HTTP). In case of failure, the saga is compensated in the
-  rac-rent-service and error message has to be returned to the api gateway over websocket. User then has to contact the support.
+  rac-rent-service and error message has to be returned to the api gateway over websocket. User then has to contact the
+  support.
 
 When a rental is finished, customer and car GPS agents should decrease the frequency of data sending to the carLocation
 service - once per 30s.
@@ -214,6 +219,22 @@ Location service should update the car and user carLocation in the database and 
 **RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search, car, user and rent
 service).
 User is notified about the successful return by the Websocket connection.
+
+### Simulation service
+
+Simulation service let to simulate the data of the cars and users. It is used for testing purposes.
+Simulation is configured through the config service. It is possible to configure the number of concurrent threads
+simulating active sessions of users and administrators adding or removing cars from the pool of available cars.
+Scenarios have a probability to be executed. It is possible to configure the probability of each scenario.
+
+Possible simulation scenarios:
+
+- User registers
+- User unregisters
+- Administrator adds a car
+- Administrator removes a car from the pool of available cars
+- User rents a car - then localizations of the user and the car are updated and then user returns the car
+- User tries to rent already rented car
 
 ## Build and run
 

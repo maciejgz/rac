@@ -8,6 +8,7 @@ import pl.mg.rac.car.application.dto.command.ReturnCarCommand;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyExistsException;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyNotExistException;
 import pl.mg.rac.car.application.dto.exception.CarNotFoundException;
+import pl.mg.rac.car.application.dto.exception.CarRentedException;
 import pl.mg.rac.car.application.dto.query.GetCarQuery;
 import pl.mg.rac.car.application.dto.response.*;
 import pl.mg.rac.car.application.port.in.*;
@@ -23,7 +24,7 @@ import pl.mg.rac.commons.event.car.payload.*;
 import java.util.Optional;
 
 @Slf4j
-public class CarApplicationService implements AddCar, DeleteCar, RentCar, ReturnCar, GetCar {
+public class CarApplicationService implements AddCar, DeleteCar, RentCar, ReturnCar, GetCar, GetRandomCar {
 
     private final CarDatabase carDatabase;
     private final CarEventPublisher eventPublisher;
@@ -46,10 +47,15 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
     }
 
     @Override
-    public DeleteCarResponse deleteCar(DeleteCarCommand command) throws CarAlreadyNotExistException {
+    public DeleteCarResponse deleteCar(DeleteCarCommand command) throws CarAlreadyNotExistException, CarRentedException {
         log.debug("deleteCar() called with: command = [" + command + "]");
+
         if (!carDatabase.existsByVin(command.vin())) {
             throw new CarAlreadyNotExistException("Car with vin: " + command.vin() + " already not exist.");
+        }
+        Optional<Car> car = carDatabase.getCarByVin(command.vin());
+        if (car.isPresent() && car.get().getRented()) {
+            throw new CarRentedException("Car with vin: " + command.vin() + " is rented.");
         }
         carDatabase.deleteByVin(command.vin());
         eventPublisher.publishCarEvent(new CarDeletedEvent(command.vin(), new CarDeletedPayload(command.vin())));
@@ -111,6 +117,17 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
             eventPublisher.publishCarEvent(new CarReturnFailedNotExistsEvent(command.vin(),
                     new CarReturnFailedNotExistsPayload(command.vin(), command.rentalId(), command.location(), command.distanceTraveled())));
             throw new CarNotFoundException("Car with vin: " + command.vin() + " not found.");
+        }
+    }
+
+    @Override
+    public GetCarResponse getRandomCar() throws CarNotFoundException {
+        log.debug("getRandomCar() called");
+        Optional<Car> car = carDatabase.getRandomCar();
+        if (car.isEmpty()) {
+            throw new CarNotFoundException("No cars in database");
+        } else {
+            return new GetCarResponse(car.get().getVin(), car.get().getLocation(), car.get().getRented(), car.get().getMileage(), car.get().getRentalId());
         }
     }
 }

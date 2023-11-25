@@ -42,7 +42,8 @@ public class ReturnRequestUserAdapter implements EventAdapter<RacEvent<?>>, Rent
                                     returnRequestUserEvent.getPayload().vin(),
                                     returnRequestUserEvent.getPayload().distanceTraveled(),
                                     returnRequestUserEvent.getPayload().rentStartDate(),
-                                    chargedAmount
+                                    chargedAmount,
+                                    returnRequestUserEvent.getPayload().endLocation()
                             )
                     );
                     userEventPublisher.publishReturnRequestCarEvent(eventToPush);

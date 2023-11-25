@@ -9,10 +9,7 @@ import pl.mg.rac.user.application.dto.query.GetUserQuery;
 import pl.mg.rac.user.application.dto.response.ChargeUserResponse;
 import pl.mg.rac.user.application.dto.response.CreateUserResponse;
 import pl.mg.rac.user.application.dto.response.UserResponse;
-import pl.mg.rac.user.application.port.in.ChargeUserPort;
-import pl.mg.rac.user.application.port.in.CreateUserPort;
-import pl.mg.rac.user.application.port.in.DeleteUserPort;
-import pl.mg.rac.user.application.port.in.GetUserPort;
+import pl.mg.rac.user.application.port.in.*;
 import pl.mg.rac.user.application.service.EventApplicationService;
 
 /**
@@ -25,13 +22,15 @@ public class UserFacade {
     private final DeleteUserPort deleteUserAdapter;
     private final ChargeUserPort chargeUserAdapter;
     private final GetUserPort getUserAdapter;
+    private final GetRandomUserPort getRandomUserAdapter;
     private final EventApplicationService eventApplicationService;
 
-    public UserFacade(CreateUserPort createUserAdapter, DeleteUserPort deleteUserAdapter, ChargeUserPort chargeUserAdapter, GetUserPort getUserAdapter, EventApplicationService eventApplicationService) {
+    public UserFacade(CreateUserPort createUserAdapter, DeleteUserPort deleteUserAdapter, ChargeUserPort chargeUserAdapter, GetUserPort getUserAdapter, GetRandomUserPort getRandomUserAdapter, EventApplicationService eventApplicationService) {
         this.createUserAdapter = createUserAdapter;
         this.deleteUserAdapter = deleteUserAdapter;
         this.chargeUserAdapter = chargeUserAdapter;
         this.getUserAdapter = getUserAdapter;
+        this.getRandomUserAdapter = getRandomUserAdapter;
         this.eventApplicationService = eventApplicationService;
     }
 
@@ -49,6 +48,10 @@ public class UserFacade {
 
     public UserResponse getUser(GetUserQuery query) throws UserSearchException, UserNotFoundException {
         return getUserAdapter.getUser(query);
+    }
+
+    public UserResponse getRandomUser() throws UserSearchException, UserNotFoundException {
+        return getRandomUserAdapter.getRandomUser();
     }
 
     public void handleIncomingEvent(RacEvent<?> event) {

@@ -34,6 +34,11 @@ public class UserRepository implements UserDatabase {
         return userJpaRepository.findByName(name).map(this::mapToDomainUser);
     }
 
+    @Override
+    public Optional<User> getRandomUser() {
+        return userJpaRepository.findRandomUser().map(this::mapToDomainUser);
+    }
+
     private User mapToDomainUser(UserEntity userEntity) {
         return new User(userEntity.getId(), userEntity.getName(),
                 userEntity.getBalance(), userEntity.getLocation(),
