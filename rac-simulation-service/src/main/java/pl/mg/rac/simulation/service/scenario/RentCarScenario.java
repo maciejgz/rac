@@ -13,6 +13,10 @@ import pl.mg.rac.simulation.service.client.LocationServiceClient;
 import pl.mg.rac.simulation.service.client.RentServiceClient;
 import pl.mg.rac.simulation.service.client.UserServiceClient;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.SecureRandom;
+
 @Component
 @Slf4j
 @RefreshScope
@@ -36,29 +40,35 @@ public class RentCarScenario implements SimulationScenario {
 
     @Override
     public void execute() {
-        log.debug("execute() RentCarScenario");
+        log.debug("SCENARIO: RentCarScenario");
         try {
             SimulationUser randomUser = userServiceClient.getRandomUser();
             SimulationCar randomCar = carServiceClient.getRandomCar();
             SimulationRent rent;
             if (randomUser != null && randomCar != null) {
+                if (randomCar.isRented() || randomUser.isRenting()) {
+                    log.debug("execute() RentCarScenario randomCar is rented or randomUser is renting");
+                    return;
+                }
                 rent = rentServiceClient.rentCar(randomUser.getName(), randomCar.getVin(), randomCar.getLocation());
             } else {
                 log.debug("execute() RentCarScenario randomUser or randomCar is null");
                 return;
             }
-
+            SecureRandom secureRandom = new SecureRandom();
             //sent location updates with random probability - between 1 and 4 seconds
             for (int i = 0; i < 10; i++) {
-                Thread.sleep((long) (Math.random() * 3000 + 1000));
+                Thread.sleep((long) (secureRandom.nextDouble() * 3000 + 1000));
                 locationServiceClient.publishCarLocation(randomCar.getVin(),
                         SimulationLocation.randomOfOtherLocation(randomCar.getLocation(), 2));
             }
-
             //return car
             rentServiceClient.returnCar(rent.getRentId());
-        } catch (Exception e) {
-            log.error("execute() RentCarScenario", e);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+        } catch (IOException | URISyntaxException e) {
+            log.error(e.getMessage(), e);
         }
     }
 

@@ -19,9 +19,9 @@ public class SimulationController {
         this.simulationService = simulationService;
     }
 
-    @PutMapping(value = "")
-    public ResponseEntity<Void> startSimulation()  {
-        simulationService.startSimulation();
+    @PutMapping(value = "/{numberOfScenarios}")
+    public ResponseEntity<Void> startSimulation(@PathVariable long numberOfScenarios)  {
+        simulationService.startSimulation(numberOfScenarios);
         return ResponseEntity.ok().build();
     }
 

@@ -6,6 +6,9 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import pl.mg.rac.simulation.service.client.UserServiceClient;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 @Component
 @Slf4j
 @RefreshScope
@@ -25,8 +28,11 @@ public class RemoveUserScenario implements SimulationScenario {
         log.debug("execute() RemoveUserScenario");
         try {
             userServiceClient.deleteUser(userServiceClient.getRandomUser().getName());
-        } catch (Exception e) {
-            log.error("execute() RemoveCarScenario", e);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+        } catch (IOException | URISyntaxException e) {
+            log.error(e.getMessage(), e);
         }
     }
 

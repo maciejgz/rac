@@ -8,7 +8,9 @@ import pl.mg.rac.simulation.model.SimulationLocation;
 import pl.mg.rac.simulation.model.SimulationUser;
 import pl.mg.rac.simulation.service.client.UserServiceClient;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 @Component
@@ -27,7 +29,7 @@ public class RegisterUserScenario implements SimulationScenario {
 
     @Override
     public void execute() {
-        log.debug("execute() RegisterUserScenario");
+        log.debug("SCENARIO: RegisterUserScenario");
         try {
             SimulationUser user = new SimulationUser(
                     UUID.randomUUID().toString(),
@@ -37,7 +39,10 @@ public class RegisterUserScenario implements SimulationScenario {
                     null
             );
             userServiceClient.registerUser(user);
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
+        } catch (IOException | URISyntaxException e) {
             log.error(e.getMessage(), e);
         }
     }

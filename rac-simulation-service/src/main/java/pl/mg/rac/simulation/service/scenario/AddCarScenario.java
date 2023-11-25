@@ -28,7 +28,7 @@ public class AddCarScenario implements SimulationScenario {
 
     @Override
     public void execute() {
-        log.debug("execute() AddCarScenario");
+        log.debug("SCENARIO: AddCarScenario");
         try {
             SimulationCar car = new SimulationCar(UUID.randomUUID().toString(),
                     SimulationLocation.getRandomLocationInWarsaw(),
@@ -37,8 +37,11 @@ public class AddCarScenario implements SimulationScenario {
                     null
             );
             carServiceClient.addCar(car);
-        } catch (URISyntaxException | IOException | InterruptedException e) {
+        } catch (URISyntaxException | IOException e) {
             log.error(e.getMessage(), e);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
     }
 

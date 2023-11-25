@@ -73,8 +73,9 @@ public record SimulationLocation(BigDecimal latitude, BigDecimal longitude) {
      */
     public static SimulationLocation getRandomLocationInWarsaw() {
         //return random location in Warsaw
-        BigDecimal latitude = BigDecimal.valueOf(52.0 + Math.random());
-        BigDecimal longitude = BigDecimal.valueOf(20.0 + Math.random() * 2);
+        SecureRandom secureRandom = new SecureRandom();
+        BigDecimal latitude = BigDecimal.valueOf(52.0 + secureRandom.nextDouble());
+        BigDecimal longitude = BigDecimal.valueOf(20.0 + secureRandom.nextDouble() * 1.5d);
         return new SimulationLocation(latitude, longitude);
     }
 }

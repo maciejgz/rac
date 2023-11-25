@@ -8,6 +8,8 @@ import pl.mg.rac.simulation.service.scenario.SimulationScenario;
 import java.security.SecureRandom;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
@@ -23,16 +25,18 @@ public class SimulationService {
         );
     }
 
-    public void startSimulation() {
-        executeScenario();
+    public void startSimulation(long numberOfScenarios) {
+        try (ExecutorService executorService = Executors.newFixedThreadPool(100)) {
+            for (int i = 0; i < numberOfScenarios; i++) {
+                executorService.submit(this::executeScenario);
+                log.debug("Scenario finished no: {}", i);
+            }
+        }
     }
 
     public void executeScenario() {
         SecureRandom secureRandom = new SecureRandom();
         double random = secureRandom.nextDouble();
-        for (SimulationScenario scenario : scenarios) {
-            log.debug("Scenario: " + scenario.getClass().getSimpleName() + " probability: " + scenario.getProbability());
-        }
         for (SimulationScenario scenario : scenarios) {
             random -= scenario.getProbability();
             if (random <= 0) {
