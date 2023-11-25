@@ -51,6 +51,7 @@ public class RentCarScenario implements SimulationScenario {
                     return;
                 }
                 rent = rentServiceClient.rentCar(randomUser.getName(), randomCar.getVin(), randomCar.getLocation());
+                //TODO add websocket channel communication and wait for the response from the rent service - with status of the rent
             } else {
                 log.debug("execute() RentCarScenario randomUser or randomCar is null");
                 return;
