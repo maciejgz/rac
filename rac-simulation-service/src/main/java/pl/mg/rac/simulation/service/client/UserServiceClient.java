@@ -31,9 +31,40 @@ public class UserServiceClient implements ServiceClient {
                 .build();
 
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.statusCode());
-        System.out.println(response.body());
+        log.debug("code: " + response.statusCode());
+        log.debug(response.body());
+    }
 
+    public SimulationUser getRandomUser() throws IOException, InterruptedException, URISyntaxException {
+        log.debug("getRandomUser()");
+
+        //TODO use spring cloud feign client
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8080/api/user/random"))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        log.debug("code: " + response.statusCode());
+        log.debug(response.body());
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(response.body(), SimulationUser.class);
+    }
+
+    public void deleteUser(String username) throws IOException, InterruptedException, URISyntaxException {
+        log.debug("deleteUser()");
+
+        //TODO use spring cloud feign client
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8080/api/user/" + username))
+                .header("Content-Type", "application/json")
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        log.debug("code: " + response.statusCode());
+        log.debug(response.body());
     }
 
 }

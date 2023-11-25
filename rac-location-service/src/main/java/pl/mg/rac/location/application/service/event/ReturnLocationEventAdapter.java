@@ -40,7 +40,8 @@ public class ReturnLocationEventAdapter implements EventAdapter<RacEvent<?>> {
                         eventMapped.getPayload().username(),
                         eventMapped.getPayload().vin(),
                         distanceTraveled,
-                        eventMapped.getPayload().rentStartDate()
+                        eventMapped.getPayload().rentStartDate(),
+                        locations.getLast().getLocation()
                 ));
         eventPublisher.publishRentEvent(returnRequestUserEvent);
     }

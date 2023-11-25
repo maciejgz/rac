@@ -1,4 +1,4 @@
-package pl.mg.rac.simulation.model.scenario;
+package pl.mg.rac.simulation.service.scenario;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

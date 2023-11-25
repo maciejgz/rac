@@ -7,6 +7,7 @@ import pl.mg.rac.car.application.dto.command.AddCarCommand;
 import pl.mg.rac.car.application.dto.command.DeleteCarCommand;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyExistsException;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyNotExistException;
+import pl.mg.rac.car.application.dto.exception.CarRentedException;
 import pl.mg.rac.car.application.dto.response.AddCarResponse;
 import pl.mg.rac.car.application.dto.response.DeleteCarResponse;
 import pl.mg.rac.car.application.facade.CarFacade;
@@ -34,7 +35,7 @@ public class CarCommandController {
     }
 
     @DeleteMapping(value = "/{vin}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String vin) throws CarAlreadyNotExistException {
+    public ResponseEntity<Void> deleteUser(@PathVariable String vin) throws CarAlreadyNotExistException, CarRentedException {
         log.debug("deleteUser() called with: vin = [" + vin + "]");
         DeleteCarResponse response = carFacade.deleteCar(new DeleteCarCommand(vin));
         return ResponseEntity.noContent().build();
@@ -47,6 +48,11 @@ public class CarCommandController {
 
     @ExceptionHandler
     public ResponseEntity<ApiError> handleCarAlreadyExistException(CarAlreadyExistsException e) {
+        return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleCarRentedException(CarRentedException e) {
         return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
     }
 }

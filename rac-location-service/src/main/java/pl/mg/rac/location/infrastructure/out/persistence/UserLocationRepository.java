@@ -21,8 +21,8 @@ public class UserLocationRepository implements UserLocationDatabase {
     public UserLocation saveUserLocation(UserLocation userLocation) {
         UserLocationEntity entity = new UserLocationEntity(
                 new UserLocationEntity.UserKey(userLocation.getUsername(), userLocation.getTimestamp()),
-                BigDecimal.valueOf(userLocation.getLocation().latitude()),
-                BigDecimal.valueOf(userLocation.getLocation().longitude())
+                userLocation.getLocation().latitude(),
+                userLocation.getLocation().longitude()
         );
         return ofEntity(userRepository.save(entity));
     }
@@ -40,7 +40,7 @@ public class UserLocationRepository implements UserLocationDatabase {
     private static UserLocation ofEntity(UserLocationEntity entity) {
         return new UserLocation(
                 entity.getKey().getUsername(),
-                new Location(entity.getLatitude().doubleValue(), entity.getLongitude().doubleValue()),
+                new Location(entity.getLatitude(), entity.getLongitude()),
                 entity.getKey().getTimestamp()
         );
     }

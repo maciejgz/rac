@@ -1,4 +1,4 @@
-package pl.mg.rac.simulation.model.scenario;
+package pl.mg.rac.simulation.service.scenario;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RefreshScope
-public class RentCarScenario implements SimulationScenario {
+public class RentAlreadyRentedCarScenario implements SimulationScenario {
 
-    @Value("${rac.simulation.probability.rent-car-scenario}")
+    @Value("${rac.simulation.probability.rent-already-rented-car-scenario}")
     private double probability;
 
     @Override
     public void execute() {
-        log.debug("execute() RentCarScenario");
+        log.debug("execute() RentAlreadyRentedCarScenario");
         //TODO implement
     }
 

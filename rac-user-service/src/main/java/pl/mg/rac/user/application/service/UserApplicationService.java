@@ -80,6 +80,10 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
     public void deleteUser(DeleteUserCommand command) throws UserDeletionException {
         log.debug("deleteUser() called with: command = [" + command + "]");
         try {
+            Optional<User> userOpt = userDatabase.findByName(command.name());
+            if (userOpt.isPresent() && userOpt.get().getCurrentRentId() != null) {
+                throw new UserDeletionException("User with name " + command.name() + " has active rent");
+            }
             userDatabase.delete(userDatabase.findByName(command.name()).orElseThrow(
                     () -> new UserNotExistException("User with name " + command.name() + " not exists")));
             List<RacEvent<?>> domainEvents = List.of(new UserDeletedEvent(command.name(), new UserDeletedPayload(command.name())));
@@ -95,7 +99,7 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
         log.debug("getUser() called with: name = [" + query + "]");
         User user = userDatabase.findByName(query.name()).orElseThrow(
                 () -> new UserNotFoundException("User with name " + query.name() + " not exists"));
-        return new UserResponse(user.getName(), user.getBalance());
+        return new UserResponse(user.getName(), user.getBalance(), user.getLocation());
     }
 
     @Override
@@ -105,7 +109,7 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
         if (user.isEmpty()) {
             throw new UserNotFoundException("No users in database");
         } else {
-            return new UserResponse(user.get().getName(), user.get().getBalance());
+            return new UserResponse(user.get().getName(), user.get().getBalance(), user.get().getLocation());
         }
     }
 }

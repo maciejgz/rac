@@ -1,9 +1,10 @@
-package pl.mg.rac.simulation.model.scenario;
+package pl.mg.rac.simulation.service.scenario;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
+import pl.mg.rac.simulation.service.client.CarServiceClient;
 
 @Component
 @Slf4j
@@ -13,10 +14,20 @@ public class RemoveCarScenario implements SimulationScenario {
     @Value("${rac.simulation.probability.remove-car-scenario}")
     private double probability;
 
+    private final CarServiceClient carServiceClient;
+
+    public RemoveCarScenario(CarServiceClient carServiceClient) {
+        this.carServiceClient = carServiceClient;
+    }
+
     @Override
     public void execute() {
         log.debug("execute() RemoveCarScenario");
-        //TODO implement
+        try {
+            carServiceClient.deleteCar(carServiceClient.getRandomCar().getVin());
+        } catch (Exception e) {
+            log.error("execute() RemoveCarScenario", e);
+        }
     }
 
     @Override

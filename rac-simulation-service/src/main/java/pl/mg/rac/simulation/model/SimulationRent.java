@@ -5,8 +5,9 @@ import lombok.Data;
 @Data
 public class SimulationRent {
 
-    private String UUID;
-    private SimulationRentStatus status;
-    private SimulationUser user;
+    private String rentId;
+    private String status;
+    private String username;
+    private String vin;
 
 }

@@ -8,6 +8,7 @@ import pl.mg.rac.car.application.dto.command.ReturnCarCommand;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyExistsException;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyNotExistException;
 import pl.mg.rac.car.application.dto.exception.CarNotFoundException;
+import pl.mg.rac.car.application.dto.exception.CarRentedException;
 import pl.mg.rac.car.application.dto.query.GetCarQuery;
 import pl.mg.rac.car.application.dto.response.*;
 import pl.mg.rac.car.application.port.in.*;
@@ -46,10 +47,15 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
     }
 
     @Override
-    public DeleteCarResponse deleteCar(DeleteCarCommand command) throws CarAlreadyNotExistException {
+    public DeleteCarResponse deleteCar(DeleteCarCommand command) throws CarAlreadyNotExistException, CarRentedException {
         log.debug("deleteCar() called with: command = [" + command + "]");
+
         if (!carDatabase.existsByVin(command.vin())) {
             throw new CarAlreadyNotExistException("Car with vin: " + command.vin() + " already not exist.");
+        }
+        Optional<Car> car = carDatabase.getCarByVin(command.vin());
+        if (car.isPresent() && car.get().getRented()) {
+            throw new CarRentedException("Car with vin: " + command.vin() + " is rented.");
         }
         carDatabase.deleteByVin(command.vin());
         eventPublisher.publishCarEvent(new CarDeletedEvent(command.vin(), new CarDeletedPayload(command.vin())));

@@ -24,8 +24,8 @@ public class CarLocationRepository implements CarLocationDatabase {
                 new CarLocationEntity.CarKey(carLocation.getVin(),
                         Instant.now()
                 ),
-                BigDecimal.valueOf(carLocation.getLocation().latitude()),
-                BigDecimal.valueOf(carLocation.getLocation().longitude())
+                carLocation.getLocation().latitude(),
+                carLocation.getLocation().longitude()
         );
         CarLocationEntity savedEntity = carRepository.save(entity);
         ofEntity(savedEntity);
@@ -52,7 +52,7 @@ public class CarLocationRepository implements CarLocationDatabase {
     private static CarLocation ofEntity(CarLocationEntity entity) {
         return new CarLocation(
                 entity.getKey().getVin(),
-                new Location(entity.getLatitude().doubleValue(), entity.getLongitude().doubleValue()),
+                new Location(entity.getLatitude(), entity.getLongitude()),
                 entity.getKey().getTimestamp()
         );
     }

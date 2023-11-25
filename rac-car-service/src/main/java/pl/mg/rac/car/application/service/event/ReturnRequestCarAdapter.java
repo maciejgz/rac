@@ -87,7 +87,7 @@ public class ReturnRequestCarAdapter implements EventAdapter<RacEvent<?>> {
                         returnRequestCarEvent.getPayload().rentId(),
                         returnRequestCarEvent.getPayload().username(),
                         returnRequestCarEvent.getPayload().vin(),
-                        car.getLocation(),
+                        returnRequestCarEvent.getPayload().endLocation(),
                         returnRequestCarEvent.getPayload().distanceTraveled(),
                         returnRequestCarEvent.getPayload().chargedAmount()
                 )

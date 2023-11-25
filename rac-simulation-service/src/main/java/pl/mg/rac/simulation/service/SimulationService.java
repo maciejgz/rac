@@ -3,7 +3,7 @@ package pl.mg.rac.simulation.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
-import pl.mg.rac.simulation.model.scenario.SimulationScenario;
+import pl.mg.rac.simulation.service.scenario.SimulationScenario;
 
 import java.security.SecureRandom;
 import java.util.Comparator;
