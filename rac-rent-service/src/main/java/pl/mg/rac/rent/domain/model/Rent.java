@@ -56,6 +56,11 @@ public class Rent {
         this.rentEndTimestamp = Instant.now();
     }
 
+    public void handleRentTimeout() {
+        this.moveToRentDeclinedStatus("Timeout");
+        this.rentEndTimestamp = Instant.now();
+    }
+
     public void requestReturn() {
         this.moveToReturnRequestedStatus();
         this.returnRequestTimestamp = Instant.now();
@@ -71,6 +76,12 @@ public class Rent {
         this.moveToReturnDeclinedStatus();
         this.rentEndTimestamp = Instant.now();
         this.statusReason = reason;
+    }
+
+    public void handleReturnTimeout() {
+        this.moveToReturnDeclinedStatus();
+        this.rentEndTimestamp = Instant.now();
+        this.statusReason = "Timeout";
     }
 
     // state machine
