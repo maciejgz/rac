@@ -1,6 +1,5 @@
 package pl.mg.rac.simulation.service.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,6 +41,25 @@ public class RentServiceClient implements ServiceClient {
         return rent;
     }
 
+    public SimulationRent getRent(String rentId) throws IOException, URISyntaxException, InterruptedException {
+        log.debug("getRent() called with: rentId = [" + rentId + "]");
+
+        //TODO use spring cloud feign client
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI("http://localhost:8080/api/rent/" + rentId))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        //map response to SimulationRent
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        SimulationRent rent = objectMapper.readValue(response.body(), SimulationRent.class);
+        log.debug("status code: " + response.statusCode());
+        log.debug(response.body());
+        return rent;
+    }
+
     public void returnCar(String rentId) throws IOException, URISyntaxException, InterruptedException {
         log.debug("returnCar() called with: rentId = [" + rentId + "]");
 
@@ -58,7 +76,6 @@ public class RentServiceClient implements ServiceClient {
 
     private record RentCarCommand(String username, String vin, SimulationLocation location) {
     }
-
 
 
 }
