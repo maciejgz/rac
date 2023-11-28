@@ -2,6 +2,7 @@
 
 Java 21, Spring Cloud based microservices application for renting cars. POC of the Spring Cloud microservices
 architecture written in DDD and hexagonal architecture.
+Transactions are handled with saga choreography pattern. Communication between services is done with Kafka.
 
 ### Repository
 
