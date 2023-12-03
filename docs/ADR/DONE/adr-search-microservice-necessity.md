@@ -15,6 +15,8 @@ There is a need for the following search functionalities in the system:
 
 All of these functionalities can be achieved by using the database engine - MongoDB. We don't need to create a separated
 search microservice with a search engine like Elasticsearch.
+Lack of search engine functionalities is not a problem because we don't need to perform complex search queries of users
+or cars. We only need to perform simple queries like search by ID, name or search by location.
 
 ### Consequences
 
