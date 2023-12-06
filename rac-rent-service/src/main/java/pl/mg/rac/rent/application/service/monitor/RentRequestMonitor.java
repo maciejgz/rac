@@ -30,7 +30,7 @@ public class RentRequestMonitor {
         rentRequest.handleRentTimeout();
         rentDatabase.save(rentRequest);
         //TODO notify user about timeout over websocket
-        //TODO all services should receive compensation event
+        //TODO all services should receive compensation event - car and user to be added
     }
 
     private boolean isTimeout(Rent rentRequest) {

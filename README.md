@@ -3,6 +3,8 @@
 Java 21, Spring Cloud based microservices application for renting cars. POC of the Spring Cloud microservices
 architecture written in DDD and hexagonal architecture.
 
+## Architecture
+
 ### Repository
 
 https://github.com/maciejgz/rac
@@ -113,7 +115,7 @@ https://github.com/maciejgz/rac
 | RAC_USER_DELETED | RAC_USER | Sent when user is deleted                                      |
 | RAC_USER_CHARGED | RAC_USER | Sent when user is charged for rent or due to some other reason |
 
-### Car service events
+#### Car service events
 
 | event ID                               |  topic  | comment                                                            |
 |----------------------------------------|:-------:|:-------------------------------------------------------------------|
@@ -220,7 +222,7 @@ Location service should update the car and user carLocation in the database and 
 service).
 User is notified about the successful return by the Websocket connection.
 
-### Simulation service
+### Simulation
 
 Simulation service let to simulate the data of the cars and users. It is used for testing purposes.
 Simulation is configured through the config service. It is possible to configure the number of concurrent threads
@@ -235,6 +237,14 @@ Possible simulation scenarios:
 - Administrator removes a car from the pool of available cars
 - User rents a car - then localizations of the user and the car are updated and then user returns the car
 - User tries to rent already rented car
+
+### Monitoring
+
+Monitoring is based on Micrometer, Prometheus and Grafana. Each service has a Micrometer agent that sends metrics to the
+Prometheus. Prometheus is a time series database that stores metrics. Grafana is a Web UI for Prometheus. It is possible to create
+dashboards in Grafana.
+All the required components are deployed in the docker containers.
+Grafana is available in the browser under http://localhost:9091/ with admin/admin credentials.
 
 ## Build and run
 

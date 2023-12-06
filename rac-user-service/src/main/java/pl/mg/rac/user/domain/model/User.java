@@ -8,9 +8,11 @@ import pl.mg.rac.commons.event.RacEventPayload;
 import pl.mg.rac.commons.event.user.UserChargedEvent;
 import pl.mg.rac.commons.event.user.payload.UserChargedPayload;
 import pl.mg.rac.commons.value.Location;
+import pl.mg.rac.user.domain.model.policy.ChargeUserPolicyRegistry;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,10 @@ public class User {
     private String name;
     private BigDecimal balance;
     private Location location;
+    //TODO make it read only cache value filled in when rent-service accepts rent and cleared when rent-service returns is committed
     private String currentRentId;
+    private LocalDate registrationDate;
+
 
     @Transient
     private final List<RacEvent<? extends RacEventPayload>> events;
@@ -31,19 +36,21 @@ public class User {
         this.events = new ArrayList<>();
     }
 
-    public User(String id, String name, BigDecimal balance, Location location, String currentRentId) {
+    public User(String id, String name, BigDecimal balance, Location location, String currentRentId, LocalDate registrationDate) {
         this.id = id;
         this.name = name;
         this.balance = balance;
         this.location = location;
         this.events = new ArrayList<>();
+        this.registrationDate = registrationDate;
         this.currentRentId = currentRentId;
     }
 
-    public User(String name, BigDecimal balance, Location location) {
+    public User(String name, BigDecimal balance, Location location, LocalDate registrationDate) {
         this.name = name;
         this.balance = balance;
         this.location = location;
+        this.registrationDate = registrationDate;
         this.events = new ArrayList<>();
     }
 
@@ -59,7 +66,7 @@ public class User {
 
     public BigDecimal finishRentAndCharge(Instant rentStartDate, Instant rentEndDate, BigDecimal distanceTraveled) {
         //TODO add policy to calculate rent amount
-        BigDecimal amount = calculateRentAmount(rentStartDate, rentEndDate, distanceTraveled);
+        BigDecimal amount = calculateRentCharge(rentStartDate, rentEndDate, distanceTraveled);
         charge(amount);
         cancelRent();
         return amount;
@@ -71,9 +78,8 @@ public class User {
         this.balance = balance.subtract(amount);
     }
 
-    private BigDecimal calculateRentAmount(Instant rentStartDate, Instant rentEndDate, BigDecimal distanceTraveled) {
-        return BigDecimal.valueOf((double) (rentEndDate.getEpochSecond() - rentStartDate.getEpochSecond()) / 60 * 0.2)
-                .add(distanceTraveled.multiply(BigDecimal.valueOf(0.1)));
+    private BigDecimal calculateRentCharge(Instant rentStartDate, Instant rentEndDate, BigDecimal distanceTraveled) {
+        return ChargeUserPolicyRegistry.getChargeUserPolicy(this).calculateRentCharge(rentStartDate, rentEndDate, distanceTraveled);
     }
 
     public void startRent(String rentId) {
