@@ -52,7 +52,7 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
         if (userDatabase.exists(command.name())) {
             throw new UserRegistrationException("User with name " + command.name() + " already exists");
         }
-        User user = UserFactory.createUser(command.name(), command.location());
+        User user = UserFactory.createNewUser(command.name(), command.location());
         user.addEvent(new UserCreatedEvent(user.getName(), new UserCreatedPayload(user.getName(), user.getLocation())));
         User userSaved = userDatabase.save(user);
         user.getEvents().forEach(userEventPublisher::publishUserEvent);

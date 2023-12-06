@@ -8,6 +8,7 @@ import pl.mg.rac.commons.value.Location;
 import pl.mg.rac.user.domain.model.User;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Document(collection = "user")
 @Data
@@ -21,6 +22,7 @@ public class UserEntity {
     private BigDecimal balance;
     private Location location;
     private String currentRentId;
+    private LocalDate registrationDate;
 
     public static UserEntity ofUser(User user) {
         UserEntity userEntity = new UserEntity();
@@ -29,6 +31,7 @@ public class UserEntity {
         userEntity.setBalance(user.getBalance());
         userEntity.setLocation(user.getLocation());
         userEntity.setCurrentRentId(user.getCurrentRentId());
+        userEntity.setRegistrationDate(user.getRegistrationDate());
         return userEntity;
     }
 }
