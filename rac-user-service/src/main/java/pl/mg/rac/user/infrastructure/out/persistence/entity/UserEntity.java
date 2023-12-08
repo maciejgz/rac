@@ -23,6 +23,7 @@ public class UserEntity {
     private Location location;
     private String currentRentId;
     private LocalDate registrationDate;
+    private Boolean blocked;
 
     public static UserEntity ofUser(User user) {
         UserEntity userEntity = new UserEntity();
@@ -32,6 +33,7 @@ public class UserEntity {
         userEntity.setLocation(user.getLocation());
         userEntity.setCurrentRentId(user.getCurrentRentId());
         userEntity.setRegistrationDate(user.getRegistrationDate());
+        userEntity.setBlocked(user.isBlocked());
         return userEntity;
     }
 }

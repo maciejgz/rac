@@ -26,6 +26,7 @@ public class User {
     private Location location;
     //TODO make it read only cache value filled in when rent-service accepts rent and cleared when rent-service returns is committed
     private String currentRentId;
+    private boolean blocked = false;
     private LocalDate registrationDate;
 
 
@@ -89,6 +90,13 @@ public class User {
         this.currentRentId = rentId;
     }
 
+    public void block() {
+        this.blocked = true;
+    }
+
+    public void unblock() {
+        this.blocked = false;
+    }
 
     public void cancelRent() {
         this.currentRentId = null;

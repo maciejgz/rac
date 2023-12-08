@@ -4,14 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.mg.rac.commons.api.dto.ApiError;
-import pl.mg.rac.user.application.dto.command.ChargeUserCommand;
-import pl.mg.rac.user.application.dto.command.CreateUserCommand;
-import pl.mg.rac.user.application.dto.command.DeleteUserCommand;
+import pl.mg.rac.user.application.dto.command.*;
 import pl.mg.rac.user.application.dto.exception.UserChargeException;
 import pl.mg.rac.user.application.dto.exception.UserDeletionException;
+import pl.mg.rac.user.application.dto.exception.UserNotFoundException;
 import pl.mg.rac.user.application.dto.exception.UserRegistrationException;
+import pl.mg.rac.user.application.dto.response.BlockUserResponse;
 import pl.mg.rac.user.application.dto.response.ChargeUserResponse;
 import pl.mg.rac.user.application.dto.response.CreateUserResponse;
+import pl.mg.rac.user.application.dto.response.UnblockUserResponse;
 import pl.mg.rac.user.application.facade.UserFacade;
 
 import java.net.URI;
@@ -47,6 +48,18 @@ public class UserCommandController {
         return ResponseEntity.ok(chargeUserResponse);
     }
 
+    @PutMapping(value = "/{name}/block")
+    public ResponseEntity<BlockUserResponse> blockUser(@PathVariable String name) throws UserNotFoundException {
+        BlockUserResponse chargeUserResponse = userFacade.blockUser(new BlockUserCommand(name));
+        return ResponseEntity.ok(chargeUserResponse);
+    }
+
+    @PutMapping(value = "/{name}/unblock")
+    public ResponseEntity<UnblockUserResponse> unblockUser(@PathVariable String name) throws UserNotFoundException {
+        UnblockUserResponse chargeUserResponse = userFacade.unblockUser(new UnblockUserCommand(name));
+        return ResponseEntity.ok(chargeUserResponse);
+    }
+
     @ExceptionHandler
     public ResponseEntity<ApiError> handleRegistrationException(UserRegistrationException e) {
         return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
@@ -60,5 +73,10 @@ public class UserCommandController {
     @ExceptionHandler
     public ResponseEntity<ApiError> handleChargeException(UserChargeException e) {
         return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleUserNotFoundException(UserNotFoundException ignoredE) {
+        return ResponseEntity.notFound().build();
     }
 }

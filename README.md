@@ -137,6 +137,7 @@ https://github.com/maciejgz/rac
 | RAC_RENT_CONFIRMATION | RAC_RENT | Sent when rent is confirmed in car service and should be confirmed in rent service                 |
 | RAC_RENT_FAILED_USER  | RAC_RENT | Issue in rent validation in user service. Consumed by                                              |
 | RAC_RENT_FAILED_CAR   | RAC_RENT | Issue in rent validation in car service                                                            |
+| RAC_RENT_SUCCESS      | RAC_RENT | Sent when rent is successfully created and accepted                                                |
 
 #### Return related events
 
@@ -149,6 +150,7 @@ https://github.com/maciejgz/rac
 | RAC_RETURN_FAILED_LOCATION  | RAC_RETURN | Issue in return validation in carLocation service                                                          |
 | RAC_RETURN_FAILED_USER      | RAC_RETURN | Issue in return validation in user service                                                                 |
 | RAC_RETURN_FAILED_CAR       | RAC_RETURN | Issue in return validation in car service                                                                  |
+| RAC_RETURN_SUCCESS          | RAC_RETURN | Sent when return is confirmed and accepted                                                                 |
 
 #### Location service events
 
@@ -163,57 +165,59 @@ https://github.com/maciejgz/rac
 
 - User sends a rent HTTP request to the API Gateway
 - API Gateway sends a rent request to the rac-rent-service (HTTP)
-- Rent service validates the request and:
-    - in case of success: creates a rent, starts a saga and sends a rent request to the rac-user-service (Kafka) - *
-      *RAC_RENT_REQUEST_USER**
+- Rent service validates the request (final validation will be done in the last event) and checks if there is not active
+  or requested rent for the user and car.
+    - in case of success: creates a rent with status RENT_REQUESTED, starts a saga and sends a rent request to
+      the rac-user-service (Kafka) - **RAC_RENT_REQUEST_USER**
     - in case of failure: sends a rent failure to the api gateway (HTTP)
-- User service validates the event and:
-    - in case of success - sets the user as a renter with the rental id and sends a rent request to the
-      rac-car-service (Kafka) - **RAC_RENT_REQUEST_CAR**
+- User service validates the rent request. What should be validated: user exists, user is not blocked.
+    - in case of success - sends a rent request to the rac-car-service (Kafka) - **RAC_RENT_REQUEST_CAR**
     - in case of failure - sends a rent failure to the rac-rent-service (Kafka) - **RAC_RENT_FAILED_USER**, then the
       saga is compensated in the rac-rent-service
-- Car service validates the request and:
-    - in case of success - sets the car as rented with the rental id and sends a rent confirmation to the
-      rac-rent-service (Kafka) - **RAC_RENT_CONFIRMATION**. Search service is updated with the car status.
+- Car service validates the request. What should be validated: car exists, car is available, car is healthy.
+    - in case of success - sends a rent confirmation to the rac-rent-service (Kafka) - **RAC_RENT_CONFIRMATION**
     - in case of failure - sends a rent failure to the rac-rent-service and rac-user-service (Kafka) - *
-      *RAC_RENT_FAILED_CAR**. Then the saga is compensated in the rac-rent-service and rac-user-service
+      *RAC_RENT_FAILED_CAR**. Then the saga is compensated in the rac-rent-service
+- Rent service receives **RAC_RENT_CONFIRMATION** message and validates if there is no active or requested rent for the
+  user and car. If not, rent status is changed to RENT_CONFIRMED. Rent service sends an event: **RAC_RENT_SUCCESS**
+  which is consumed by the car service and user service to fill in rentalId as a readonly cache used for search.
 
 When a rental is initiated, customer and car GPS agents should increase the frequency of data sending to the carLocation
 service - once per 5s. Location service should update the car and user carLocation in the database and push
 notifications (**RAC_LOCATION_USER_CHANGED**, **RAC_LOCATION_CAR_CHANGED**) to Kafka (events consumed by the search,
-car, user and rent
-service).
+car, user and rent service).
 User is notified about the successful rent by the Websocket connection.
+In case of car failure, car healthcheck system sends contacts with car-service REST API to inform about failure. It
+should block user from returning the car and request contact the support.
 
 #### Return car saga
 
 - User sends a return HTTP request to the API Gateway
 - API Gateway sends a return request to the rac-rent-service (HTTP)
-- rac-rent-service validates the request and:
+- rac-rent-service validates the request: if there is an active rent for the user and car.
     - in case of success - calculate distance traveled querying rac-carLocation-service by event (Kafka) - *
       *RAC_RETURN_REQUEST_LOCATION**
     - in case of failure - sends a return failure api gateway (HTTP)
-- rac-carLocation-service validates **RAC_RETURN_REQUEST_LOCATION**. In case of success:
+- rac-location-service validates **RAC_RETURN_REQUEST_LOCATION**. In case of success:
     - calculates the distance traveled and sends a return request to the rac-user-service (Kafka) - *
       *RAC_RETURN_REQUEST_USER**
     - in case of failure - sends a return failure to the rac-rent-service (Kafka) - **RAC_RETURN_FAILED_LOCATION**, then
-      the
       saga is compensated in the rac-rent-service
-- rac-user-service validates the request and:
-    - in case of success - charges user for the distance traveled, sends an event to the rac-car-service (Kafka) -
+- rac-user-service receives the request and tries to charge the user:
+    - in case of success - charges user for the distance traveled (with proper policy), sends an event to the
+      rac-car-service (Kafka) -
       **RAC_RETURN_REQUEST_CAR**
     - in case of failure - sends a return failure to the rac-rent-service (Kafka) - **RAC_RETURN_FAILED_USER**, then the
       saga is compensated in the rac-rent-service
-- rac-car-service validates the request and:
-    - in case of success - sets the car as available and sends a return confirmation to the rac-rent-service (Kafka) -
-      **RAC_RETURN_CONFIRMATION**. Search service is updated with the car status.
-    - in case of failure - sends a return failure to the rac-rent-service and rac-user-service (Kafka) - *
-      *RAC_RETURN_FAILED_CAR**.
-      Then the saga is compensated in the rac-rent-service and rac-user-service (charged money
-      is returned to the user).
-- rac-rent-service sends a return success to the api gateway (HTTP). In case of failure, the saga is compensated in the
-  rac-rent-service and error message has to be returned to the api gateway over websocket. User then has to contact the
-  support.
+- rac-car-service validates the request (car health status, car exists) and:
+    - in case of validation success - sets the car as available and sends a return confirmation to the
+      rac-rent-service (Kafka) - **RAC_RETURN_CONFIRMATION**.
+    - in case of validation failure - sends a return failure event to the rac-rent-service and rac-user-service (
+      Kafka) - **RAC_RETURN_FAILED_CAR**. Then the saga is compensated in the rac-rent-service (contact with support
+      request) and rac-user-service (charged money is returned to the user).
+- rac-rent-service receives **RAC_RETURN_CONFIRMATION** message and validates if there is an active rent for the user
+  and car. If yes, rent status is changed to RENT_RETURNED. Rent service sends an event: **RAC_RETURN_SUCCESS** which is
+  consumed by the car service and user service to clear rentalId as a readonly cache used for search.
 
 When a rental is finished, customer and car GPS agents should decrease the frequency of data sending to the carLocation
 service - once per 30s.
@@ -235,13 +239,16 @@ Possible simulation scenarios:
 - User unregisters
 - Administrator adds a car
 - Administrator removes a car from the pool of available cars
-- User rents a car - then localizations of the user and the car are updated and then user returns the car
+- User rents a car - then localizations of the user and the car are updated and then user returns the car - success
+  story
 - User tries to rent already rented car
+- Car's healthcheck system sends a message about car failure
 
 ### Monitoring
 
 Monitoring is based on Micrometer, Prometheus and Grafana. Each service has a Micrometer agent that sends metrics to the
-Prometheus. Prometheus is a time series database that stores metrics. Grafana is a Web UI for Prometheus. It is possible to create
+Prometheus. Prometheus is a time series database that stores metrics. Grafana is a Web UI for Prometheus. It is possible
+to create
 dashboards in Grafana.
 All the required components are deployed in the docker containers.
 Grafana is available in the browser under http://localhost:9091/ with admin/admin credentials.

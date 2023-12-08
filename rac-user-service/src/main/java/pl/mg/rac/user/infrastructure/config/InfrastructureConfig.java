@@ -33,7 +33,7 @@ public class InfrastructureConfig {
     @Bean
     public UserFacade userFacade(EventApplicationService eventApplicationService) {
         return new UserFacade(userApplicationService(), userApplicationService(), userApplicationService(),
-                userApplicationService(), userApplicationService(), eventApplicationService);
+                userApplicationService(), userApplicationService(), userApplicationService(), userApplicationService(), eventApplicationService);
     }
 
     //application services
