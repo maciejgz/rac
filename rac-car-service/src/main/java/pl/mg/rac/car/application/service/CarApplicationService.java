@@ -1,10 +1,7 @@
 package pl.mg.rac.car.application.service;
 
 import lombok.extern.slf4j.Slf4j;
-import pl.mg.rac.car.application.dto.command.AddCarCommand;
-import pl.mg.rac.car.application.dto.command.DeleteCarCommand;
-import pl.mg.rac.car.application.dto.command.RentCarCommand;
-import pl.mg.rac.car.application.dto.command.ReturnCarCommand;
+import pl.mg.rac.car.application.dto.command.*;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyExistsException;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyNotExistException;
 import pl.mg.rac.car.application.dto.exception.CarNotFoundException;
@@ -24,7 +21,7 @@ import pl.mg.rac.commons.event.car.payload.*;
 import java.util.Optional;
 
 @Slf4j
-public class CarApplicationService implements AddCar, DeleteCar, RentCar, ReturnCar, GetCar, GetRandomCar {
+public class CarApplicationService implements AddCar, DeleteCar, RentCar, ReturnCar, GetCar, GetRandomCar, ReportCarFailurePort, ReportCarFailureFixPort {
 
     private final CarDatabase carDatabase;
     private final CarEventPublisher eventPublisher;
@@ -128,6 +125,32 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
             throw new CarNotFoundException("No cars in database");
         } else {
             return new GetCarResponse(car.get().getVin(), car.get().getLocation(), car.get().getRented(), car.get().getMileage(), car.get().getRentalId());
+        }
+    }
+
+    @Override
+    public ReportCarFailureFixResponse reportCarFailureFix(ReportCarFailureFixCommand command) throws CarNotFoundException {
+        log.debug("reportCarFailureFix() called with: command = [" + command + "]");
+        Optional<Car> car = carDatabase.getCarByVin(command.vin());
+        if (car.isPresent()) {
+            car.get().removeFailure();
+            carDatabase.save(car.get());
+            return new ReportCarFailureFixResponse(command.vin(), car.get().getFailure());
+        } else {
+            throw new CarNotFoundException("Car with vin: " + command.vin() + " not found.");
+        }
+    }
+
+    @Override
+    public ReportCarFailureResponse reportCarFailure(ReportCarFailureCommand command) throws CarNotFoundException {
+        log.debug("reportCarFailure() called with: command = [" + command + "]");
+        Optional<Car> car = carDatabase.getCarByVin(command.vin());
+        if (car.isPresent()) {
+            car.get().setFailure(command.failureReason());
+            carDatabase.save(car.get());
+            return new ReportCarFailureResponse(command.vin(), car.get().getFailure(), car.get().getFailureReason());
+        } else {
+            throw new CarNotFoundException("Car with vin: " + command.vin() + " not found.");
         }
     }
 }

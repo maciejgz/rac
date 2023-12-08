@@ -35,7 +35,10 @@ public class InfrastructureConfig {
     public CarFacade carFacade(EventApplicationService eventApplicationService) {
         return new CarFacade(carApplicationService(), carApplicationService(),
                 carApplicationService(), carApplicationService(),
-                carApplicationService(), carApplicationService(), eventApplicationService);
+                carApplicationService(), carApplicationService(),
+                eventApplicationService,
+                carApplicationService(),
+                carApplicationService());
     }
 
     //application services

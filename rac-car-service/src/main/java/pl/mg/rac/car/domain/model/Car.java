@@ -22,9 +22,13 @@ public class Car {
     private String id;
     private String vin;
     private Location location;
+    //TODO remove this field and use just rentalId instead
     private Boolean rented;
     private BigDecimal mileage;
     private String rentalId;
+    private Boolean failure = false;
+    private String failureReason;
+
 
     @Transient
     private final List<RacEvent<? extends RacEventPayload>> events = new ArrayList<>();
@@ -37,13 +41,15 @@ public class Car {
 
     }
 
-    public Car(String id, String vin, Location location, Boolean rented, BigDecimal mileage, String rentalId) {
+    public Car(String id, String vin, Location location, Boolean rented, BigDecimal mileage, String rentalId, Boolean failure, String failureReason) {
         this.id = id;
         this.vin = vin;
         this.location = location;
         this.rented = rented;
         this.mileage = mileage;
         this.rentalId = rentalId;
+        this.failure = failure;
+        this.failureReason = failureReason;
     }
 
     public Car(String vin, Location location, Boolean rented, BigDecimal mileage, String rentalId) {
@@ -82,6 +88,16 @@ public class Car {
 
     public void updateLocation(Location location) {
         this.location = location;
+    }
+
+    public void setFailure(String failureReason) {
+        this.failure = true;
+        this.failureReason = failureReason;
+    }
+
+    public void removeFailure() {
+        this.failure = false;
+        this.failureReason = null;
     }
 
 }

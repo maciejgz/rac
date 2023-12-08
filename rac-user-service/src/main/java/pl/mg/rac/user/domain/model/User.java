@@ -37,7 +37,7 @@ public class User {
         this.events = new ArrayList<>();
     }
 
-    public User(String id, String name, BigDecimal balance, Location location, String currentRentId, LocalDate registrationDate) {
+    public User(String id, String name, BigDecimal balance, Location location, String currentRentId, LocalDate registrationDate, boolean blocked) {
         this.id = id;
         this.name = name;
         this.balance = balance;
@@ -45,6 +45,7 @@ public class User {
         this.events = new ArrayList<>();
         this.registrationDate = registrationDate;
         this.currentRentId = currentRentId;
+        this.blocked = blocked;
     }
 
     public User(String name, BigDecimal balance, Location location, LocalDate registrationDate) {

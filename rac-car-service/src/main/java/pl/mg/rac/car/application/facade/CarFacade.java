@@ -1,9 +1,6 @@
 package pl.mg.rac.car.application.facade;
 
-import pl.mg.rac.car.application.dto.command.AddCarCommand;
-import pl.mg.rac.car.application.dto.command.DeleteCarCommand;
-import pl.mg.rac.car.application.dto.command.RentCarCommand;
-import pl.mg.rac.car.application.dto.command.ReturnCarCommand;
+import pl.mg.rac.car.application.dto.command.*;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyExistsException;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyNotExistException;
 import pl.mg.rac.car.application.dto.exception.CarNotFoundException;
@@ -24,7 +21,10 @@ public class CarFacade {
     private final GetRandomCar getRandomCarAdapter;
     private final EventApplicationService eventApplicationService;
 
-    public CarFacade(AddCar addCarAdapter, DeleteCar deleteCarAdapter, RentCar rentCarAdapter, ReturnCar returnCarAdapter, GetCar getCarAdapter, GetRandomCar getRandomCarAdapter, EventApplicationService eventApplicationService) {
+    private final ReportCarFailurePort reportCarFailurePort;
+    private final ReportCarFailureFixPort reportCarFailureFixPort;
+
+    public CarFacade(AddCar addCarAdapter, DeleteCar deleteCarAdapter, RentCar rentCarAdapter, ReturnCar returnCarAdapter, GetCar getCarAdapter, GetRandomCar getRandomCarAdapter, EventApplicationService eventApplicationService, ReportCarFailurePort reportCarFailurePort, ReportCarFailureFixPort reportCarFailureFixPort) {
         this.addCarAdapter = addCarAdapter;
         this.deleteCarAdapter = deleteCarAdapter;
         this.rentCarAdapter = rentCarAdapter;
@@ -32,6 +32,8 @@ public class CarFacade {
         this.getCarAdapter = getCarAdapter;
         this.getRandomCarAdapter = getRandomCarAdapter;
         this.eventApplicationService = eventApplicationService;
+        this.reportCarFailurePort = reportCarFailurePort;
+        this.reportCarFailureFixPort = reportCarFailureFixPort;
     }
 
     public AddCarResponse addCar(AddCarCommand command) throws CarAlreadyExistsException {
@@ -61,5 +63,13 @@ public class CarFacade {
 
     public GetCarResponse getRandomCar() throws CarNotFoundException {
         return getRandomCarAdapter.getRandomCar();
+    }
+
+    public ReportCarFailureResponse reportCarFailure(ReportCarFailureCommand command) throws CarNotFoundException {
+        return reportCarFailurePort.reportCarFailure(command);
+    }
+
+    public ReportCarFailureFixResponse reportCarFailureFix(ReportCarFailureFixCommand command) throws CarNotFoundException {
+        return reportCarFailureFixPort.reportCarFailureFix(command);
     }
 }
