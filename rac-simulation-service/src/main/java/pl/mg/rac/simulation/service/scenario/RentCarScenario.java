@@ -1,6 +1,7 @@
 package pl.mg.rac.simulation.service.scenario;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import pl.mg.rac.simulation.service.client.UserServiceClient;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -42,43 +44,47 @@ public class RentCarScenario implements SimulationScenario {
     public void execute() {
         log.debug("SCENARIO: RentCarScenario");
         try {
-            SimulationUser randomUser = userServiceClient.getRandomUser();
+            Optional<SimulationUser> randomUser = userServiceClient.getRandomUser();
             SimulationCar randomCar = carServiceClient.getRandomCar();
-            SimulationRent rent;
-            if (randomUser != null && randomCar != null) {
-                if (randomCar.isRented() || randomUser.isRenting()) {
+            Optional<SimulationRent> rentOpt;
+            if (randomUser.isPresent() && randomCar != null) {
+                if (StringUtils.isNotBlank(randomCar.getRentalId()) || StringUtils.isNotBlank(randomUser.get().getCurrentRentId())) {
                     log.debug("execute() RentCarScenario randomCar is rented or randomUser is renting");
                     return;
                 }
-                rent = rentServiceClient.rentCar(randomUser.getName(), randomCar.getVin(), randomCar.getLocation());
-
-                for (int i = 0; i < 10; i++) {
-                    Thread.sleep(2000);
-                    rent = rentServiceClient.getRent(rent.getRentId());
-                    if (rent.getStatus().equals("RENT_ACCEPTED")) {
-                        break;
-                    }
-                }
-
-                if (rent.getStatus().equals("RENT_ACCEPTED")) {
-                    log.debug("RentCarScenario rent {} accepted", rent.getRentId());
+                rentOpt = rentServiceClient.rentCar(randomUser.get().getName(), randomCar.getVin(), randomCar.getLocation());
+                if (rentOpt.isEmpty()) {
+                    log.debug("execute() RentCarScenario rent is empty");
                 } else {
-                    log.debug("RentCarScenario rent {} not accepted", rent.getRentId());
-                    return;
+                    SimulationRent rent = rentOpt.get();
+                    for (int i = 0; i < 10; i++) {
+                        Thread.sleep(2000);
+                        Optional<SimulationRent> rCheck = rentServiceClient.getRent(rent.getRentId());
+                        if (rCheck.isPresent() && rCheck.get().getStatus().equals("RENT_ACCEPTED")) {
+                            rent = rCheck.get();
+                            break;
+                        }
+                    }
+
+                    if (rent.getStatus().equals("RENT_ACCEPTED")) {
+                        log.debug("RentCarScenario rent {} accepted", rent.getRentId());
+                    } else {
+                        log.debug("RentCarScenario rent {} not accepted", rent.getRentId());
+                        return;
+                    }
+                    SecureRandom secureRandom = new SecureRandom();
+                    //sent location updates with random probability - between 1 and 4 seconds
+                    for (int i = 0; i < 10; i++) {
+                        Thread.sleep((long) (secureRandom.nextDouble() * 3000 + 1000));
+                        locationServiceClient.publishCarLocation(randomCar.getVin(),
+                                SimulationLocation.randomOfOtherLocation(randomCar.getLocation(), 2));
+                    }
+                    //return car
+                    rentServiceClient.returnCar(rent.getRentId());
                 }
             } else {
                 log.debug("execute() RentCarScenario randomUser or randomCar is null");
-                return;
             }
-            SecureRandom secureRandom = new SecureRandom();
-            //sent location updates with random probability - between 1 and 4 seconds
-            for (int i = 0; i < 10; i++) {
-                Thread.sleep((long) (secureRandom.nextDouble() * 3000 + 1000));
-                locationServiceClient.publishCarLocation(randomCar.getVin(),
-                        SimulationLocation.randomOfOtherLocation(randomCar.getLocation(), 2));
-            }
-            //return car
-            rentServiceClient.returnCar(rent.getRentId());
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
             Thread.currentThread().interrupt();

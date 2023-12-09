@@ -12,7 +12,8 @@ public class SimulationCar {
     private String vin;
     private SimulationLocation location;
     private Long mileage;
-    private boolean isRented;
     private String rentalId;
+    private boolean failure;
+    private String failureReason;
 
 }

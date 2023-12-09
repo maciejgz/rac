@@ -34,9 +34,9 @@ public class RegisterUserScenario implements SimulationScenario {
             SimulationUser user = new SimulationUser(
                     UUID.randomUUID().toString(),
                     SimulationLocation.getRandomLocationInWarsaw(),
-                    false,
                     BigDecimal.ZERO,
-                    null
+                    null,
+                    false
             );
             userServiceClient.registerUser(user);
         } catch (InterruptedException e) {

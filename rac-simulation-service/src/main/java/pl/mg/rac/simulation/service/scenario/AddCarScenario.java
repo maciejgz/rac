@@ -33,6 +33,7 @@ public class AddCarScenario implements SimulationScenario {
             SimulationCar car = new SimulationCar(UUID.randomUUID().toString(),
                     SimulationLocation.getRandomLocationInWarsaw(),
                     0L,
+                    null,
                     false,
                     null
             );
