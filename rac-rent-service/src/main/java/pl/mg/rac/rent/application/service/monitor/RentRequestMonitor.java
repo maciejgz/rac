@@ -20,7 +20,7 @@ public class RentRequestMonitor {
         List<Rent> openRentRequests = rentDatabase.findOpenRentRequests();
         log.debug("Checking {} rent requests", openRentRequests.size());
         for (Rent rentRequest : openRentRequests) {
-            if (isTimeout(rentRequest)) {
+            if (isRentTimeout(rentRequest)) {
                 handleTimeout(rentRequest);
             }
         }
@@ -33,7 +33,7 @@ public class RentRequestMonitor {
         //TODO all services should receive compensation event - car and user to be added
     }
 
-    private boolean isTimeout(Rent rentRequest) {
+    private boolean isRentTimeout(Rent rentRequest) {
         return rentRequest.getRentRequestTimestamp()
                 .isBefore(Instant.now().minusSeconds(60));
     }

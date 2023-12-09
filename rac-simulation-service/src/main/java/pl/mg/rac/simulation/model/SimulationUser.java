@@ -13,8 +13,8 @@ public class SimulationUser {
 
     private String name;
     private SimulationLocation location;
-    private boolean isRenting;
     private BigDecimal balance;
     private String currentRentId;
+    private boolean blocked;
 
 }

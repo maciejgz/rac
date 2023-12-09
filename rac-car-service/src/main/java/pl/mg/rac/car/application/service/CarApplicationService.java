@@ -1,10 +1,8 @@
 package pl.mg.rac.car.application.service;
 
 import lombok.extern.slf4j.Slf4j;
-import pl.mg.rac.car.application.dto.command.AddCarCommand;
-import pl.mg.rac.car.application.dto.command.DeleteCarCommand;
-import pl.mg.rac.car.application.dto.command.RentCarCommand;
-import pl.mg.rac.car.application.dto.command.ReturnCarCommand;
+import org.apache.commons.lang.StringUtils;
+import pl.mg.rac.car.application.dto.command.*;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyExistsException;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyNotExistException;
 import pl.mg.rac.car.application.dto.exception.CarNotFoundException;
@@ -14,8 +12,7 @@ import pl.mg.rac.car.application.dto.response.*;
 import pl.mg.rac.car.application.port.in.*;
 import pl.mg.rac.car.application.port.out.CarDatabase;
 import pl.mg.rac.car.application.port.out.CarEventPublisher;
-import pl.mg.rac.car.domain.exception.CarAlreadyRentedException;
-import pl.mg.rac.car.domain.exception.CarAlreadyReturnedException;
+import pl.mg.rac.car.domain.exception.CarBrokenException;
 import pl.mg.rac.car.domain.model.Car;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.car.*;
@@ -24,7 +21,7 @@ import pl.mg.rac.commons.event.car.payload.*;
 import java.util.Optional;
 
 @Slf4j
-public class CarApplicationService implements AddCar, DeleteCar, RentCar, ReturnCar, GetCar, GetRandomCar {
+public class CarApplicationService implements AddCar, DeleteCar, RentCar, ReturnCar, GetCar, GetRandomCar, ReportCarFailurePort, ReportCarFailureFixPort {
 
     private final CarDatabase carDatabase;
     private final CarEventPublisher eventPublisher;
@@ -40,7 +37,7 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
         if (carDatabase.existsByVin(command.vin())) {
             throw new CarAlreadyExistsException("Car with vin: " + command.vin() + " already exists.");
         }
-        Car car = new Car(command.vin(), command.location(), false, command.mileage(), null);
+        Car car = new Car(command.vin(), command.location(), command.mileage(), null);
         Car saved = carDatabase.save(car);
         eventPublisher.publishCarEvent(new CarCreatedEvent(command.vin(), new CarCreatedPayload(command.vin(), command.location(), command.mileage())));
         return new AddCarResponse(saved.getVin(), saved.getLocation(), saved.getMileage());
@@ -54,7 +51,7 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
             throw new CarAlreadyNotExistException("Car with vin: " + command.vin() + " already not exist.");
         }
         Optional<Car> car = carDatabase.getCarByVin(command.vin());
-        if (car.isPresent() && car.get().getRented()) {
+        if (car.isPresent() && StringUtils.isNotBlank(car.get().getRentalId())) {
             throw new CarRentedException("Car with vin: " + command.vin() + " is rented.");
         }
         carDatabase.deleteByVin(command.vin());
@@ -67,19 +64,12 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
         log.debug("rentCar() called with: command = [" + command + "]");
         Optional<Car> car = carDatabase.getCarByVin(command.vin());
         if (car.isPresent()) {
-            try {
-                car.get().rentCar(command.rentalId());
-                carDatabase.save(car.get());
-                for (RacEvent<?> event : car.get().getEvents()) {
-                    eventPublisher.publishCarEvent(event);
-                }
-                return new RentCarResponse(command.vin(), command.rentalId(), true);
-            } catch (CarAlreadyRentedException e) {
-                log.error("Car with vin: " + command.vin() + " is already rented. Rental id: " + car.get().getRentalId());
-                CarRentFailedAlreadyRentedEvent event = new CarRentFailedAlreadyRentedEvent(command.vin(), new CarRentFailedAlreadyRentedPayload(command.vin(), command.rentalId()));
+            car.get().rentCar(command.rentalId());
+            carDatabase.save(car.get());
+            for (RacEvent<?> event : car.get().getEvents()) {
                 eventPublisher.publishCarEvent(event);
-                return new RentCarResponse(command.vin(), command.rentalId(), false);
             }
+            return new RentCarResponse(command.vin(), command.rentalId(), true);
         } else {
             CarRentFailedNotExistsEvent event = new CarRentFailedNotExistsEvent(command.vin(), new CarRentFailedNotExistsPayload(command.vin(), command.rentalId()));
             eventPublisher.publishCarEvent(event);
@@ -90,7 +80,7 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
     @Override
     public GetCarResponse getCar(GetCarQuery command) throws CarNotFoundException {
         Optional<Car> carByVin = carDatabase.getCarByVin(command.vin());
-        return carByVin.map(car -> new GetCarResponse(car.getVin(), car.getLocation(), car.getRented(), car.getMileage(), car.getRentalId())).orElseThrow(
+        return carByVin.map(car -> new GetCarResponse(car.getVin(), car.getLocation(), car.getMileage(), car.getRentalId(), car.getFailure(), car.getFailureReason())).orElseThrow(
                 () -> new CarNotFoundException("Car with vin: " + command.vin() + " not found.")
         );
     }
@@ -101,17 +91,18 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
         Optional<Car> car = carDatabase.getCarByVin(command.vin());
         if (car.isPresent()) {
             try {
-                car.get().returnCar(command.rentalId(), command.distanceTraveled());
+                car.get().returnCarRequest();
                 carDatabase.save(car.get());
                 for (RacEvent<?> event : car.get().getEvents()) {
                     eventPublisher.publishCarEvent(event);
                 }
                 return new ReturnCarResponse(command.vin(), command.distanceTraveled(), command.rentalId(), command.location(), true);
-            } catch (CarAlreadyReturnedException e) {
-                log.error("Car with vin: " + command.vin() + " is already rented. Rental id: " + car.get().getRentalId());
-                eventPublisher.publishCarEvent(new CarReturnFailedAlreadyReturnedEvent(command.vin(),
-                        new CarReturnFailedAlreadyReturnedPayload(command.vin(), command.rentalId(), command.location(), command.distanceTraveled())));
+            } catch (CarBrokenException e) {
+                log.error("Car with vin: " + command.vin() + " is broken. Reason: " + car.get().getFailureReason());
+                eventPublisher.publishCarEvent(new CarReturnFailedCarBrokenEvent(command.vin(),
+                        new CarReturnFailedBrokenPayload(command.vin(), command.rentalId(), command.location(), command.distanceTraveled())));
                 return new ReturnCarResponse(command.vin(), command.distanceTraveled(), command.rentalId(), command.location(), false);
+
             }
         } else {
             eventPublisher.publishCarEvent(new CarReturnFailedNotExistsEvent(command.vin(),
@@ -127,7 +118,33 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
         if (car.isEmpty()) {
             throw new CarNotFoundException("No cars in database");
         } else {
-            return new GetCarResponse(car.get().getVin(), car.get().getLocation(), car.get().getRented(), car.get().getMileage(), car.get().getRentalId());
+            return new GetCarResponse(car.get().getVin(), car.get().getLocation(), car.get().getMileage(), car.get().getRentalId(), car.get().getFailure(), car.get().getFailureReason());
+        }
+    }
+
+    @Override
+    public ReportCarFailureFixResponse reportCarFailureFix(ReportCarFailureFixCommand command) throws CarNotFoundException {
+        log.debug("reportCarFailureFix() called with: command = [" + command + "]");
+        Optional<Car> car = carDatabase.getCarByVin(command.vin());
+        if (car.isPresent()) {
+            car.get().removeFailure();
+            carDatabase.save(car.get());
+            return new ReportCarFailureFixResponse(command.vin(), car.get().getFailure());
+        } else {
+            throw new CarNotFoundException("Car with vin: " + command.vin() + " not found.");
+        }
+    }
+
+    @Override
+    public ReportCarFailureResponse reportCarFailure(ReportCarFailureCommand command) throws CarNotFoundException {
+        log.debug("reportCarFailure() called with: command = [" + command + "]");
+        Optional<Car> car = carDatabase.getCarByVin(command.vin());
+        if (car.isPresent()) {
+            car.get().setFailure(command.failureReason());
+            carDatabase.save(car.get());
+            return new ReportCarFailureResponse(command.vin(), car.get().getFailure(), car.get().getFailureReason());
+        } else {
+            throw new CarNotFoundException("Car with vin: " + command.vin() + " not found.");
         }
     }
 }

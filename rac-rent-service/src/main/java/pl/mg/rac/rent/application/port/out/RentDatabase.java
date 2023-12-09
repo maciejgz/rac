@@ -13,4 +13,10 @@ public interface RentDatabase {
     List<Rent> findOpenRentRequests();
 
     List<Rent> findOpenReturnRequests();
+
+    Optional<Rent> findOpenRentRequestByUserAndVin(String username, String vin);
+
+    Optional<Rent> findOpenRentRequestByUser(String username);
+
+    Optional<Rent> findOpenRentRequestByVin(String vin);
 }

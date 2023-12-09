@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
+import pl.mg.rac.simulation.model.SimulationUser;
 import pl.mg.rac.simulation.service.client.UserServiceClient;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -27,7 +29,12 @@ public class RemoveUserScenario implements SimulationScenario {
     public void execute() {
         log.debug("execute() RemoveUserScenario");
         try {
-            userServiceClient.deleteUser(userServiceClient.getRandomUser().getName());
+            Optional<SimulationUser> randomUser = userServiceClient.getRandomUser();
+            if (randomUser.isEmpty()) {
+                log.debug("execute() RemoveUserScenario randomUser is empty");
+                return;
+            }
+            userServiceClient.deleteUser(randomUser.get().getName());
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
             Thread.currentThread().interrupt();

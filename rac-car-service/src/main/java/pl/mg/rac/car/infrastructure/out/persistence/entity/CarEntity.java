@@ -21,13 +21,16 @@ public class CarEntity {
     @Indexed(unique = true)
     private String vin;
     private Location location;
-    private Boolean rented;
     private BigDecimal mileage;
     @Field("rental_id")
     private String rentalId;
+    private Boolean failure;
+    @Field("failure_reason")
+    private String failureReason;
 
     public static CarEntity ofCar(pl.mg.rac.car.domain.model.Car car) {
-        return new CarEntity(car.getId(), car.getVin(), car.getLocation(), car.getRented(), car.getMileage(), car.getRentalId());
+        return new CarEntity(car.getId(), car.getVin(), car.getLocation(), car.getMileage(),
+                car.getRentalId(), car.getFailure(), car.getFailureReason());
     }
 
 }

@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -35,7 +36,7 @@ public class CarServiceClient implements ServiceClient {
         log.debug(response.body());
     }
 
-    public SimulationCar getRandomCar() throws IOException, InterruptedException, URISyntaxException {
+    public Optional<SimulationCar> getRandomCar() throws IOException, InterruptedException, URISyntaxException {
         log.debug("getRandomCar()");
 
         //TODO use spring cloud feign client
@@ -48,8 +49,12 @@ public class CarServiceClient implements ServiceClient {
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         log.debug("code: " + response.statusCode());
         log.debug(response.body());
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(response.body(), SimulationCar.class);
+        if (response.statusCode() == 200) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return Optional.ofNullable(objectMapper.readValue(response.body(), SimulationCar.class));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public void deleteCar(String vin) throws URISyntaxException, IOException, InterruptedException {

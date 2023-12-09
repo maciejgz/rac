@@ -7,8 +7,10 @@ import pl.mg.rac.commons.event.rentreturn.ReturnRequestLocationEvent;
 import pl.mg.rac.commons.event.rentreturn.payload.ReturnRequestLocationPayload;
 import pl.mg.rac.rent.application.dto.command.RequestRentCommand;
 import pl.mg.rac.rent.application.dto.command.RequestReturnCommand;
+import pl.mg.rac.rent.application.dto.exception.CarAlreadyHasActiveRentException;
 import pl.mg.rac.rent.application.dto.exception.InvalidRentStateException;
 import pl.mg.rac.rent.application.dto.exception.RentNotFoundException;
+import pl.mg.rac.rent.application.dto.exception.UserAlreadyHasActiveRentException;
 import pl.mg.rac.rent.application.dto.query.GetRentByIdQuery;
 import pl.mg.rac.rent.application.dto.response.RentResponse;
 import pl.mg.rac.rent.application.dto.response.RequestRentResponse;
@@ -34,15 +36,24 @@ public class RentApplicationService implements RequestRent, GetRent, RequestRetu
     }
 
     @Override
-    public RequestRentResponse requestRent(RequestRentCommand command) {
+    public RequestRentResponse requestRent(RequestRentCommand command) throws UserAlreadyHasActiveRentException, CarAlreadyHasActiveRentException {
         Rent rent = Rent.requestRent(command.username(), command.vin(), command.location());
+        Optional<Rent> openUserRentRequest = rentDatabase.findOpenRentRequestByUser(command.username());
+        if (openUserRentRequest.isPresent()) {
+            throw new UserAlreadyHasActiveRentException("User: " + command.username() + " already has active rent request");
+        }
+
+        Optional<Rent> openCarRentRequest = rentDatabase.findOpenRentRequestByVin(command.vin());
+        if (openCarRentRequest.isPresent()) {
+            throw new CarAlreadyHasActiveRentException("Car: " + command.vin() + " already has open rent request");
+        }
+
         Rent savedRentRequest = rentDatabase.save(rent);
         RentRequestUserEvent rentRequestUserEvent = new RentRequestUserEvent(savedRentRequest.getRentId(),
                 new RentRequestUserPayload(savedRentRequest.getRentId(),
                         savedRentRequest.getUsername(),
                         savedRentRequest.getVin()));
         rentEventPublisher.publishRentEvent(rentRequestUserEvent);
-        //TODO handle exceptions
         return new RequestRentResponse(savedRentRequest.getRentId(),
                 savedRentRequest.getUsername(),
                 savedRentRequest.getVin(),

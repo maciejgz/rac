@@ -20,7 +20,7 @@ public class ReturnRequestMonitor {
         List<Rent> openRentRequests = rentDatabase.findOpenReturnRequests();
         log.debug("Checking {} return requests", openRentRequests.size());
         for (Rent rentRequest : openRentRequests) {
-            if (isTimeout(rentRequest)) {
+            if (isReturnTimeout(rentRequest)) {
                 handleTimeout(rentRequest);
             }
         }
@@ -32,7 +32,7 @@ public class ReturnRequestMonitor {
         //TODO notify user about timeout over websocket
     }
 
-    private boolean isTimeout(Rent rentRequest) {
+    private boolean isReturnTimeout(Rent rentRequest) {
         return rentRequest.getReturnRequestTimestamp()
                 .isBefore(Instant.now().minusSeconds(60));
     }

@@ -45,6 +45,7 @@ public class UserRepository implements UserDatabase {
                 userEntity.getBalance(),
                 userEntity.getLocation(),
                 userEntity.getCurrentRentId(),
-                userEntity.getRegistrationDate());
+                userEntity.getRegistrationDate(),
+                userEntity.getBlocked());
     }
 }

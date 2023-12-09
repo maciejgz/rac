@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.rent.application.dto.command.RequestRentCommand;
 import pl.mg.rac.rent.application.dto.command.RequestReturnCommand;
+import pl.mg.rac.rent.application.dto.exception.CarAlreadyHasActiveRentException;
 import pl.mg.rac.rent.application.dto.exception.InvalidRentStateException;
 import pl.mg.rac.rent.application.dto.exception.RentNotFoundException;
+import pl.mg.rac.rent.application.dto.exception.UserAlreadyHasActiveRentException;
 import pl.mg.rac.rent.application.dto.query.GetRentByIdQuery;
 import pl.mg.rac.rent.application.dto.response.RentResponse;
 import pl.mg.rac.rent.application.dto.response.RequestRentResponse;
@@ -30,7 +32,7 @@ public class RentFacade {
         this.eventApplicationService = eventApplicationService;
     }
 
-    public RequestRentResponse requestRent(RequestRentCommand command) {
+    public RequestRentResponse requestRent(RequestRentCommand command) throws UserAlreadyHasActiveRentException, CarAlreadyHasActiveRentException {
         return requestRentAdapter.requestRent(command);
     }
 

@@ -3,7 +3,7 @@ package pl.mg.rac.car.application.service.event;
 import lombok.extern.slf4j.Slf4j;
 import pl.mg.rac.car.application.port.out.CarDatabase;
 import pl.mg.rac.car.application.port.out.CarEventPublisher;
-import pl.mg.rac.car.domain.exception.CarAlreadyRentedException;
+import pl.mg.rac.car.domain.exception.CarBrokenException;
 import pl.mg.rac.car.domain.model.Car;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
@@ -32,14 +32,13 @@ public class RentRequestCarAdapter implements EventAdapter<RacEvent<?>> {
         Optional<Car> car = carDatabase.getCarByVin(rentRequestCarEvent.getPayload().vin());
         if (car.isPresent()) {
             try {
-                car.get().rentCar(rentRequestCarEvent.getPayload().rentId());
+                car.get().rentRequest();
                 carDatabase.save(car.get());
                 publishRentConfirmedEvent(rentRequestCarEvent, car.get());
-            } catch (CarAlreadyRentedException e) {
-                String errorMessage = "rentConfirmationEvent: car " + rentRequestCarEvent.getPayload().vin()
-                        + " already has rent " + rentRequestCarEvent.getPayload().rentId();
+            } catch (CarBrokenException e) {
+                String errorMessage = "Car with VIN: " + rentRequestCarEvent.getPayload().vin() + " is broken: " + e.getMessage();
                 log.error(errorMessage, e);
-                publishRentFailedEvent(rentRequestCarEvent, errorMessage);
+                publishRentFailedCarBrokenEvent(rentRequestCarEvent, errorMessage);
             }
         } else {
             log.warn("Car with VIN: {} not found", rentRequestCarEvent.getPayload().vin());
@@ -60,14 +59,14 @@ public class RentRequestCarAdapter implements EventAdapter<RacEvent<?>> {
         );
     }
 
-    private void publishRentFailedEvent(RentRequestCarEvent rentRequestCarEvent, String errorMessage) {
+    private void publishRentFailedCarBrokenEvent(RentRequestCarEvent rentRequestCarEvent, String errorMessage) {
         RentFailedCarEvent failEvent = new RentFailedCarEvent(
                 rentRequestCarEvent.getPayload().rentId(),
                 new RentFailedCarPayload(
                         rentRequestCarEvent.getPayload().rentId(),
                         rentRequestCarEvent.getPayload().username(),
                         rentRequestCarEvent.getPayload().vin(),
-                        "CAR_ALREADY_RENTED",
+                        "CAR_BROKEN",
                         errorMessage
                 )
         );

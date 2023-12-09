@@ -8,6 +8,7 @@ import pl.mg.rac.commons.event.RacEventPayload;
 import pl.mg.rac.commons.event.user.UserChargedEvent;
 import pl.mg.rac.commons.event.user.payload.UserChargedPayload;
 import pl.mg.rac.commons.value.Location;
+import pl.mg.rac.user.domain.exception.UserBlockedException;
 import pl.mg.rac.user.domain.model.policy.ChargeUserPolicyRegistry;
 
 import java.math.BigDecimal;
@@ -24,8 +25,8 @@ public class User {
     private String name;
     private BigDecimal balance;
     private Location location;
-    //TODO make it read only cache value filled in when rent-service accepts rent and cleared when rent-service returns is committed
     private String currentRentId;
+    private boolean blocked = false;
     private LocalDate registrationDate;
 
 
@@ -36,7 +37,7 @@ public class User {
         this.events = new ArrayList<>();
     }
 
-    public User(String id, String name, BigDecimal balance, Location location, String currentRentId, LocalDate registrationDate) {
+    public User(String id, String name, BigDecimal balance, Location location, String currentRentId, LocalDate registrationDate, boolean blocked) {
         this.id = id;
         this.name = name;
         this.balance = balance;
@@ -44,6 +45,7 @@ public class User {
         this.events = new ArrayList<>();
         this.registrationDate = registrationDate;
         this.currentRentId = currentRentId;
+        this.blocked = blocked;
     }
 
     public User(String name, BigDecimal balance, Location location, LocalDate registrationDate) {
@@ -64,11 +66,12 @@ public class User {
         return balance;
     }
 
-    public BigDecimal finishRentAndCharge(Instant rentStartDate, Instant rentEndDate, BigDecimal distanceTraveled) {
-        //TODO add policy to calculate rent amount
+    public BigDecimal finishRentAndCharge(Instant rentStartDate, Instant rentEndDate, BigDecimal distanceTraveled) throws UserBlockedException {
+        if (this.blocked) {
+            throw new UserBlockedException("User is blocked");
+        }
         BigDecimal amount = calculateRentCharge(rentStartDate, rentEndDate, distanceTraveled);
         charge(amount);
-        cancelRent();
         return amount;
     }
 
@@ -82,16 +85,31 @@ public class User {
         return ChargeUserPolicyRegistry.getChargeUserPolicy(this).calculateRentCharge(rentStartDate, rentEndDate, distanceTraveled);
     }
 
-    public void startRent(String rentId) {
-        if (this.currentRentId != null && !this.currentRentId.isEmpty()) {
-            throw new IllegalStateException("User already has a rent" + rentId);
+    public void requestRent() throws UserBlockedException {
+        if (this.blocked) {
+            throw new UserBlockedException("User is blocked");
         }
-        this.currentRentId = rentId;
+    }
+
+    public void returnSuccess() {
+        this.currentRentId = null;
     }
 
 
+    public void startRent(String rentId) {
+        this.currentRentId = rentId;
+    }
+
+    public void block() {
+        this.blocked = true;
+    }
+
+    public void unblock() {
+        this.blocked = false;
+    }
+
     public void cancelRent() {
-        this.currentRentId = null;
+        //nothing to do here yet
     }
 
 }

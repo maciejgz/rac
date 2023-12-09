@@ -7,17 +7,13 @@ import pl.mg.rac.commons.event.user.UserCreatedEvent;
 import pl.mg.rac.commons.event.user.UserDeletedEvent;
 import pl.mg.rac.commons.event.user.payload.UserCreatedPayload;
 import pl.mg.rac.commons.event.user.payload.UserDeletedPayload;
-import pl.mg.rac.user.application.dto.command.ChargeUserCommand;
-import pl.mg.rac.user.application.dto.command.CreateUserCommand;
-import pl.mg.rac.user.application.dto.command.DeleteUserCommand;
+import pl.mg.rac.user.application.dto.command.*;
 import pl.mg.rac.user.application.dto.exception.UserChargeException;
 import pl.mg.rac.user.application.dto.exception.UserDeletionException;
 import pl.mg.rac.user.application.dto.exception.UserNotFoundException;
 import pl.mg.rac.user.application.dto.exception.UserRegistrationException;
 import pl.mg.rac.user.application.dto.query.GetUserQuery;
-import pl.mg.rac.user.application.dto.response.ChargeUserResponse;
-import pl.mg.rac.user.application.dto.response.CreateUserResponse;
-import pl.mg.rac.user.application.dto.response.UserResponse;
+import pl.mg.rac.user.application.dto.response.*;
 import pl.mg.rac.user.application.port.in.*;
 import pl.mg.rac.user.application.port.out.UserDatabase;
 import pl.mg.rac.user.application.port.out.UserEventPublisher;
@@ -33,7 +29,7 @@ import java.util.Optional;
  * Responsible for transaction handling and domain services coordination - it is a facade for domain services.
  */
 @Slf4j
-public class UserApplicationService implements CreateUserPort, DeleteUserPort, ChargeUserPort, GetUserPort, GetRandomUserPort {
+public class UserApplicationService implements CreateUserPort, DeleteUserPort, ChargeUserPort, GetUserPort, GetRandomUserPort, BlockUserPort, UnblockUserPort {
 
     private final UserDomainService userDomainService;
     private final UserEventPublisher userEventPublisher;
@@ -110,6 +106,32 @@ public class UserApplicationService implements CreateUserPort, DeleteUserPort, C
             throw new UserNotFoundException("No users in database");
         } else {
             return new UserResponse(user.get().getName(), user.get().getBalance(), user.get().getLocation());
+        }
+    }
+
+    @Override
+    public BlockUserResponse block(BlockUserCommand command) throws UserNotFoundException {
+        log.debug("block() called with: command = [" + command + "]");
+        Optional<User> user = userDatabase.findByName(command.username());
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with name " + command.username() + " not exists");
+        } else {
+            user.get().block();
+            userDatabase.save(user.get());
+            return new BlockUserResponse(user.get().getName(), user.get().isBlocked());
+        }
+    }
+
+    @Override
+    public UnblockUserResponse unblock(UnblockUserCommand command) throws UserNotFoundException {
+        log.debug("unblock() called with: command = [" + command + "]");
+        Optional<User> user = userDatabase.findByName(command.username());
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with name " + command.username() + " not exists");
+        } else {
+            user.get().unblock();
+            userDatabase.save(user.get());
+            return new UnblockUserResponse(user.get().getName(), user.get().isBlocked());
         }
     }
 }

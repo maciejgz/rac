@@ -33,7 +33,7 @@ public class InfrastructureConfig {
     @Bean
     public UserFacade userFacade(EventApplicationService eventApplicationService) {
         return new UserFacade(userApplicationService(), userApplicationService(), userApplicationService(),
-                userApplicationService(), userApplicationService(), eventApplicationService);
+                userApplicationService(), userApplicationService(), userApplicationService(), userApplicationService(), eventApplicationService);
     }
 
     //application services
@@ -84,6 +84,16 @@ public class InfrastructureConfig {
     @Bean
     public EventAdapter<RacEvent<?>> returnRequestUserAdapter() {
         return new ReturnRequestUserAdapter(userDatabase(), userEventPublisher());
+    }
+
+    @Bean
+    public EventAdapter<RacEvent<?>> rentSuccessAdapter() {
+        return new RentSuccessEventAdapter(userDatabase());
+    }
+
+    @Bean
+    public EventAdapter<RacEvent<?>> returnSuccessAdapter() {
+        return new ReturnSuccessEventAdapter(userDatabase());
     }
 
 }

@@ -11,6 +11,7 @@ import pl.mg.rac.commons.event.rent.payload.RentRequestCarPayload;
 import pl.mg.rac.user.application.port.in.RentRequestUserPort;
 import pl.mg.rac.user.application.port.out.UserDatabase;
 import pl.mg.rac.user.application.port.out.UserEventPublisher;
+import pl.mg.rac.user.domain.exception.UserBlockedException;
 import pl.mg.rac.user.domain.model.User;
 
 import java.util.Optional;
@@ -33,14 +34,14 @@ public class RentRequestUserEventAdapter implements EventAdapter<RacEvent<?>>, R
         Optional<User> user = userDatabase.findByName(rentRequestUserEvent.getPayload().username());
         if (user.isPresent()) {
             try {
-                user.get().startRent(rentRequestUserEvent.getPayload().rentId());
+                user.get().requestRent();
                 userDatabase.save(user.get());
                 pushRentRequestCarEvent(rentRequestUserEvent);
-            } catch (IllegalStateException e) {
+            } catch (UserBlockedException e) {
                 String errorMessage = "rentConfirmationEvent: user " + rentRequestUserEvent.getPayload().username()
-                        + " already has rent " + rentRequestUserEvent.getPayload().rentId();
+                        + " id blocked";
                 log.error(errorMessage, e);
-                pushRentFailedEvent(rentRequestUserEvent, "USER_ALREADY_HAS_RENT", errorMessage);
+                pushRentFailedEvent(rentRequestUserEvent, "USER_BLOCKED", errorMessage);
             }
         } else {
             String errorMessage = "rentConfirmationEvent: rentId " + rentRequestUserEvent.getPayload().rentId()

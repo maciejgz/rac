@@ -40,6 +40,7 @@ public class CarRepository implements CarDatabase {
     }
 
     private Car mapToAggregate(CarEntity carEntity) {
-        return new Car(carEntity.getId(), carEntity.getVin(), carEntity.getLocation(), carEntity.getRented(), carEntity.getMileage(), carEntity.getRentalId());
+        return new Car(carEntity.getId(), carEntity.getVin(), carEntity.getLocation(),
+                carEntity.getMileage(), carEntity.getRentalId(), carEntity.getFailure(), carEntity.getFailureReason());
     }
 }

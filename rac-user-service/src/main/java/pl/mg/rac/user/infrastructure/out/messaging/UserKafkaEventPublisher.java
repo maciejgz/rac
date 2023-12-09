@@ -6,6 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.rent.RentFailedUserEvent;
 import pl.mg.rac.commons.event.rent.RentRequestCarEvent;
+import pl.mg.rac.commons.event.rentreturn.ReturnFailedUserEvent;
 import pl.mg.rac.commons.event.rentreturn.ReturnRequestCarEvent;
 import pl.mg.rac.commons.event.user.UserChargedEvent;
 import pl.mg.rac.commons.event.user.UserCreatedEvent;
@@ -59,6 +60,12 @@ public class UserKafkaEventPublisher implements UserEventPublisher {
     @Override
     public void publishReturnRequestCarEvent(ReturnRequestCarEvent event) {
         log.debug("publishReturnRequestCarEvent");
+        kafkaTemplate.send(KafkaTopicConfig.RAC_RENT_TOPIC, UUID.randomUUID().toString(), event);
+    }
+
+    @Override
+    public void publishReturnFailedUserEvent(ReturnFailedUserEvent event) {
+        log.debug("publishReturnFailedUserEvent");
         kafkaTemplate.send(KafkaTopicConfig.RAC_RENT_TOPIC, UUID.randomUUID().toString(), event);
     }
 }

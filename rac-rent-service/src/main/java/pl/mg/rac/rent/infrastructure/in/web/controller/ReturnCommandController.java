@@ -32,7 +32,7 @@ public class ReturnCommandController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ApiError> handleDeletionException(RentNotFoundException e) {
+    public ResponseEntity<ApiError> handleDeletionException(RentNotFoundException ignoredE) {
         return ResponseEntity.notFound().build();
     }
 

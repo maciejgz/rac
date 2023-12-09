@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -35,7 +36,7 @@ public class UserServiceClient implements ServiceClient {
         log.debug(response.body());
     }
 
-    public SimulationUser getRandomUser() throws IOException, InterruptedException, URISyntaxException {
+    public Optional<SimulationUser> getRandomUser() throws IOException, InterruptedException, URISyntaxException {
         log.debug("getRandomUser()");
 
         //TODO use spring cloud feign client
@@ -48,8 +49,12 @@ public class UserServiceClient implements ServiceClient {
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         log.debug("code: " + response.statusCode());
         log.debug(response.body());
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(response.body(), SimulationUser.class);
+        if (response.statusCode() == 200) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return Optional.ofNullable(objectMapper.readValue(response.body(), SimulationUser.class));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public void deleteUser(String username) throws IOException, InterruptedException, URISyntaxException {
