@@ -11,7 +11,7 @@ import pl.mg.rac.car.application.dto.response.*;
 import pl.mg.rac.car.application.port.in.*;
 import pl.mg.rac.car.application.port.out.CarDatabase;
 import pl.mg.rac.car.application.port.out.CarEventPublisher;
-import pl.mg.rac.car.domain.exception.CarAlreadyReturnedException;
+import pl.mg.rac.car.domain.exception.CarBrokenException;
 import pl.mg.rac.car.domain.model.Car;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.car.*;
@@ -90,17 +90,18 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
         Optional<Car> car = carDatabase.getCarByVin(command.vin());
         if (car.isPresent()) {
             try {
-                car.get().returnCar(command.rentalId(), command.distanceTraveled());
+                car.get().returnCarRequest();
                 carDatabase.save(car.get());
                 for (RacEvent<?> event : car.get().getEvents()) {
                     eventPublisher.publishCarEvent(event);
                 }
                 return new ReturnCarResponse(command.vin(), command.distanceTraveled(), command.rentalId(), command.location(), true);
-            } catch (CarAlreadyReturnedException e) {
-                log.error("Car with vin: " + command.vin() + " is already rented. Rental id: " + car.get().getRentalId());
-                eventPublisher.publishCarEvent(new CarReturnFailedAlreadyReturnedEvent(command.vin(),
-                        new CarReturnFailedAlreadyReturnedPayload(command.vin(), command.rentalId(), command.location(), command.distanceTraveled())));
+            } catch (CarBrokenException e) {
+                log.error("Car with vin: " + command.vin() + " is broken. Reason: " + car.get().getFailureReason());
+                eventPublisher.publishCarEvent(new CarReturnFailedCarBrokenEvent(command.vin(),
+                        new CarReturnFailedBrokenPayload(command.vin(), command.rentalId(), command.location(), command.distanceTraveled())));
                 return new ReturnCarResponse(command.vin(), command.distanceTraveled(), command.rentalId(), command.location(), false);
+
             }
         } else {
             eventPublisher.publishCarEvent(new CarReturnFailedNotExistsEvent(command.vin(),

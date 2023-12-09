@@ -9,10 +9,7 @@ import pl.mg.rac.car.application.port.out.CarDatabase;
 import pl.mg.rac.car.application.port.out.CarEventPublisher;
 import pl.mg.rac.car.application.service.CarApplicationService;
 import pl.mg.rac.car.application.service.EventApplicationService;
-import pl.mg.rac.car.application.service.event.EventAdapter;
-import pl.mg.rac.car.application.service.event.RentRequestCarAdapter;
-import pl.mg.rac.car.application.service.event.RentSuccessAdapter;
-import pl.mg.rac.car.application.service.event.ReturnRequestCarAdapter;
+import pl.mg.rac.car.application.service.event.*;
 import pl.mg.rac.car.domain.service.CarDomainService;
 import pl.mg.rac.car.infrastructure.out.messaging.CarKafkaEventPublisher;
 import pl.mg.rac.car.infrastructure.out.persistence.CarJpaRepository;
@@ -86,6 +83,11 @@ public class InfrastructureConfig {
     @Bean
     public EventAdapter<RacEvent<?>> rentSuccessAdapter() {
         return new RentSuccessAdapter(carDatabase());
+    }
+
+    @Bean
+    public EventAdapter<RacEvent<?>> returnSuccessAdapter() {
+        return new ReturnSuccessAdapter(carDatabase());
     }
 
 }

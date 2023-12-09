@@ -16,7 +16,7 @@ public class RentSuccessEvent extends RacEvent<RentSuccessPayload> {
 
     @Override
     public String getEventType() {
-        return EventType.RAC_RENT_CONFIRMATION.getId();
+        return EventType.RAC_RENT_SUCCESS.getId();
     }
 
 }

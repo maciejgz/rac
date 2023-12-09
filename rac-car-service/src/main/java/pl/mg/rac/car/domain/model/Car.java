@@ -2,14 +2,11 @@ package pl.mg.rac.car.domain.model;
 
 import lombok.Getter;
 import org.springframework.data.annotation.Transient;
-import pl.mg.rac.car.domain.exception.CarAlreadyReturnedException;
 import pl.mg.rac.car.domain.exception.CarBrokenException;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.RacEventPayload;
 import pl.mg.rac.commons.event.car.CarRentSuccessEvent;
-import pl.mg.rac.commons.event.car.CarReturnSuccessEvent;
 import pl.mg.rac.commons.event.car.payload.CarRentSuccessPayload;
-import pl.mg.rac.commons.event.car.payload.CarReturnSuccessPayload;
 import pl.mg.rac.commons.value.Location;
 
 import java.math.BigDecimal;
@@ -60,13 +57,14 @@ public class Car {
         this.rentalId = rentalId;
     }
 
-    public void returnCar(String rentalId, BigDecimal distanceTraveled) throws CarAlreadyReturnedException {
-        if (!rented) {
-            throw new CarAlreadyReturnedException("Car with vin: " + vin + " is already returned. Last rental id: " + rentalId);
+    public void returnCarRequest() throws CarBrokenException {
+        if (failure) {
+            throw new CarBrokenException("Car with vin: " + vin + " is broken. Reason: " + failureReason);
         }
-        this.rented = false;
+    }
+
+    public void returnCar() {
         this.rentalId = null;
-        this.addEvent(new CarReturnSuccessEvent(vin, new CarReturnSuccessPayload(vin, rentalId, location, distanceTraveled, mileage)));
     }
 
     public void rentRequest() throws CarBrokenException {

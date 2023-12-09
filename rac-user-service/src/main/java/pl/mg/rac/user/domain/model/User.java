@@ -66,11 +66,12 @@ public class User {
         return balance;
     }
 
-    public BigDecimal finishRentAndCharge(Instant rentStartDate, Instant rentEndDate, BigDecimal distanceTraveled) {
-        //TODO add policy to calculate rent amount
+    public BigDecimal finishRentAndCharge(Instant rentStartDate, Instant rentEndDate, BigDecimal distanceTraveled) throws UserBlockedException {
+        if (this.blocked) {
+            throw new UserBlockedException("User is blocked");
+        }
         BigDecimal amount = calculateRentCharge(rentStartDate, rentEndDate, distanceTraveled);
         charge(amount);
-        cancelRent();
         return amount;
     }
 
@@ -89,6 +90,11 @@ public class User {
             throw new UserBlockedException("User is blocked");
         }
     }
+
+    public void returnSuccess() {
+        this.currentRentId = null;
+    }
+
 
     public void startRent(String rentId) {
         this.currentRentId = rentId;

@@ -3,7 +3,7 @@ package pl.mg.rac.car.application.service.event;
 import lombok.extern.slf4j.Slf4j;
 import pl.mg.rac.car.application.port.out.CarDatabase;
 import pl.mg.rac.car.application.port.out.CarEventPublisher;
-import pl.mg.rac.car.domain.exception.CarAlreadyReturnedException;
+import pl.mg.rac.car.domain.exception.CarBrokenException;
 import pl.mg.rac.car.domain.model.Car;
 import pl.mg.rac.commons.event.EventType;
 import pl.mg.rac.commons.event.RacEvent;
@@ -32,33 +32,51 @@ public class ReturnRequestCarAdapter implements EventAdapter<RacEvent<?>> {
         Optional<Car> car = carDatabase.getCarByVin(returnRequestCarEvent.getPayload().vin());
         if (car.isPresent()) {
             try {
-                car.get().returnCar(returnRequestCarEvent.getPayload().rentId(), returnRequestCarEvent.getPayload().distanceTraveled());
+                car.get().returnCarRequest();
                 carDatabase.save(car.get());
                 car.get().getEvents().forEach(eventPublisher::publishCarEvent);
                 publishReturnConfirmationEvent(returnRequestCarEvent, car.get());
-            } catch (CarAlreadyReturnedException e) {
-                String message = "Car with VIN: " + returnRequestCarEvent.getPayload().vin() + " already returned";
+            } catch (CarBrokenException e) {
+                String message = "Car with VIN: " + returnRequestCarEvent.getPayload().vin()
+                        + " is broken and cannot be returned. Reason: " + e.getMessage() + ". Contact with support.";
                 log.error(message);
-                publishCarAlreadyReturnedEvent(returnRequestCarEvent, car.get(), message);
+                pushReturnFailedCarBrokenEvent(returnRequestCarEvent, message);
             }
         } else {
             String message = "Car with VIN: " + returnRequestCarEvent.getPayload().vin() + " not found";
             log.warn(message);
             publishCarNotExistsEvent(returnRequestCarEvent, message);
+            pushReturnFailedCarNotExistEvent(returnRequestCarEvent, message);
         }
     }
 
-    private void publishCarAlreadyReturnedEvent(ReturnRequestCarEvent returnRequestCarEvent, Car car, String message) {
-        eventPublisher.publishCarEvent(new ReturnFailedCarEvent(
+    private void pushReturnFailedCarBrokenEvent(ReturnRequestCarEvent returnRequestCarEvent, String message) {
+        eventPublisher.publishRentEvent(new ReturnFailedCarEvent(
                 returnRequestCarEvent.getAggregateId(),
                 new ReturnFailedCarPayload(
                         returnRequestCarEvent.getPayload().rentId(),
                         returnRequestCarEvent.getPayload().username(),
                         returnRequestCarEvent.getPayload().vin(),
-                        car.getLocation(),
+                        returnRequestCarEvent.getPayload().endLocation(),
                         returnRequestCarEvent.getPayload().distanceTraveled(),
                         returnRequestCarEvent.getPayload().chargedAmount(),
-                        "RAC_CAR_ALREADY_RETURNED",
+                        "CAR_BROKEN",
+                        message
+                )
+        ));
+    }
+
+    private void pushReturnFailedCarNotExistEvent(ReturnRequestCarEvent returnRequestCarEvent, String message) {
+        eventPublisher.publishRentEvent(new ReturnFailedCarEvent(
+                returnRequestCarEvent.getAggregateId(),
+                new ReturnFailedCarPayload(
+                        returnRequestCarEvent.getPayload().rentId(),
+                        returnRequestCarEvent.getPayload().username(),
+                        returnRequestCarEvent.getPayload().vin(),
+                        returnRequestCarEvent.getPayload().endLocation(),
+                        returnRequestCarEvent.getPayload().distanceTraveled(),
+                        returnRequestCarEvent.getPayload().chargedAmount(),
+                        "CAR_NOT_EXISTS",
                         message
                 )
         ));
