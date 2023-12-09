@@ -1,6 +1,7 @@
 package pl.mg.rac.car.application.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import pl.mg.rac.car.application.dto.command.*;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyExistsException;
 import pl.mg.rac.car.application.dto.exception.CarAlreadyNotExistException;
@@ -36,7 +37,7 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
         if (carDatabase.existsByVin(command.vin())) {
             throw new CarAlreadyExistsException("Car with vin: " + command.vin() + " already exists.");
         }
-        Car car = new Car(command.vin(), command.location(), false, command.mileage(), null);
+        Car car = new Car(command.vin(), command.location(), command.mileage(), null);
         Car saved = carDatabase.save(car);
         eventPublisher.publishCarEvent(new CarCreatedEvent(command.vin(), new CarCreatedPayload(command.vin(), command.location(), command.mileage())));
         return new AddCarResponse(saved.getVin(), saved.getLocation(), saved.getMileage());
@@ -50,7 +51,7 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
             throw new CarAlreadyNotExistException("Car with vin: " + command.vin() + " already not exist.");
         }
         Optional<Car> car = carDatabase.getCarByVin(command.vin());
-        if (car.isPresent() && car.get().getRented()) {
+        if (car.isPresent() && StringUtils.isNotBlank(car.get().getRentalId())) {
             throw new CarRentedException("Car with vin: " + command.vin() + " is rented.");
         }
         carDatabase.deleteByVin(command.vin());
@@ -79,7 +80,7 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
     @Override
     public GetCarResponse getCar(GetCarQuery command) throws CarNotFoundException {
         Optional<Car> carByVin = carDatabase.getCarByVin(command.vin());
-        return carByVin.map(car -> new GetCarResponse(car.getVin(), car.getLocation(), car.getRented(), car.getMileage(), car.getRentalId())).orElseThrow(
+        return carByVin.map(car -> new GetCarResponse(car.getVin(), car.getLocation(), car.getMileage(), car.getRentalId(), car.getFailure(), car.getFailureReason())).orElseThrow(
                 () -> new CarNotFoundException("Car with vin: " + command.vin() + " not found.")
         );
     }
@@ -117,7 +118,7 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
         if (car.isEmpty()) {
             throw new CarNotFoundException("No cars in database");
         } else {
-            return new GetCarResponse(car.get().getVin(), car.get().getLocation(), car.get().getRented(), car.get().getMileage(), car.get().getRentalId());
+            return new GetCarResponse(car.get().getVin(), car.get().getLocation(), car.get().getMileage(), car.get().getRentalId(), car.get().getFailure(), car.get().getFailureReason());
         }
     }
 

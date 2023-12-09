@@ -239,6 +239,10 @@ Possible simulation scenarios:
 - User unregisters
 - Administrator adds a car
 - Administrator removes a car from the pool of available cars
+- User is locked by administrator - TODO
+- User is unlocked by administrator - TODO
+- Car is broken - TODO
+- Car is fixed - TODO
 - User rents a car - then localizations of the user and the car are updated and then user returns the car - success
   story
 - User tries to rent already rented car

@@ -15,7 +15,7 @@ public class ReturnSuccessEvent extends RacEvent<ReturnSuccessPayload> {
 
     @Override
     public String getEventType() {
-        return EventType.RAC_RETURN_CONFIRMATION.getId();
+        return EventType.RAC_RETURN_SUCCESS.getId();
     }
 
 }

@@ -5,10 +5,11 @@ import pl.mg.rac.commons.value.Location;
 
 import java.math.BigDecimal;
 
-public record GetCarResponse(String vin, Location location, boolean rented, BigDecimal mileage, String rentalId) {
+public record GetCarResponse(String vin, Location location, BigDecimal mileage, String rentalId, Boolean failure,
+                             String failureReason) {
 
     public GetCarResponse ofCar(Car car) {
-        return new GetCarResponse(car.getVin(), car.getLocation(), car.getRented(), car.getMileage(), car.getRentalId());
+        return new GetCarResponse(car.getVin(), car.getLocation(), car.getMileage(), car.getRentalId(), car.getFailure(), car.getFailureReason());
     }
 
 }
