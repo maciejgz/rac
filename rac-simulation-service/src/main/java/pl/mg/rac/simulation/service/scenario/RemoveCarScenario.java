@@ -27,7 +27,7 @@ public class RemoveCarScenario implements SimulationScenario {
     public void execute() {
         log.debug("execute() RemoveCarScenario");
         try {
-            carServiceClient.deleteCar(carServiceClient.getRandomCar().getVin());
+            carServiceClient.deleteCar(carServiceClient.getRandomCar().orElseThrow().getVin());
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
             Thread.currentThread().interrupt();

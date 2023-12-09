@@ -45,14 +45,14 @@ public class RentCarScenario implements SimulationScenario {
         log.debug("SCENARIO: RentCarScenario");
         try {
             Optional<SimulationUser> randomUser = userServiceClient.getRandomUser();
-            SimulationCar randomCar = carServiceClient.getRandomCar();
+            Optional<SimulationCar> randomCar = carServiceClient.getRandomCar();
             Optional<SimulationRent> rentOpt;
-            if (randomUser.isPresent() && randomCar != null) {
-                if (StringUtils.isNotBlank(randomCar.getRentalId()) || StringUtils.isNotBlank(randomUser.get().getCurrentRentId())) {
+            if (randomUser.isPresent() && randomCar.isPresent()) {
+                if (StringUtils.isNotBlank(randomCar.get().getRentalId()) || StringUtils.isNotBlank(randomUser.get().getCurrentRentId())) {
                     log.debug("execute() RentCarScenario randomCar is rented or randomUser is renting");
                     return;
                 }
-                rentOpt = rentServiceClient.rentCar(randomUser.get().getName(), randomCar.getVin(), randomCar.getLocation());
+                rentOpt = rentServiceClient.rentCar(randomUser.get().getName(), randomCar.get().getVin(), randomCar.get().getLocation());
                 if (rentOpt.isEmpty()) {
                     log.debug("execute() RentCarScenario rent is empty");
                 } else {
@@ -76,8 +76,8 @@ public class RentCarScenario implements SimulationScenario {
                     //sent location updates with random probability - between 1 and 4 seconds
                     for (int i = 0; i < 10; i++) {
                         Thread.sleep((long) (secureRandom.nextDouble() * 3000 + 1000));
-                        locationServiceClient.publishCarLocation(randomCar.getVin(),
-                                SimulationLocation.randomOfOtherLocation(randomCar.getLocation(), 2));
+                        locationServiceClient.publishCarLocation(randomCar.get().getVin(),
+                                SimulationLocation.randomOfOtherLocation(randomCar.get().getLocation(), 2));
                     }
                     //return car
                     rentServiceClient.returnCar(rent.getRentId());

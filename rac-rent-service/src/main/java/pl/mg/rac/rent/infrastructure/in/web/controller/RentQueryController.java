@@ -9,9 +9,6 @@ import pl.mg.rac.rent.application.dto.query.GetRentByIdQuery;
 import pl.mg.rac.rent.application.dto.response.RentResponse;
 import pl.mg.rac.rent.application.facade.RentFacade;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 @RestController
 @RequestMapping("/rent")
 @Slf4j
@@ -24,14 +21,14 @@ public class RentQueryController {
     }
 
     @GetMapping(value = "/{rentId}")
-    public ResponseEntity<RentResponse> getRent(@PathVariable String rentId) throws URISyntaxException, RentNotFoundException {
+    public ResponseEntity<RentResponse> getRent(@PathVariable String rentId) throws RentNotFoundException {
         log.debug("getRent() called with: rentId = [" + rentId + "]");
         RentResponse rent = rentFacade.getRent(new GetRentByIdQuery(rentId));
-        return ResponseEntity.created(new URI("/rent/" + rent.rentId())).body(rent);
+        return ResponseEntity.ok(rent);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ApiError> handleDeletionException(RentNotFoundException e) {
+    public ResponseEntity<ApiError> handleDeletionException(RentNotFoundException ignoredE) {
         return ResponseEntity.notFound().build();
     }
 }
