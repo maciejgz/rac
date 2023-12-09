@@ -15,4 +15,9 @@ public interface RentJpaRepository extends MongoRepository<RentEntity, String> {
 
     List<RentEntity> findByStatus(RentStatus status);
 
+    Optional<RentEntity> findByUsernameAndVinAndStatusIn(String username, String vin, List<RentStatus> status);
+
+    Optional<RentEntity> findByUsernameAndStatusIn(String username, List<RentStatus> status);
+    Optional<RentEntity> findByVinAndStatusIn(String vin, List<RentStatus> status);
+
 }

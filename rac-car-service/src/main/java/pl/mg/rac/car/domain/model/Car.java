@@ -2,8 +2,8 @@ package pl.mg.rac.car.domain.model;
 
 import lombok.Getter;
 import org.springframework.data.annotation.Transient;
-import pl.mg.rac.car.domain.exception.CarAlreadyRentedException;
 import pl.mg.rac.car.domain.exception.CarAlreadyReturnedException;
+import pl.mg.rac.car.domain.exception.CarBrokenException;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.commons.event.RacEventPayload;
 import pl.mg.rac.commons.event.car.CarRentSuccessEvent;
@@ -69,11 +69,13 @@ public class Car {
         this.addEvent(new CarReturnSuccessEvent(vin, new CarReturnSuccessPayload(vin, rentalId, location, distanceTraveled, mileage)));
     }
 
-    public void rentCar(String rentalId) throws CarAlreadyRentedException {
-        if (rented) {
-            throw new CarAlreadyRentedException("Car with vin: " + vin + " is already rented. Rental id: " + rentalId);
+    public void rentRequest() throws CarBrokenException {
+        if (this.failure) {
+            throw new CarBrokenException("Car with vin: " + vin + " is broken. Reason: " + failureReason);
         }
-        this.rented = true;
+    }
+
+    public void rentCar(String rentalId) {
         this.rentalId = rentalId;
         this.addEvent(new CarRentSuccessEvent(vin, new CarRentSuccessPayload(vin, rentalId)));
     }

@@ -8,6 +8,7 @@ import pl.mg.rac.commons.event.RacEventPayload;
 import pl.mg.rac.commons.event.user.UserChargedEvent;
 import pl.mg.rac.commons.event.user.payload.UserChargedPayload;
 import pl.mg.rac.commons.value.Location;
+import pl.mg.rac.user.domain.exception.UserBlockedException;
 import pl.mg.rac.user.domain.model.policy.ChargeUserPolicyRegistry;
 
 import java.math.BigDecimal;
@@ -24,7 +25,6 @@ public class User {
     private String name;
     private BigDecimal balance;
     private Location location;
-    //TODO make it read only cache value filled in when rent-service accepts rent and cleared when rent-service returns is committed
     private String currentRentId;
     private boolean blocked = false;
     private LocalDate registrationDate;
@@ -84,10 +84,13 @@ public class User {
         return ChargeUserPolicyRegistry.getChargeUserPolicy(this).calculateRentCharge(rentStartDate, rentEndDate, distanceTraveled);
     }
 
-    public void startRent(String rentId) {
-        if (this.currentRentId != null && !this.currentRentId.isEmpty()) {
-            throw new IllegalStateException("User already has a rent" + rentId);
+    public void requestRent() throws UserBlockedException {
+        if (this.blocked) {
+            throw new UserBlockedException("User is blocked");
         }
+    }
+
+    public void startRent(String rentId) {
         this.currentRentId = rentId;
     }
 
@@ -100,7 +103,7 @@ public class User {
     }
 
     public void cancelRent() {
-        this.currentRentId = null;
+        //nothing to do here yet
     }
 
 }

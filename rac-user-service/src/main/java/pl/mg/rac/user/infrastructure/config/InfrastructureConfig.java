@@ -86,4 +86,9 @@ public class InfrastructureConfig {
         return new ReturnRequestUserAdapter(userDatabase(), userEventPublisher());
     }
 
+    @Bean
+    public EventAdapter<RacEvent<?>> rentSuccessAdapter() {
+        return new RentSuccessEventAdapter(userDatabase());
+    }
+
 }

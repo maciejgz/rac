@@ -11,7 +11,6 @@ import pl.mg.rac.car.application.dto.response.*;
 import pl.mg.rac.car.application.port.in.*;
 import pl.mg.rac.car.application.port.out.CarDatabase;
 import pl.mg.rac.car.application.port.out.CarEventPublisher;
-import pl.mg.rac.car.domain.exception.CarAlreadyRentedException;
 import pl.mg.rac.car.domain.exception.CarAlreadyReturnedException;
 import pl.mg.rac.car.domain.model.Car;
 import pl.mg.rac.commons.event.RacEvent;
@@ -64,19 +63,12 @@ public class CarApplicationService implements AddCar, DeleteCar, RentCar, Return
         log.debug("rentCar() called with: command = [" + command + "]");
         Optional<Car> car = carDatabase.getCarByVin(command.vin());
         if (car.isPresent()) {
-            try {
-                car.get().rentCar(command.rentalId());
-                carDatabase.save(car.get());
-                for (RacEvent<?> event : car.get().getEvents()) {
-                    eventPublisher.publishCarEvent(event);
-                }
-                return new RentCarResponse(command.vin(), command.rentalId(), true);
-            } catch (CarAlreadyRentedException e) {
-                log.error("Car with vin: " + command.vin() + " is already rented. Rental id: " + car.get().getRentalId());
-                CarRentFailedAlreadyRentedEvent event = new CarRentFailedAlreadyRentedEvent(command.vin(), new CarRentFailedAlreadyRentedPayload(command.vin(), command.rentalId()));
+            car.get().rentCar(command.rentalId());
+            carDatabase.save(car.get());
+            for (RacEvent<?> event : car.get().getEvents()) {
                 eventPublisher.publishCarEvent(event);
-                return new RentCarResponse(command.vin(), command.rentalId(), false);
             }
+            return new RentCarResponse(command.vin(), command.rentalId(), true);
         } else {
             CarRentFailedNotExistsEvent event = new CarRentFailedNotExistsEvent(command.vin(), new CarRentFailedNotExistsPayload(command.vin(), command.rentalId()));
             eventPublisher.publishCarEvent(event);

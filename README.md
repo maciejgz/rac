@@ -165,7 +165,7 @@ https://github.com/maciejgz/rac
 
 - User sends a rent HTTP request to the API Gateway
 - API Gateway sends a rent request to the rac-rent-service (HTTP)
-- Rent service validates the request (final validation will be done in the last event) and checks if there is not active
+- Rent service validates the request (final validation will be done in the last event) and checks if there is no active
   or requested rent for the user and car.
     - in case of success: creates a rent with status RENT_REQUESTED, starts a saga and sends a rent request to
       the rac-user-service (Kafka) - **RAC_RENT_REQUEST_USER**

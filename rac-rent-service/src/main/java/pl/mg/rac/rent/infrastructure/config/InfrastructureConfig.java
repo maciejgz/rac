@@ -92,7 +92,7 @@ public class InfrastructureConfig {
 
     @Bean
     public EventAdapter<RacEvent<?>> rentAcceptedEventAdapter() {
-        return new RentAcceptedEventAdapter(rentDatabase());
+        return new RentAcceptedEventAdapter(rentDatabase(), rentEventPublisher());
     }
 
     @Bean
