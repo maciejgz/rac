@@ -28,19 +28,20 @@ public class SimulationService {
     public void startSimulation(long numberOfScenarios) {
         try (ExecutorService executorService = Executors.newFixedThreadPool(100)) {
             for (int i = 0; i < numberOfScenarios; i++) {
-                executorService.submit(this::executeScenario);
+                int number = i;
+                executorService.submit(() -> executeScenario(number));
                 log.debug("Scenario finished no: {}", i);
             }
         }
     }
 
-    public void executeScenario() {
+    public void executeScenario(int id) {
         SecureRandom secureRandom = new SecureRandom();
         double random = secureRandom.nextDouble();
         for (SimulationScenario scenario : scenarios) {
             random -= scenario.getProbability();
             if (random <= 0) {
-                scenario.execute();
+                scenario.execute(id);
                 break;
             }
         }

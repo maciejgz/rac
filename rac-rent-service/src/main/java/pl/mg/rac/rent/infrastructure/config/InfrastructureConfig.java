@@ -11,6 +11,7 @@ import pl.mg.rac.rent.application.port.out.RentEventPublisher;
 import pl.mg.rac.rent.application.service.EventApplicationService;
 import pl.mg.rac.rent.application.service.RentApplicationService;
 import pl.mg.rac.rent.application.service.event.*;
+import pl.mg.rac.rent.application.service.monitor.FailedReturnRequestMonitor;
 import pl.mg.rac.rent.application.service.monitor.RentRequestMonitor;
 import pl.mg.rac.rent.application.service.monitor.ReturnRequestMonitor;
 import pl.mg.rac.rent.domain.service.RentDomainService;
@@ -57,6 +58,11 @@ public class InfrastructureConfig {
     }
 
     @Bean
+    public FailedReturnRequestMonitor failedReturnRequestMonitor(RentDatabase rentDatabase, RentEventPublisher eventPublisher) {
+        return new FailedReturnRequestMonitor(rentDatabase, eventPublisher);
+    }
+
+    @Bean
     public ReturnRequestMonitor returnRequestMonitor(RentDatabase rentDatabase) {
         return new ReturnRequestMonitor(rentDatabase);
     }
@@ -69,6 +75,11 @@ public class InfrastructureConfig {
     @Scheduled(fixedRate = 60000) // Check every 60 seconds
     public void checkReturnRequests() {
         returnRequestMonitor(rentDatabase()).checkReturnRequests();
+    }
+
+    @Scheduled(fixedRate = 30000) // Check every 60 seconds
+    public void unlockFailedReturnRequests() {
+        failedReturnRequestMonitor(rentDatabase(), rentEventPublisher()).unlockFailedReturnRequests();
     }
 
     //domain service

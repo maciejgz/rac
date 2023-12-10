@@ -28,7 +28,7 @@ public class RegisterUserScenario implements SimulationScenario {
     }
 
     @Override
-    public void execute() {
+    public void execute(int id) {
         log.debug("SCENARIO: RegisterUserScenario");
         try {
             SimulationUser user = new SimulationUser(

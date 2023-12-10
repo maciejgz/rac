@@ -14,7 +14,7 @@ public class RentAlreadyRentedCarScenario implements SimulationScenario {
     private double probability;
 
     @Override
-    public void execute() {
+    public void execute(int id) {
         log.debug("execute() RentAlreadyRentedCarScenario");
         //TODO implement scenario
     }

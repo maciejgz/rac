@@ -26,7 +26,7 @@ public class RemoveUserScenario implements SimulationScenario {
     }
 
     @Override
-    public void execute() {
+    public void execute(int id) {
         log.debug("execute() RemoveUserScenario");
         try {
             Optional<SimulationUser> randomUser = userServiceClient.getRandomUser();

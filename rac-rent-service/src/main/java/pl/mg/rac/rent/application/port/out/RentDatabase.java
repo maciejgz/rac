@@ -14,6 +14,8 @@ public interface RentDatabase {
 
     List<Rent> findOpenReturnRequests();
 
+    List<Rent> findDeclinedReturnRequests();
+
     Optional<Rent> findOpenRentRequestByUserAndVin(String username, String vin);
 
     Optional<Rent> findOpenRentRequestByUser(String username);

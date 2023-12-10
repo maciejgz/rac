@@ -24,7 +24,7 @@ public class RemoveCarScenario implements SimulationScenario {
     }
 
     @Override
-    public void execute() {
+    public void execute(int id) {
         log.debug("execute() RemoveCarScenario");
         try {
             carServiceClient.deleteCar(carServiceClient.getRandomCar().orElseThrow().getVin());
