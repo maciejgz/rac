@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   rac-mongodb:
-    image: mongo:7
+    image: mongo:7.0.4
     restart: no
     container_name: rac-mongodb
     ports:

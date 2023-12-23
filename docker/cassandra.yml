@@ -1,7 +1,7 @@
 version: '3'
 services:
   rac-cassandra:
-    image: cassandra:latest
+    image: cassandra:5
     container_name: rac-cassandra
     volumes:
       - /var/lib/docker/volumes/rac/cassandra_data:/var/lib/cassandra
