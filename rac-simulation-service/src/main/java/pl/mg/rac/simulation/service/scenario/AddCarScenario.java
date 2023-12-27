@@ -8,6 +8,7 @@ import pl.mg.rac.simulation.model.SimulationCar;
 import pl.mg.rac.simulation.model.SimulationLocation;
 import pl.mg.rac.simulation.persistence.SimulationScenarioRepository;
 import pl.mg.rac.simulation.service.client.CarServiceClient;
+import pl.mg.rac.simulation.service.scenario.model.SimulationResult;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,7 +31,7 @@ public class AddCarScenario implements SimulationScenario {
     }
 
     @Override
-    public void execute(int id) {
+    public SimulationResult execute(int id) {
         log.debug("SCENARIO: AddCarScenario");
         try {
             SimulationCar car = new SimulationCar(UUID.randomUUID().toString(),
@@ -40,12 +41,10 @@ public class AddCarScenario implements SimulationScenario {
                     false,
                     null
             );
-            carServiceClient.addCar(car);
-        } catch (URISyntaxException | IOException e) {
+            return carServiceClient.addCar(car);
+        } catch (URISyntaxException | IOException | InterruptedException e) {
             log.error(e.getMessage(), e);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-            Thread.currentThread().interrupt();
+            return new SimulationResult("AddCarScenario", false, e.getMessage());
         }
     }
 

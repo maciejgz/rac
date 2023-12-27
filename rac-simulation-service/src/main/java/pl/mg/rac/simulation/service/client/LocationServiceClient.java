@@ -32,8 +32,7 @@ public class LocationServiceClient implements ServiceClient {
                 .build();
 
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        log.debug("status code: " + response.statusCode());
-        log.debug(response.body());
+        log.debug("status code: " + response.statusCode() + " body: " + response.body());
     }
 
     public void publishCarLocation(String vin, SimulationLocation location) throws IOException, InterruptedException, URISyntaxException {
@@ -50,8 +49,7 @@ public class LocationServiceClient implements ServiceClient {
                 .build();
 
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-        log.debug("code: " + response.statusCode());
-        log.debug(response.body());
+        log.debug("code: " + response.statusCode() + " body: " + response.body());
     }
 
     private record UpdateCarLocationCommand(String vin, SimulationLocation location) {

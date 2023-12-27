@@ -11,5 +11,6 @@ public class SimulationRent {
     private String status;
     private String username;
     private String vin;
+    private String statusReason;
 
 }
