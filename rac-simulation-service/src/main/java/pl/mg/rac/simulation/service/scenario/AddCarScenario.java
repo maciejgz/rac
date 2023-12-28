@@ -6,7 +6,10 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import pl.mg.rac.simulation.model.SimulationCar;
 import pl.mg.rac.simulation.model.SimulationLocation;
+import pl.mg.rac.simulation.persistence.SimulationScenarioEntity;
+import pl.mg.rac.simulation.persistence.SimulationScenarioRepository;
 import pl.mg.rac.simulation.service.client.CarServiceClient;
+import pl.mg.rac.simulation.service.scenario.model.SimulationResult;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,16 +21,18 @@ import java.util.UUID;
 public class AddCarScenario implements SimulationScenario {
 
     private final CarServiceClient carServiceClient;
+    private final SimulationScenarioRepository repository;
 
     @Value("${rac.simulation.probability.add-car-scenario}")
     private double probability;
 
-    public AddCarScenario(CarServiceClient carServiceClient) {
+    public AddCarScenario(CarServiceClient carServiceClient, SimulationScenarioRepository repository) {
         this.carServiceClient = carServiceClient;
+        this.repository = repository;
     }
 
     @Override
-    public void execute() {
+    public SimulationResult execute(int id) {
         log.debug("SCENARIO: AddCarScenario");
         try {
             SimulationCar car = new SimulationCar(UUID.randomUUID().toString(),
@@ -37,12 +42,10 @@ public class AddCarScenario implements SimulationScenario {
                     false,
                     null
             );
-            carServiceClient.addCar(car);
-        } catch (URISyntaxException | IOException e) {
+            return carServiceClient.addCar(car);
+        } catch (URISyntaxException | IOException | InterruptedException e) {
             log.error(e.getMessage(), e);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-            Thread.currentThread().interrupt();
+            return new SimulationResult("AddCarScenario", false, e.getMessage());
         }
     }
 

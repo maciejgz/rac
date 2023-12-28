@@ -78,6 +78,11 @@ public class Rent {
         this.statusReason = reason;
     }
 
+    public void acceptReturnByAdmin() {
+        moveToReturnAcceptedByAdminStatus();
+        this.rentEndTimestamp = Instant.now();
+    }
+
     public void handleReturnTimeout() {
         this.moveToReturnDeclinedStatus();
         this.rentEndTimestamp = Instant.now();
@@ -127,6 +132,13 @@ public class Rent {
             throw new IllegalStateException("Rent status is not RETURN_REQUESTED");
         }
         this.status = RentStatus.RETURN_DECLINED;
+    }
+
+    public void moveToReturnAcceptedByAdminStatus() {
+        if (this.status == null ||  (this.status != RentStatus.RETURN_DECLINED && this.status != RentStatus.RETURN_REQUESTED)) {
+            throw new IllegalStateException("Rent status is not RETURN_REQUESTED or RETURN_DECLINED");
+        }
+        this.status = RentStatus.RETURN_ACCEPTED_BY_ADMIN;
     }
 
     public void addDomainEvent(RacEvent<?> event) {

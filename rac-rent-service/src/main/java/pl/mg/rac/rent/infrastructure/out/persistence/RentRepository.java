@@ -37,6 +37,11 @@ public class RentRepository implements RentDatabase {
     }
 
     @Override
+    public List<Rent> findDeclinedReturnRequests() {
+        return rentJpaRepository.findByStatus(RentStatus.RETURN_DECLINED).stream().map(RentEntityMapper::ofEntity).toList();
+    }
+
+    @Override
     public Optional<Rent> findOpenRentRequestByUserAndVin(String username, String vin) {
         return rentJpaRepository.findByUsernameAndVinAndStatusIn(username, vin, List.of(RentStatus.RENT_REQUESTED, RentStatus.RENT_ACCEPTED))
                 .map(RentEntityMapper::ofEntity);

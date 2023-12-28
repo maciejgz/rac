@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import pl.mg.rac.simulation.model.SimulationLocation;
 import pl.mg.rac.simulation.model.SimulationUser;
 import pl.mg.rac.simulation.service.client.UserServiceClient;
+import pl.mg.rac.simulation.service.scenario.model.SimulationResult;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -28,7 +29,7 @@ public class RegisterUserScenario implements SimulationScenario {
     }
 
     @Override
-    public void execute() {
+    public SimulationResult execute(int id) {
         log.debug("SCENARIO: RegisterUserScenario");
         try {
             SimulationUser user = new SimulationUser(
@@ -38,12 +39,10 @@ public class RegisterUserScenario implements SimulationScenario {
                     null,
                     false
             );
-            userServiceClient.registerUser(user);
-        } catch (InterruptedException e) {
+            return userServiceClient.registerUser(user);
+        } catch (InterruptedException | IOException | URISyntaxException e) {
             log.error(e.getMessage(), e);
-            Thread.currentThread().interrupt();
-        } catch (IOException | URISyntaxException e) {
-            log.error(e.getMessage(), e);
+            return new SimulationResult("RegisterUserScenario", false, e.getMessage());
         }
     }
 

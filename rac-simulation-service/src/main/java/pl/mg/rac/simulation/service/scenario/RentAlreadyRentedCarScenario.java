@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
+import pl.mg.rac.simulation.service.scenario.model.SimulationResult;
 
 @Component
 @Slf4j
@@ -14,9 +15,10 @@ public class RentAlreadyRentedCarScenario implements SimulationScenario {
     private double probability;
 
     @Override
-    public void execute() {
+    public SimulationResult execute(int id) {
         log.debug("execute() RentAlreadyRentedCarScenario");
         //TODO implement scenario
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override

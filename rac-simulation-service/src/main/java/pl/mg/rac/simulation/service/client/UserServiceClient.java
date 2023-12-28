@@ -2,8 +2,10 @@ package pl.mg.rac.simulation.service.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pl.mg.rac.simulation.model.SimulationUser;
+import pl.mg.rac.simulation.service.scenario.model.SimulationResult;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,7 +21,7 @@ public class UserServiceClient implements ServiceClient {
 
     private static final HttpClient CLIENT = HttpClient.newHttpClient();
 
-    public void registerUser(SimulationUser user) throws IOException, InterruptedException, URISyntaxException {
+    public SimulationResult registerUser(SimulationUser user) throws IOException, InterruptedException, URISyntaxException {
         log.debug("registerUser()");
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -34,6 +36,13 @@ public class UserServiceClient implements ServiceClient {
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         log.debug("code: " + response.statusCode());
         log.debug(response.body());
+
+        if (response.statusCode() == HttpStatus.SC_CREATED) {
+            return new SimulationResult("RegisterUserScenario", true, "User created: " + user.getName());
+        } else {
+            return new SimulationResult("RegisterUserScenario", false, response.body());
+        }
+
     }
 
     public Optional<SimulationUser> getRandomUser() throws IOException, InterruptedException, URISyntaxException {
@@ -57,7 +66,7 @@ public class UserServiceClient implements ServiceClient {
         }
     }
 
-    public void deleteUser(String username) throws IOException, InterruptedException, URISyntaxException {
+    public SimulationResult deleteUser(String username) throws IOException, InterruptedException, URISyntaxException {
         log.debug("deleteUser()");
 
         //TODO use spring cloud feign client
@@ -70,6 +79,11 @@ public class UserServiceClient implements ServiceClient {
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         log.debug("code: " + response.statusCode());
         log.debug(response.body());
+        if(response.statusCode() == HttpStatus.SC_NO_CONTENT) {
+            return new SimulationResult("RemoveUserScenario", true, "User deleted: " + username);
+        } else {
+            return new SimulationResult("RemoveUserScenario", false, response.body());
+        }
     }
 
 }

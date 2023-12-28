@@ -1,7 +1,9 @@
 package pl.mg.rac.simulation.service.scenario;
 
-public interface SimulationScenario {
-    void execute();
+import pl.mg.rac.simulation.service.scenario.model.SimulationResult;
 
+public interface SimulationScenario {
+    SimulationResult execute(int id);
     double getProbability();
+
 }

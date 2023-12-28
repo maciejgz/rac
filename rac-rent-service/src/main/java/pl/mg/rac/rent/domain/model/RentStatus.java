@@ -12,6 +12,8 @@ public enum RentStatus {
 
     RETURN_ACCEPTED,
 
+    RETURN_ACCEPTED_BY_ADMIN,
+
     RETURN_DECLINED;
 
 }

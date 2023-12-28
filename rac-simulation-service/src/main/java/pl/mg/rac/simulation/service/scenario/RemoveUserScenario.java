@@ -6,6 +6,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import pl.mg.rac.simulation.model.SimulationUser;
 import pl.mg.rac.simulation.service.client.UserServiceClient;
+import pl.mg.rac.simulation.service.scenario.model.SimulationResult;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -26,20 +27,18 @@ public class RemoveUserScenario implements SimulationScenario {
     }
 
     @Override
-    public void execute() {
+    public SimulationResult execute(int id) {
         log.debug("execute() RemoveUserScenario");
         try {
             Optional<SimulationUser> randomUser = userServiceClient.getRandomUser();
             if (randomUser.isEmpty()) {
                 log.debug("execute() RemoveUserScenario randomUser is empty");
-                return;
+                return new SimulationResult("RemoveUserScenario", false, "No users in database");
             }
-            userServiceClient.deleteUser(randomUser.get().getName());
-        } catch (InterruptedException e) {
+            return userServiceClient.deleteUser(randomUser.get().getName());
+        } catch (InterruptedException | IOException | URISyntaxException e) {
             log.error(e.getMessage(), e);
-            Thread.currentThread().interrupt();
-        } catch (IOException | URISyntaxException e) {
-            log.error(e.getMessage(), e);
+            return new SimulationResult("RemoveUserScenario", false, e.getMessage());
         }
     }
 

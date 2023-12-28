@@ -1,1 +1,2 @@
 rootProject.name = 'rac-car-service'
+include('rac-commons')

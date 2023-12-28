@@ -3,8 +3,10 @@ package pl.mg.rac.simulation.service.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.mg.rac.simulation.model.ApiErrorResponse;
 import pl.mg.rac.simulation.model.SimulationLocation;
 import pl.mg.rac.simulation.model.SimulationRent;
+import pl.mg.rac.simulation.service.scenario.model.SimulationResult;
 
 import java.io.IOException;
 import java.net.URI;
@@ -41,8 +43,9 @@ public class RentServiceClient implements ServiceClient {
             SimulationRent rent = objectMapper.readValue(response.body(), SimulationRent.class);
             return Optional.ofNullable(rent);
         } else {
-            log.debug(response.body());
-            return Optional.empty();
+            log.debug("Invalid rent: " + response.statusCode() + " body: " + response.body());
+            ApiErrorResponse error = objectMapper.readValue(response.body(), ApiErrorResponse.class);
+            return Optional.of(new SimulationRent(null, "RENT_FAILED", username, vin, error.getMessage()));
         }
     }
 
@@ -70,7 +73,7 @@ public class RentServiceClient implements ServiceClient {
         }
     }
 
-    public void returnCar(String rentId) throws IOException, URISyntaxException, InterruptedException {
+    public SimulationResult returnCar(String rentId) throws IOException, URISyntaxException, InterruptedException {
         log.debug("returnCar() called with: rentId = [" + rentId + "]");
 
         //TODO use spring cloud feign client
@@ -82,6 +85,11 @@ public class RentServiceClient implements ServiceClient {
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         log.debug("status code: " + response.statusCode());
         log.debug(response.body());
+        if (response.statusCode() == 201) {
+            return new SimulationResult(RentServiceClient.class.getName(), true, "Car returned");
+        } else {
+            return new SimulationResult(RentServiceClient.class.getName(), false, "Car not returned");
+        }
     }
 
     private record RentCarCommand(String username, String vin, SimulationLocation location) {

@@ -40,7 +40,7 @@ public class CarCommandController {
     }
 
     @DeleteMapping(value = "/{vin}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String vin) throws CarAlreadyNotExistException, CarRentedException {
+    public ResponseEntity<Void> deleteCar(@PathVariable String vin) throws CarAlreadyNotExistException, CarRentedException {
         log.debug("deleteUser() called with: vin = [" + vin + "]");
         DeleteCarResponse response = carFacade.deleteCar(new DeleteCarCommand(vin));
         return ResponseEntity.noContent().build();
