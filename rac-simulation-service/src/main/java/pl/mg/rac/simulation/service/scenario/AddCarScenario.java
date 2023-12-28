@@ -6,6 +6,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import pl.mg.rac.simulation.model.SimulationCar;
 import pl.mg.rac.simulation.model.SimulationLocation;
+import pl.mg.rac.simulation.persistence.SimulationScenarioEntity;
 import pl.mg.rac.simulation.persistence.SimulationScenarioRepository;
 import pl.mg.rac.simulation.service.client.CarServiceClient;
 import pl.mg.rac.simulation.service.scenario.model.SimulationResult;

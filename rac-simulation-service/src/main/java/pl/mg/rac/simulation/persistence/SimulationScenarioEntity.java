@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class SimulationScenarioEntity {
 
     @Id
-    public Long id;
+    public String id;
 
     private final Long scenarioId;
     private final String scenarioType;

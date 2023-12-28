@@ -59,10 +59,15 @@ public class RentCarScenario implements SimulationScenario {
                 }
                 rentOpt = rentServiceClient.rentCar(randomUser.get().getName(), randomCar.get().getVin(), randomCar.get().getLocation());
                 if (rentOpt.isEmpty()) {
-                    log.debug("execute() RentCarScenario rent is empty");
+                    log.debug("execute() RentCarScenario cannot rent car");
                     result = new SimulationResult(RentCarScenario.class.getName(), false, "rent is empty");
+                } else if (rentOpt.get().getStatus().equals("RENT_FAILED")) {
+                    log.debug("execute() RentCarScenario cannot rent car");
+                    result = new SimulationResult(RentCarScenario.class.getName(), false, "rent failed: " + rentOpt.get().getStatusReason());
                 } else {
+
                     SimulationRent rent = rentOpt.get();
+                    //wait for rent to be accepted
                     for (int i = 0; i < 10; i++) {
                         Thread.sleep(2000);
                         Optional<SimulationRent> rCheck = rentServiceClient.getRent(rent.getRentId());
@@ -81,7 +86,7 @@ public class RentCarScenario implements SimulationScenario {
                     }
                     SecureRandom secureRandom = new SecureRandom();
                     //sent location updates with random probability - between 1 and 4 seconds
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 4; i++) {
                         Thread.sleep((long) (secureRandom.nextDouble() * 3000 + 1000));
                         locationServiceClient.publishCarLocation(randomCar.get().getVin(),
                                 SimulationLocation.randomOfOtherLocation(randomCar.get().getLocation(), 2));
