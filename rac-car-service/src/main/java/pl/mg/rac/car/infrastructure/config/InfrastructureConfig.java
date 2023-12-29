@@ -4,6 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 import pl.mg.rac.car.application.facade.CarFacade;
 import pl.mg.rac.car.application.port.out.CarDatabase;
 import pl.mg.rac.car.application.port.out.CarEventPublisher;
@@ -90,4 +94,20 @@ public class InfrastructureConfig {
         return new ReturnSuccessAdapter(carDatabase());
     }
 
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
+        KafkaTemplate<String, Object> stringStringKafkaTemplate = new KafkaTemplate<>(producerFactory);
+        stringStringKafkaTemplate.setObservationEnabled(true);
+        return stringStringKafkaTemplate;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String>
+    kafkaListenerContainerFactory(ConsumerFactory<String, Object> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.getContainerProperties().setObservationEnabled(true);
+        factory.setConsumerFactory(consumerFactory);
+        return factory;
+    }
 }

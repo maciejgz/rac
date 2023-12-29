@@ -3,6 +3,10 @@ package pl.mg.rac.user.infrastructure.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 import pl.mg.rac.commons.event.RacEvent;
 import pl.mg.rac.user.application.facade.UserFacade;
 import pl.mg.rac.user.application.port.out.UserDatabase;
@@ -94,6 +98,23 @@ public class InfrastructureConfig {
     @Bean
     public EventAdapter<RacEvent<?>> returnSuccessAdapter() {
         return new ReturnSuccessEventAdapter(userDatabase());
+    }
+
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
+        KafkaTemplate<String, Object> stringStringKafkaTemplate = new KafkaTemplate<>(producerFactory);
+        stringStringKafkaTemplate.setObservationEnabled(true);
+        return stringStringKafkaTemplate;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String>
+    kafkaListenerContainerFactory(ConsumerFactory<String, Object> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.getContainerProperties().setObservationEnabled(true);
+        factory.setConsumerFactory(consumerFactory);
+        return factory;
     }
 
 }

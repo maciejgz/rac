@@ -22,9 +22,9 @@ public class UserQueryController {
         this.userFacade = userFacade;
     }
 
-
     @GetMapping(value = "/random")
     public ResponseEntity<UserResponse> getRandomUser() throws UserSearchException, UserNotFoundException {
+        log.info("getRandomUser() called");
         UserResponse user = userFacade.getRandomUser();
         return ResponseEntity.ok(user);
     }
@@ -36,7 +36,7 @@ public class UserQueryController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Void> handleException(UserNotFoundException e) {
+    public ResponseEntity<Void> handleException(UserNotFoundException ignoredE) {
         return ResponseEntity.notFound().build();
     }
 

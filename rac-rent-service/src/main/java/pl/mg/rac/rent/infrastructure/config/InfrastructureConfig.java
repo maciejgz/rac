@@ -2,6 +2,10 @@ package pl.mg.rac.rent.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import pl.mg.rac.commons.event.RacEvent;
@@ -134,6 +138,23 @@ public class InfrastructureConfig {
     @Bean
     public EventAdapter<RacEvent<?>> returnFailedLocationAdapter() {
         return new ReturnFailedLocationEventAdapter(rentDatabase());
+    }
+
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
+        KafkaTemplate<String, Object> stringStringKafkaTemplate = new KafkaTemplate<>(producerFactory);
+        stringStringKafkaTemplate.setObservationEnabled(true);
+        return stringStringKafkaTemplate;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String>
+    kafkaListenerContainerFactory(ConsumerFactory<String, Object> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.getContainerProperties().setObservationEnabled(true);
+        factory.setConsumerFactory(consumerFactory);
+        return factory;
     }
 
 
