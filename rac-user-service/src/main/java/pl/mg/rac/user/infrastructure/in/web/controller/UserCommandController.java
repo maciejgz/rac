@@ -33,6 +33,7 @@ public class UserCommandController {
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserCommand command) throws UserRegistrationException, URISyntaxException {
         log.debug("createUser() called with: command = [" + command + "]");
         CreateUserResponse user = userFacade.createUser(command);
+
         return ResponseEntity.created(new URI("/user/" + user.name())).body(user);
     }
 

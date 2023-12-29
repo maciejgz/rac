@@ -257,6 +257,12 @@ dashboards in Grafana.
 All the required components are deployed in the docker containers.
 Grafana is available in the browser under http://localhost:9091/ with admin/admin credentials.
 
+### Tracing
+
+Tracing is based on Zipkin. Each service has a Zipkin agent that sends traces to the Zipkin server. The same trace ID is
+used for all the events and HTTP requests related to the same user request.
+Kafka events contains header `traceparent` with the trace ID formatted as `00-<trace-id>-<span-id>-<trace-flags>` (like `00-fe6938c57a2d70d8f85f1373c26c39b0-638a54064ebea9f0-01`)
+
 ## Build and run
 
 ### Build
