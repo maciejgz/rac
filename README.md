@@ -303,14 +303,17 @@ Then run all the Spring Boot services with the following command in the root rep
 
 ### Tests
 
-Test were written for the first 3 levels of the tests pyramid. 
+Test were written for the first 3 levels of the tests pyramid partially and only for the rac-user-service - for test
+purposes.
+
 - Unit tests are written with JUnit 5 and Mockito.
-- Integration tests are written with Spring Boot Test and Testcontainers.
+- Integration tests are written with Spring Boot Test and Testcontainers (Kafka MongoDB).
 - Contract tests are written with Spring Cloud Contract
-https://martinfowler.com/articles/practical-test-pyramid.html
-https://medium.com/@dees3g/microservices-testing-types-a-guide-to-unit-integration-contract-and-end-to-end-testing-ab56be8b94c#d040
+  https://martinfowler.com/articles/practical-test-pyramid.html
+  https://medium.com/@dees3g/microservices-testing-types-a-guide-to-unit-integration-contract-and-end-to-end-testing-ab56be8b94c#d040
 
 #### Unit tests
+
 Run unit tests with the following command in the root repository directory:
 
 ```shell
@@ -318,13 +321,15 @@ Run unit tests with the following command in the root repository directory:
 ```
 
 #### Integration tests
-Run integration tests with the following command in the root repository directory:
+
+Run integration tests with Docker running and Testcontainers and the following command in the root repository directory:
 
 ```shell
 .\gradle.bat integrationTest
 ```
 
 #### Contract tests
+
 Run contract tests with the following command in the root repository directory:
 
 ```shell
