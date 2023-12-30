@@ -1,14 +1,14 @@
-package pl.mg.rac.user;
+package pl.mg.rac.user.unit;
 
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SampleClassTest {
+class SampleUnitTest {
 
     @Test
-    void test() {
+    void sampleUnitTest() {
         System.out.println("Hello from user-service");
         assertTrue(true);
     }

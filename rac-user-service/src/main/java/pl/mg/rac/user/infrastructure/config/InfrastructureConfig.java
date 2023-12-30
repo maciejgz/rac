@@ -14,7 +14,6 @@ import pl.mg.rac.user.application.port.out.UserEventPublisher;
 import pl.mg.rac.user.application.service.EventApplicationService;
 import pl.mg.rac.user.application.service.UserApplicationService;
 import pl.mg.rac.user.application.service.event.*;
-import pl.mg.rac.user.domain.service.UserDomainService;
 import pl.mg.rac.user.infrastructure.out.messaging.UserKafkaEventPublisher;
 import pl.mg.rac.user.infrastructure.out.persistence.UserJpaRepository;
 import pl.mg.rac.user.infrastructure.out.persistence.UserRepository;
@@ -43,19 +42,13 @@ public class InfrastructureConfig {
     //application services
     @Bean
     UserApplicationService userApplicationService() {
-        return new UserApplicationService(userDomainService(), userEventPublisher(), userDatabase());
+        return new UserApplicationService(userEventPublisher(), userDatabase());
     }
 
     @Bean
     @Lazy
     EventApplicationService eventApplicationService(Map<String, EventAdapter<RacEvent<?>>> eventAdapters) {
         return new EventApplicationService(eventAdapters);
-    }
-
-    //domain service
-    @Bean
-    UserDomainService userDomainService() {
-        return new UserDomainService();
     }
 
     //outgoing port adapters
