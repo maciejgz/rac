@@ -261,7 +261,8 @@ Grafana is available in the browser under http://localhost:9091/ with admin/admi
 
 Tracing is based on Zipkin. Each service has a Zipkin agent that sends traces to the Zipkin server. The same trace ID is
 used for all the events and HTTP requests related to the same user request.
-Kafka events contains header `traceparent` with the trace ID formatted as `00-<trace-id>-<span-id>-<trace-flags>` (like `00-fe6938c57a2d70d8f85f1373c26c39b0-638a54064ebea9f0-01`)
+Kafka events contains header `traceparent` with the trace ID formatted as `00-<trace-id>-<span-id>-<trace-flags>` (
+like `00-fe6938c57a2d70d8f85f1373c26c39b0-638a54064ebea9f0-01`)
 
 ## Build and run
 
@@ -299,3 +300,39 @@ the [docker](docker) directory:
 ```
 
 Then run all the Spring Boot services with the following command in the root repository directory.
+
+### Tests
+
+Test were written for the first 3 levels of the tests pyramid partially and only for the rac-user-service - as a POC.
+
+- Unit tests are written with JUnit 5 and Mockito - https://junit.org/junit5/, https://site.mockito.org/
+- Integration tests are written with Spring Boot Test and Testcontainers (Kafka, MongoDB) - https://www.testcontainers.org/
+- Contract tests are written with Spring Cloud Contract - https://spring.io/projects/spring-cloud-contract/
+- Resources:
+  - https://martinfowler.com/articles/practical-test-pyramid.html
+  - https://medium.com/@dees3g/microservices-testing-types-a-guide-to-unit-integration-contract-and-end-to-end-testing-ab56be8b94c#d040
+
+#### Unit tests
+
+Run unit tests with the following command in the root repository directory:
+
+```shell
+.\gradle.bat test
+```
+
+#### Integration tests
+
+Run integration tests with Docker running and Testcontainers and the following command in the root repository directory:
+
+```shell
+.\gradle.bat integrationTest
+```
+
+#### Contract tests
+
+To be done.
+Run contract tests with the following command in the root repository directory:
+
+```shell
+.\gradle.bat contractTest
+```

@@ -20,7 +20,6 @@ import pl.mg.rac.user.application.port.out.UserEventPublisher;
 import pl.mg.rac.user.domain.exception.UserNotExistException;
 import pl.mg.rac.user.domain.factory.UserFactory;
 import pl.mg.rac.user.domain.model.User;
-import pl.mg.rac.user.domain.service.UserDomainService;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,12 +30,10 @@ import java.util.Optional;
 @Slf4j
 public class UserApplicationService implements CreateUserPort, DeleteUserPort, ChargeUserPort, GetUserPort, GetRandomUserPort, BlockUserPort, UnblockUserPort {
 
-    private final UserDomainService userDomainService;
     private final UserEventPublisher userEventPublisher;
     private final UserDatabase userDatabase;
 
-    public UserApplicationService(UserDomainService userDomainService, UserEventPublisher userEventPublisher, UserDatabase userDatabase) {
-        this.userDomainService = userDomainService;
+    public UserApplicationService(UserEventPublisher userEventPublisher, UserDatabase userDatabase) {
         this.userEventPublisher = userEventPublisher;
         this.userDatabase = userDatabase;
     }

@@ -47,11 +47,11 @@ public class UserFacade {
         return chargeUserAdapter.chargeUser(command);
     }
 
-    public UserResponse getUser(GetUserQuery query) throws UserSearchException, UserNotFoundException {
+    public UserResponse getUser(GetUserQuery query) throws UserNotFoundException {
         return getUserAdapter.getUser(query);
     }
 
-    public UserResponse getRandomUser() throws UserSearchException, UserNotFoundException {
+    public UserResponse getRandomUser() throws UserNotFoundException {
         return getRandomUserAdapter.getRandomUser();
     }
 

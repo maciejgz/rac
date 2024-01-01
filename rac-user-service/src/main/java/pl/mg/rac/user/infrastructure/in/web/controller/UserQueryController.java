@@ -4,9 +4,7 @@ package pl.mg.rac.user.infrastructure.in.web.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.mg.rac.commons.api.dto.ApiError;
 import pl.mg.rac.user.application.dto.exception.UserNotFoundException;
-import pl.mg.rac.user.application.dto.exception.UserSearchException;
 import pl.mg.rac.user.application.dto.query.GetUserQuery;
 import pl.mg.rac.user.application.dto.response.UserResponse;
 import pl.mg.rac.user.application.facade.UserFacade;
@@ -23,14 +21,14 @@ public class UserQueryController {
     }
 
     @GetMapping(value = "/random")
-    public ResponseEntity<UserResponse> getRandomUser() throws UserSearchException, UserNotFoundException {
+    public ResponseEntity<UserResponse> getRandomUser() throws UserNotFoundException {
         log.info("getRandomUser() called");
         UserResponse user = userFacade.getRandomUser();
         return ResponseEntity.ok(user);
     }
 
     @GetMapping(value = "/{name}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable String name) throws UserSearchException, UserNotFoundException {
+    public ResponseEntity<UserResponse> getUser(@PathVariable String name) throws UserNotFoundException {
         UserResponse user = userFacade.getUser(new GetUserQuery(name));
         return ResponseEntity.ok(user);
     }
@@ -38,11 +36,6 @@ public class UserQueryController {
     @ExceptionHandler
     public ResponseEntity<Void> handleException(UserNotFoundException ignoredE) {
         return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ApiError> handleException(UserSearchException e) {
-        return ResponseEntity.badRequest().body(new ApiError(e.getMessage(), e.getStackTrace()));
     }
 
 }

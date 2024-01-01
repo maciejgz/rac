@@ -6,6 +6,7 @@ import pl.mg.rac.user.application.service.event.EventAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
+
 @Slf4j
 public class EventApplicationService {
 

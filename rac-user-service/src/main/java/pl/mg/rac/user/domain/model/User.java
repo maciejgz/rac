@@ -22,20 +22,16 @@ import java.util.List;
 public class User {
 
     private String id;
-    private String name;
+    private final String name;
     private BigDecimal balance;
-    private Location location;
+    private final Location location;
     private String currentRentId;
     private boolean blocked = false;
-    private LocalDate registrationDate;
+    private final LocalDate registrationDate;
 
 
     @Transient
     private final List<RacEvent<? extends RacEventPayload>> events;
-
-    private User() {
-        this.events = new ArrayList<>();
-    }
 
     public User(String id, String name, BigDecimal balance, Location location, String currentRentId, LocalDate registrationDate, boolean blocked) {
         this.id = id;
@@ -109,7 +105,7 @@ public class User {
     }
 
     public void cancelRent() {
-        //nothing to do here yet
+        this.currentRentId = null;
     }
 
 }
