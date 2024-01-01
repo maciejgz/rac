@@ -13,7 +13,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -35,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-class UserCommandControllerTest {
+class UserCommandTest {
 
     @LocalServerPort
     private int port;
@@ -53,7 +52,6 @@ class UserCommandControllerTest {
     private TestRestTemplate restTemplate;
 
     //kafka
-    private EmbeddedKafkaBroker embeddedKafkaBroker;
     private Consumer<String, Object> consumer;
 
     @DynamicPropertySource
@@ -64,12 +62,8 @@ class UserCommandControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Start the embedded Kafka broker
-        embeddedKafkaBroker = new EmbeddedKafkaBroker(1);
-        embeddedKafkaBroker.afterPropertiesSet();
-
         // Create a Kafka consumer
-        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafkaBroker);
+        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps(kafka.getBootstrapServers(), "testGroup", "true");
         consumer = new DefaultKafkaConsumerFactory<>(consumerProps, new StringDeserializer(), new JsonDeserializer<>()).createConsumer();
         consumer.subscribe(Collections.singletonList(KafkaTopicConfig.RAC_USER_TOPIC)); // Replace with your topic name
     }
@@ -78,12 +72,10 @@ class UserCommandControllerTest {
     void tearDown() {
         // Close the consumer and the embedded Kafka broker
         consumer.close();
-        embeddedKafkaBroker.destroy();
     }
 
     @Test
     public void registerUserTest() {
-        //Start listening to Kafka topic
         // Consume the message from Kafka in a separate thread
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Queue<String>> futureEvents = executorService.submit(kafkaClientTask);
@@ -91,6 +83,7 @@ class UserCommandControllerTest {
         //create user in user-service
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
 
         String body = """
                 {
@@ -123,8 +116,7 @@ class UserCommandControllerTest {
             Queue<String> events = futureEvents.get();
             assertEquals(1, events.size());
             // Now 'events' contains the list of events generated
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        } catch (InterruptedException | ExecutionException ignored) {
         }
         executorService.shutdown();
     }
