@@ -330,6 +330,7 @@ Run integration tests with Docker running and Testcontainers and the following c
 
 #### Contract tests
 
+To be done.
 Run contract tests with the following command in the root repository directory:
 
 ```shell
