@@ -76,9 +76,11 @@ tasks.register('integrationTest', Test) {
     include '**/integration/**'
     shouldRunAfter test
 }
+
 tasks.register('contractTest', Test) {
     useJUnitPlatform()
     include '**/contract/**'
     shouldRunAfter test
 }
+
 

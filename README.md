@@ -305,9 +305,9 @@ Then run all the Spring Boot services with the following command in the root rep
 
 Test were written for the first 3 levels of the tests pyramid partially and only for the rac-user-service - as a POC.
 
-- Unit tests are written with JUnit 5 and Mockito.
-- Integration tests are written with Spring Boot Test and Testcontainers (Kafka, MongoDB).
-- Contract tests are written with Spring Cloud Contract
+- Unit tests are written with JUnit 5 and Mockito - https://junit.org/junit5/, https://site.mockito.org/
+- Integration tests are written with Spring Boot Test and Testcontainers (Kafka, MongoDB) - https://www.testcontainers.org/
+- Contract tests are written with Spring Cloud Contract - https://spring.io/projects/spring-cloud-contract/
 - Resources:
   - https://martinfowler.com/articles/practical-test-pyramid.html
   - https://medium.com/@dees3g/microservices-testing-types-a-guide-to-unit-integration-contract-and-end-to-end-testing-ab56be8b94c#d040
